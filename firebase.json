@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "clairo",
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".github",
+      "*.yml"
+    ]
+  }
+}
