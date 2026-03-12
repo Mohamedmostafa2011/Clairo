@@ -111,6 +111,27 @@
   .nav-logo img { height: 38px; filter: drop-shadow(0 0 10px var(--bio-glow)); }
   .nav-right { display:flex; align-items:center; gap:12px; }
 
+  /* Social icons in nav */
+  .nav-socials {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-social-link {
+    display: flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    color: var(--text-sub);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 15px;
+  }
+  .nav-social-link:hover { color: var(--text); border-color: var(--glass-border); transform: translateY(-2px); }
+  .nav-social-link.yt:hover  { background: rgba(255,0,0,0.15); border-color: rgba(255,0,0,0.3); color: #ff4444; box-shadow: 0 4px 16px rgba(255,0,0,0.2); }
+  .nav-social-link.fb:hover  { background: rgba(24,119,242,0.15); border-color: rgba(24,119,242,0.3); color: #4a9eff; box-shadow: 0 4px 16px rgba(24,119,242,0.2); }
+  .nav-social-link.ig:hover  { background: rgba(225,48,108,0.15); border-color: rgba(225,48,108,0.3); color: #f77ab3; box-shadow: 0 4px 16px rgba(225,48,108,0.2); }
+
   /* Theme Toggle */
   .theme-btn {
     width: 52px; height: 28px;
@@ -329,7 +350,7 @@
     position: relative; z-index: 1;
     display: flex; gap: 16px; flex-wrap: wrap;
     justify-content: center;
-    padding: 20px 24px 80px;
+    padding: 20px 24px 60px;
     animation: fadeUp 0.9s ease 0.5s both;
   }
   .feat {
@@ -348,6 +369,78 @@
   .feat-bio { background: var(--bio); }
   .feat-chem { background: var(--chem); }
   .feat-both { background: linear-gradient(90deg, var(--bio), var(--chem)); }
+
+  /* ── SOCIAL SECTION ── */
+  .social-section {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 20px;
+    padding: 0 24px 80px;
+    animation: fadeUp 0.9s ease 0.6s both;
+  }
+  .social-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-sub);
+    opacity: 0.6;
+  }
+  .social-links {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .social-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 22px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 100px;
+    backdrop-filter: blur(16px);
+    text-decoration: none;
+    color: var(--text-sub);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .social-link::before {
+    content: '';
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+  }
+  .social-link svg {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+  .social-link:hover { transform: translateY(-4px); color: var(--text); }
+  .social-link:hover svg { transform: scale(1.15); }
+  .social-link:hover::before { opacity: 1; }
+
+  /* YouTube */
+  .social-link.yt::before { background: radial-gradient(circle at 50% 100%, rgba(255,0,0,0.12), transparent 70%); }
+  .social-link.yt:hover { border-color: rgba(255,60,60,0.35); box-shadow: 0 12px 40px rgba(255,0,0,0.18); }
+  .social-link.yt svg { color: #ff4444; }
+  /* Facebook */
+  .social-link.fb::before { background: radial-gradient(circle at 50% 100%, rgba(24,119,242,0.12), transparent 70%); }
+  .social-link.fb:hover { border-color: rgba(24,119,242,0.35); box-shadow: 0 12px 40px rgba(24,119,242,0.18); }
+  .social-link.fb svg { color: #4a9eff; }
+  /* Instagram */
+  .social-link.ig::before { background: radial-gradient(circle at 50% 100%, rgba(225,48,108,0.12), transparent 70%); }
+  .social-link.ig:hover { border-color: rgba(225,48,108,0.35); box-shadow: 0 12px 40px rgba(225,48,108,0.18); }
+  .social-link.ig svg { color: #f77ab3; }
+
+  /* Icon-only on mobile, label visible on desktop */
+  .social-link .soc-name {
+    display: inline;
+  }
+  @media(max-width: 480px) {
+    .social-link { padding: 12px 16px; }
+    .social-link .soc-name { display: none; }
+    .social-links { gap: 10px; }
+  }
 
   /* ── FOOTER ── */
   footer {
@@ -384,6 +477,7 @@
   @media(max-width:600px) {
     nav { padding: 14px 20px; }
     .card { width: min(320px, 90vw); }
+    .nav-socials { display: none; }
   }
 </style>
 </head>
@@ -406,6 +500,18 @@
     <img src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png" alt="Clairo"/>
   </div>
   <div class="nav-right">
+    <!-- Social icons in nav -->
+    <div class="nav-socials">
+      <a class="nav-social-link yt" href="https://www.youtube.com/@igclairo" target="_blank" rel="noopener" title="YouTube">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.75 15.5v-7l6.25 3.5-6.25 3.5z"/></svg>
+      </a>
+      <a class="nav-social-link fb" href="https://www.facebook.com/profile.php?id=61583681021853&sk" target="_blank" rel="noopener" title="Facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+      </a>
+      <a class="nav-social-link ig" href="https://www.instagram.com/igclairo" target="_blank" rel="noopener" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      </a>
+    </div>
     <button class="theme-btn" id="themeBtn" title="Toggle Theme">
       <span class="theme-icon"></span>
     </button>
@@ -470,6 +576,29 @@
   <div class="feat"><span class="feat-dot feat-chem"></span> Lab Simulations</div>
   <div class="feat"><span class="feat-dot feat-both"></span> Progress Tracking</div>
   <div class="feat"><span class="feat-dot feat-bio"></span> Free Access</div>
+</div>
+
+<!-- SOCIAL LINKS SECTION -->
+<div class="social-section">
+  <p class="social-label">Follow Clairo</p>
+  <div class="social-links">
+
+    <a class="social-link yt" href="https://www.youtube.com/@igclairo" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.75 15.5v-7l6.25 3.5-6.25 3.5z"/></svg>
+      <span class="soc-name">YouTube</span>
+    </a>
+
+    <a class="social-link fb" href="https://www.facebook.com/profile.php?id=61583681021853&sk" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+      <span class="soc-name">Facebook</span>
+    </a>
+
+    <a class="social-link ig" href="https://www.instagram.com/igclairo" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      <span class="soc-name">Instagram</span>
+    </a>
+
+  </div>
 </div>
 
 <!-- FOOTER -->
