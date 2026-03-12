@@ -1,11 +1,14 @@
 {
-  "hosting": {
-    "site": "clairo",
-    "public": ".",
-    "ignore": [
-      "firebase.json",
-      ".github",
-      "*.yml"
-    ]
-  }
+  "hosting": [
+    {
+      "site": "clairo",
+      "public": ".",
+      "ignore": ["firebase.json", ".github", "*.yml"]
+    },
+    {
+      "site": "igclairo",
+      "public": ".",
+      "ignore": ["firebase.json", ".github", "*.yml"]
+    }
+  ]
 }
