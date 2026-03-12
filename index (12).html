@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clairo — Science Education Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bio: #00ffaa;
+    --chem: #a78bfa;
+    --bio-dim: rgba(0,255,170,0.15);
+    --chem-dim: rgba(167,139,250,0.15);
+    --bio-glow: rgba(0,255,170,0.3);
+    --chem-glow: rgba(167,139,250,0.3);
+    --glass-bg: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.12);
+    --glass-blur: blur(20px);
+    --transition: 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  [data-theme="dark"] {
+    --bg: #08080f;
+    --bg2: #0d0d1f;
+    --text: #f0f0ff;
+    --text-sub: #8888aa;
+    --card-bg: rgba(255,255,255,0.05);
+    --card-border: rgba(255,255,255,0.10);
+    --nav-bg: rgba(8,8,15,0.7);
+    --orb1: rgba(0,255,170,0.12);
+    --orb2: rgba(167,139,250,0.12);
+  }
+
+  [data-theme="light"] {
+    --bg: #f0f4ff;
+    --bg2: #e8eeff;
+    --text: #0a0a2a;
+    --text-sub: #4444aa;
+    --card-bg: rgba(255,255,255,0.55);
+    --card-border: rgba(255,255,255,0.9);
+    --nav-bg: rgba(240,244,255,0.75);
+    --glass-bg: rgba(255,255,255,0.45);
+    --glass-border: rgba(255,255,255,0.8);
+    --orb1: rgba(0,200,130,0.15);
+    --orb2: rgba(140,100,240,0.15);
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  /* ── ANIMATED BG ORBS ── */
+  .bg-orbs {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.7;
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  .orb1 {
+    width: 500px; height: 500px;
+    background: var(--orb1);
+    top: -100px; left: -100px;
+    animation-delay: 0s;
+  }
+  .orb2 {
+    width: 600px; height: 600px;
+    background: var(--orb2);
+    bottom: -150px; right: -150px;
+    animation-delay: -4s;
+  }
+  .orb3 {
+    width: 300px; height: 300px;
+    background: rgba(0,180,255,0.07);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    animation-delay: -8s;
+  }
+  @keyframes drift {
+    0%   { transform: translate(0,0) scale(1); }
+    100% { transform: translate(40px,30px) scale(1.1); }
+  }
+
+  /* ── PARTICLES ── */
+  #particles { position:fixed; inset:0; pointer-events:none; z-index:0; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 40px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--card-border);
+    transition: background var(--transition);
+  }
+  .nav-logo img { height: 38px; filter: drop-shadow(0 0 10px var(--bio-glow)); }
+  .nav-right { display:flex; align-items:center; gap:12px; }
+
+  /* Theme Toggle */
+  .theme-btn {
+    width: 52px; height: 28px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 100px;
+    cursor: pointer;
+    position: relative;
+    backdrop-filter: blur(10px);
+    transition: all var(--transition);
+    display: flex; align-items: center;
+    padding: 0 4px;
+  }
+  .theme-btn::before {
+    content: '';
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bio), var(--chem));
+    position: absolute;
+    left: 4px;
+    transition: transform var(--transition), background var(--transition);
+    box-shadow: 0 0 8px var(--bio-glow);
+  }
+  [data-theme="light"] .theme-btn::before {
+    transform: translateX(24px);
+    background: linear-gradient(135deg, #ffb347, #ff6b6b);
+    box-shadow: 0 0 8px rgba(255,180,70,0.4);
+  }
+  .theme-icon { font-size: 13px; position:absolute; right:6px; opacity:0.7; }
+  [data-theme="dark"] .theme-icon::before { content: '☀️'; }
+  [data-theme="light"] .theme-icon::before { content: '🌙'; }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 100px 24px 60px;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 100px;
+    backdrop-filter: blur(12px);
+    font-size: 13px;
+    color: var(--text-sub);
+    margin-bottom: 32px;
+    animation: fadeDown 0.8s ease both;
+  }
+  .badge-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--bio);
+    box-shadow: 0 0 8px var(--bio);
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.5; transform:scale(1.3); }
+  }
+
+  .hero-logo {
+    width: min(340px, 80vw);
+    margin-bottom: 32px;
+    animation: fadeUp 0.9s ease 0.1s both;
+    filter: drop-shadow(0 0 30px rgba(0,255,170,0.2)) drop-shadow(0 0 60px rgba(167,139,250,0.15));
+    transition: filter var(--transition);
+  }
+  [data-theme="light"] .hero-logo {
+    filter: drop-shadow(0 4px 20px rgba(0,150,100,0.25)) drop-shadow(0 4px 40px rgba(120,80,200,0.2));
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    animation: fadeUp 0.9s ease 0.2s both;
+  }
+  .hero h1 .bio-word { color: var(--bio); }
+  .hero h1 .chem-word { color: var(--chem); }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    color: var(--text-sub);
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    animation: fadeUp 0.9s ease 0.3s both;
+  }
+
+  .hero-author {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin-bottom: 48px;
+    animation: fadeUp 0.9s ease 0.35s both;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── CARDS ── */
+  .cards {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.9s ease 0.4s both;
+  }
+
+  .card {
+    width: 280px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 32px 28px;
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+  }
+  .card::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 24px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .card-bio::before { background: radial-gradient(circle at 50% 0%, var(--bio-dim), transparent 70%); }
+  .card-chem::before { background: radial-gradient(circle at 50% 0%, var(--chem-dim), transparent 70%); }
+
+  .card:hover { transform: translateY(-10px) scale(1.02); }
+  .card-bio:hover { box-shadow: 0 20px 60px var(--bio-glow); border-color: rgba(0,255,170,0.3); }
+  .card-chem:hover { box-shadow: 0 20px 60px var(--chem-glow); border-color: rgba(167,139,250,0.3); }
+  .card:hover::before { opacity: 1; }
+
+  /* Shimmer effect */
+  .card::after {
+    content: '';
+    position: absolute;
+    top: -100%; left: -60%;
+    width: 40%; height: 300%;
+    background: linear-gradient(105deg, transparent, rgba(255,255,255,0.08), transparent);
+    transform: skewX(-15deg);
+    transition: left 0.6s ease;
+  }
+  .card:hover::after { left: 160%; }
+
+  .card-icon {
+    font-size: 2.4rem;
+    margin-bottom: 16px;
+    display: block;
+    filter: drop-shadow(0 0 12px currentColor);
+  }
+  .card-bio .card-icon { color: var(--bio); }
+  .card-chem .card-icon { color: var(--chem); }
+
+  .card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .card-bio h2 { color: var(--bio); }
+  .card-chem h2 { color: var(--chem); }
+
+  .card p {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .card-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .card-bio .card-tag { background: var(--bio-dim); color: var(--bio); }
+  .card-chem .card-tag { background: var(--chem-dim); color: var(--chem); }
+
+  .card-btn {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 100px;
+    border: 1px solid;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: fit-content;
+    text-decoration: none;
+  }
+  .card-bio .card-btn { color: var(--bio); border-color: rgba(0,255,170,0.3); }
+  .card-chem .card-btn { color: var(--chem); border-color: rgba(167,139,250,0.3); }
+  .card-bio .card-btn:hover { background: var(--bio-dim); }
+  .card-chem .card-btn:hover { background: var(--chem-dim); }
+  .card-btn .arrow { transition: transform 0.3s ease; }
+  .card-btn:hover .arrow { transform: translateX(4px); }
+
+  /* ── FEATURES STRIP ── */
+  .features {
+    position: relative; z-index: 1;
+    display: flex; gap: 16px; flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px 24px 80px;
+    animation: fadeUp 0.9s ease 0.5s both;
+  }
+  .feat {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 18px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 100px;
+    backdrop-filter: blur(12px);
+    font-size: 13px;
+    color: var(--text-sub);
+    transition: all 0.3s ease;
+  }
+  .feat:hover { color: var(--text); border-color: var(--glass-border); transform: translateY(-2px); }
+  .feat-dot { width:6px; height:6px; border-radius:50%; }
+  .feat-bio { background: var(--bio); }
+  .feat-chem { background: var(--chem); }
+  .feat-both { background: linear-gradient(90deg, var(--bio), var(--chem)); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid var(--card-border);
+    font-size: 13px;
+    color: var(--text-sub);
+    backdrop-filter: blur(12px);
+  }
+  footer span { color: var(--bio); }
+
+  /* ── SCROLL LINE ── */
+  .scroll-line {
+    position: fixed; top:0; left:0; height:2px; z-index:999;
+    background: linear-gradient(90deg, var(--bio), var(--chem));
+    width: 0%;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px var(--bio-glow);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(30px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity:0; transform:translateY(-20px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:600px) {
+    nav { padding: 14px 20px; }
+    .card { width: min(320px, 90vw); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Scroll progress line -->
+<div class="scroll-line" id="scrollLine"></div>
+
+<!-- BG Effects -->
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png" alt="Clairo"/>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" id="themeBtn" title="Toggle Theme">
+      <span class="theme-icon"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    IGCSE Science Platform · CIE Curriculum
+  </div>
+
+  <img class="hero-logo"
+       src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png"
+       alt="Clairo Logo"/>
+
+  <h1>
+    Master <span class="bio-word">Biology</span><br/>
+    &amp; <span class="chem-word">Chemistry</span>
+  </h1>
+
+  <p class="hero-sub">
+    One platform. Two sciences. Built for IGCSE students who want clarity,
+    depth, and results — from Cairo to the world.
+  </p>
+
+  <p class="hero-author">By Mohamed Mostafa Abdelsalam ⭐️</p>
+
+  <!-- SITE CARDS -->
+  <div class="cards">
+
+    <a class="card card-bio" href="https://ig-bio.vercel.app" target="_blank">
+      <span class="card-icon">🧬</span>
+      <span class="card-tag">CIE 0610</span>
+      <h2>IG-Bio</h2>
+      <p>Audio lectures, smart notes, mind maps, and interactive quizzes for IGCSE Biology.</p>
+      <span class="card-btn">
+        Start Learning <span class="arrow">→</span>
+      </span>
+    </a>
+
+    <a class="card card-chem" href="https://ig-chem.vercel.app" target="_blank">
+      <span class="card-icon">⚗️</span>
+      <span class="card-tag">CIE 0620</span>
+      <h2>IG-Chem</h2>
+      <p>Reaction mechanics, periodic table analysis, smart formulae, and lab simulations for IGCSE Chemistry.</p>
+      <span class="card-btn">
+        Start Reactions <span class="arrow">→</span>
+      </span>
+    </a>
+
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="features">
+  <div class="feat"><span class="feat-dot feat-bio"></span> Audio Lectures</div>
+  <div class="feat"><span class="feat-dot feat-chem"></span> Smart Formulae</div>
+  <div class="feat"><span class="feat-dot feat-both"></span> Mind Maps</div>
+  <div class="feat"><span class="feat-dot feat-bio"></span> Exam Quizzes</div>
+  <div class="feat"><span class="feat-dot feat-chem"></span> Lab Simulations</div>
+  <div class="feat"><span class="feat-dot feat-both"></span> Progress Tracking</div>
+  <div class="feat"><span class="feat-dot feat-bio"></span> Free Access</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>Clairo</span> · Science Education Platform ·
+  By Mohamed Mostafa Abdelsalam ⭐️ · © 2026
+</footer>
+
+<script>
+// ── THEME TOGGLE ──
+const btn = document.getElementById('themeBtn');
+const html = document.documentElement;
+btn.addEventListener('click', () => {
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+});
+
+// ── SCROLL LINE ──
+const scrollLine = document.getElementById('scrollLine');
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const max = document.body.scrollHeight - window.innerHeight;
+  scrollLine.style.width = (max > 0 ? (scrolled / max) * 100 : 0) + '%';
+});
+
+// ── PARTICLES ──
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', () => { resize(); initParticles(); });
+
+function initParticles() {
+  particles = [];
+  const count = Math.floor((W * H) / 18000);
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.5 + 0.3,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      color: Math.random() > 0.5 ? '#00ffaa' : '#a78bfa',
+      alpha: Math.random() * 0.4 + 0.1
+    });
+  }
+}
+initParticles();
+
+function drawParticles() {
+  ctx.clearRect(0, 0, W, H);
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + Math.floor(p.alpha * (isDark ? 180 : 100)).toString(16).padStart(2,'0');
+    ctx.fill();
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0) p.x = W;
+    if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H;
+    if (p.y > H) p.y = 0;
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ── MOUSE PARALLAX on cards ──
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `translateY(-10px) scale(1.02) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+</script>
+</body>
+</html>
