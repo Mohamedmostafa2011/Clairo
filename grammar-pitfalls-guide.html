@@ -1,0 +1,2665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar Pitfalls: The Complete Reference Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap');
+
+  :root {
+    --bg-primary: #050d1a;
+    --bg-secondary: #0a1628;
+    --bg-card: rgba(255,255,255,0.04);
+    --bg-card-hover: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.08);
+    --glass-border-hover: rgba(100,200,255,0.25);
+    --blur: blur(20px);
+    --text-primary: #e8f4ff;
+    --text-secondary: #8aacc8;
+    --text-muted: #4a6880;
+    --accent-blue: #4fc3f7;
+    --accent-cyan: #00e5ff;
+    --accent-purple: #bb86fc;
+    --accent-green: #69f0ae;
+    --accent-red: #ff5252;
+    --accent-orange: #ffab40;
+    --accent-yellow: #ffd740;
+    --neon-glow: 0 0 20px rgba(79,195,247,0.3);
+    --section-colors: #4fc3f7, #bb86fc, #69f0ae, #ffab40, #ff5252, #ffd740, #00e5ff, #f48fb1, #a5d6a7, #ce93d8;
+    --s1: #4fc3f7; --s2: #bb86fc; --s3: #69f0ae; --s4: #ffab40; --s5: #ff5252;
+    --s6: #ffd740; --s7: #00e5ff; --s8: #f48fb1; --s9: #a5d6a7; --s10: #ce93d8;
+    --sidebar-w: 260px;
+    --font-main: 'Space Grotesk', sans-serif;
+    --font-display: 'Playfair Display', serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  [data-theme="light"] {
+    --bg-primary: #e8f4ff;
+    --bg-secondary: #d0e8fa;
+    --bg-card: rgba(255,255,255,0.6);
+    --bg-card-hover: rgba(255,255,255,0.85);
+    --glass-border: rgba(0,0,0,0.08);
+    --text-primary: #0a1628;
+    --text-secondary: #2a4a6a;
+    --text-muted: #5a7a9a;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-main);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* === ANIMATED BACKGROUND BLOBS === */
+  .blob-container {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  }
+  .blob {
+    position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12;
+    animation: blobFloat 18s ease-in-out infinite;
+  }
+  .blob-1 { width:500px;height:500px;background:#4fc3f7;top:-100px;left:-100px;animation-delay:0s; }
+  .blob-2 { width:400px;height:400px;background:#bb86fc;top:30%;right:-80px;animation-delay:4s; }
+  .blob-3 { width:350px;height:350px;background:#69f0ae;bottom:10%;left:20%;animation-delay:8s; }
+  .blob-4 { width:300px;height:300px;background:#ffab40;bottom:-50px;right:30%;animation-delay:12s; }
+
+  @keyframes blobFloat {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(30px,-30px) scale(1.05); }
+    66% { transform: translate(-20px,20px) scale(0.95); }
+  }
+
+  /* === LAYOUT === */
+  .layout { display:flex; min-height:100vh; position:relative; z-index:1; }
+
+  /* === SIDEBAR === */
+  .sidebar {
+    width: var(--sidebar-w);
+    position: fixed; top:0; left:0; height:100vh;
+    background: rgba(5,13,26,0.85);
+    backdrop-filter: var(--blur);
+    border-right: 1px solid var(--glass-border);
+    overflow-y: auto; overflow-x: hidden;
+    z-index: 100;
+    transition: transform 0.3s ease;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-blue) transparent;
+  }
+  .sidebar::-webkit-scrollbar { width:4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius:2px; }
+
+  .sidebar-logo {
+    padding: 20px 16px 12px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .sidebar-logo h2 {
+    font-family: var(--font-display);
+    font-size: 1rem; color: var(--accent-cyan);
+    line-height: 1.3; letter-spacing: 0.02em;
+  }
+  .sidebar-logo span { font-size:0.7rem; color: var(--text-muted); display:block; margin-top:2px; }
+
+  .progress-overview {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .progress-overview label { font-size:0.65rem; color:var(--text-muted); letter-spacing:0.08em; text-transform:uppercase; }
+  .progress-bar-outer {
+    height: 4px; background: rgba(255,255,255,0.08); border-radius:2px; margin-top:6px; overflow:hidden;
+  }
+  .progress-bar-inner {
+    height: 100%; background: linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    border-radius:2px; transition: width 0.5s ease;
+    box-shadow: 0 0 8px var(--accent-cyan);
+  }
+  .progress-text { font-size:0.7rem; color:var(--accent-cyan); margin-top:4px; }
+
+  .sidebar-search {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .sidebar-search input {
+    width:100%; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border);
+    border-radius: 8px; padding: 7px 10px; color: var(--text-primary);
+    font-size: 0.75rem; font-family: var(--font-main); outline:none;
+    transition: border-color 0.2s;
+  }
+  .sidebar-search input:focus { border-color: var(--accent-blue); }
+  .sidebar-search input::placeholder { color: var(--text-muted); }
+
+  .sidebar-nav { padding: 8px 0 20px; }
+  .nav-section-item {
+    display: flex; align-items: center; gap:8px;
+    padding: 7px 16px; cursor: pointer;
+    font-size: 0.75rem; color: var(--text-secondary);
+    transition: all 0.2s; border-left: 2px solid transparent;
+    position: relative;
+  }
+  .nav-section-item:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
+  .nav-section-item.active { color: var(--text-primary); background: rgba(255,255,255,0.06); }
+  .nav-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+  .nav-check { margin-left:auto; font-size:0.65rem; color:var(--accent-green); opacity:0; transition:opacity 0.2s; }
+  .nav-section-item.read .nav-check { opacity:1; }
+
+  /* === MAIN CONTENT === */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex:1; padding: 0 0 80px;
+    min-width: 0;
+  }
+
+  /* === HEADER === */
+  .hero {
+    padding: 60px 40px 50px;
+    background: linear-gradient(135deg, rgba(79,195,247,0.06) 0%, rgba(187,134,252,0.06) 100%);
+    border-bottom: 1px solid var(--glass-border);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(79,195,247,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(187,134,252,0.08) 0%, transparent 60%);
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background: rgba(79,195,247,0.12); border: 1px solid rgba(79,195,247,0.25);
+    border-radius:20px; padding:5px 14px; font-size:0.72rem;
+    color:var(--accent-cyan); letter-spacing:0.06em; text-transform:uppercase;
+    margin-bottom:16px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem,4vw,3.2rem);
+    line-height: 1.1;
+    background: linear-gradient(135deg, #e8f4ff 0%, var(--accent-cyan) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom:12px;
+  }
+  .hero p { color: var(--text-secondary); font-size:0.95rem; max-width:600px; line-height:1.6; }
+  .hero-stats {
+    display:flex; gap:24px; margin-top:24px; flex-wrap:wrap;
+  }
+  .stat-chip {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+    border-radius:10px; padding:10px 16px; text-align:center;
+  }
+  .stat-chip .num { font-size:1.4rem; font-weight:700; color:var(--accent-blue); display:block; }
+  .stat-chip .lbl { font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; }
+
+  /* === CONTROLS BAR === */
+  .controls-bar {
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    padding: 14px 40px;
+    background: rgba(5,13,26,0.5); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+    position: sticky; top:0; z-index:50;
+  }
+  .ctrl-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border);
+    border-radius: 8px; padding: 7px 14px;
+    color: var(--text-secondary); font-size:0.78rem; font-family: var(--font-main);
+    cursor:pointer; transition: all 0.2s;
+  }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.1); color:var(--text-primary); border-color:var(--glass-border-hover); }
+  .ctrl-btn.active { background: rgba(79,195,247,0.15); color:var(--accent-cyan); border-color:rgba(79,195,247,0.3); }
+  .ctrl-search {
+    flex:1; min-width:200px; max-width:320px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+    border-radius:8px; padding:7px 12px; color:var(--text-primary);
+    font-size:0.8rem; font-family:var(--font-main); outline:none;
+    transition: border-color 0.2s;
+  }
+  .ctrl-search:focus { border-color:var(--accent-blue); }
+  .ctrl-search::placeholder { color:var(--text-muted); }
+
+  /* === CONTENT AREA === */
+  .content { padding: 0 40px; }
+
+  /* === CHEAT SHEET === */
+  .cheat-sheet {
+    margin: 32px 0;
+    background: var(--bg-card);
+    backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px; overflow:hidden;
+  }
+  .cheat-sheet-header {
+    padding:18px 24px;
+    background: linear-gradient(135deg, rgba(79,195,247,0.1), rgba(187,134,252,0.1));
+    border-bottom: 1px solid var(--glass-border);
+    display:flex; align-items:center; justify-content:space-between; cursor:pointer;
+  }
+  .cheat-sheet-header h2 { font-family:var(--font-display); font-size:1.3rem; color:var(--accent-cyan); }
+  .cheat-sheet-body { padding:24px; display:none; }
+  .cheat-sheet-body.open { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+  .cheat-card {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+    border-radius:12px; padding:16px;
+  }
+  .cheat-card h4 { font-size:0.8rem; color:var(--accent-blue); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em; }
+  .cheat-card ul { list-style:none; }
+  .cheat-card ul li { font-size:0.78rem; color:var(--text-secondary); padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .cheat-card ul li:last-child { border:none; }
+  .cheat-card ul li strong { color:var(--accent-cyan); }
+
+  /* === SECTION === */
+  .section {
+    margin: 24px 0;
+    background: var(--bg-card);
+    backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px; overflow:hidden;
+    transition: border-color 0.3s;
+  }
+  .section:hover { border-color: var(--glass-border-hover); }
+
+  .section-header {
+    padding: 20px 28px;
+    display:flex; align-items:center; gap:14px;
+    cursor:pointer; user-select:none;
+    border-bottom: 1px solid transparent;
+    transition: background 0.2s;
+  }
+  .section-header:hover { background: rgba(255,255,255,0.03); }
+  .section-header.open { border-bottom-color: var(--glass-border); }
+
+  .section-icon {
+    width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:1.3rem; flex-shrink:0;
+  }
+  .section-title-group { flex:1; min-width:0; }
+  .section-title-group h2 { font-family:var(--font-display); font-size:1.15rem; line-height:1.2; }
+  .section-title-group .section-meta { font-size:0.7rem; color:var(--text-muted); margin-top:3px; }
+  .section-chevron { color:var(--text-muted); font-size:1rem; transition:transform 0.3s; flex-shrink:0; }
+  .section-header.open .section-chevron { transform:rotate(180deg); }
+  .section-read-badge {
+    font-size:0.65rem; background:rgba(105,240,174,0.15);
+    border:1px solid rgba(105,240,174,0.25); color:var(--accent-green);
+    border-radius:6px; padding:3px 8px; flex-shrink:0;
+    display:none;
+  }
+  .section.read .section-read-badge { display:block; }
+
+  .section-body { display:none; }
+  .section-body.open { display:block; }
+
+  /* === TOPIC TABS === */
+  .topic-tabs {
+    display:flex; gap:0; overflow-x:auto; border-bottom:1px solid var(--glass-border);
+    scrollbar-width:none;
+  }
+  .topic-tabs::-webkit-scrollbar { display:none; }
+  .tab-btn {
+    padding:10px 18px; font-size:0.75rem; font-family:var(--font-main);
+    white-space:nowrap; cursor:pointer; border:none; background:transparent;
+    color:var(--text-muted); border-bottom:2px solid transparent;
+    transition:all 0.2s;
+  }
+  .tab-btn:hover { color:var(--text-secondary); }
+  .tab-btn.active { color:var(--accent-cyan); border-bottom-color:var(--accent-cyan); background:rgba(79,195,247,0.05); }
+  .tab-content { display:none; padding:24px 28px; }
+  .tab-content.active { display:block; }
+
+  /* === ACCORDION (sub-topics) === */
+  .accordion { border-radius:12px; overflow:hidden; margin-bottom:10px; border:1px solid var(--glass-border); }
+  .accordion-header {
+    padding:13px 18px; background:rgba(255,255,255,0.04);
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; font-size:0.82rem; font-weight:500;
+    transition:background 0.2s;
+  }
+  .accordion-header:hover { background:rgba(255,255,255,0.07); }
+  .accordion-header .acc-chevron { transition:transform 0.25s; font-size:0.75rem; }
+  .accordion-header.open .acc-chevron { transform:rotate(180deg); }
+  .accordion-body { display:none; padding:18px; background:rgba(0,0,0,0.15); border-top:1px solid var(--glass-border); }
+  .accordion-body.open { display:block; }
+
+  /* === GRAMMAR CARDS === */
+  .rule-box {
+    background:rgba(79,195,247,0.06); border:1px solid rgba(79,195,247,0.15);
+    border-radius:10px; padding:14px; margin:10px 0;
+    font-size:0.82rem; line-height:1.6; color:var(--text-primary);
+  }
+  .rule-box .rule-label { font-size:0.65rem; color:var(--accent-blue); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; font-weight:600; }
+
+  .pitfall-box {
+    background:rgba(255,82,82,0.06); border:1px solid rgba(255,82,82,0.15);
+    border-radius:10px; padding:12px 14px; margin:8px 0; font-size:0.8rem;
+  }
+  .pitfall-box .pitfall-label { font-size:0.63rem; color:var(--accent-red); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:5px; font-weight:600; }
+
+  .example-pair { margin:12px 0; }
+  .example-wrong {
+    background:rgba(255,82,82,0.08); border-left:3px solid var(--accent-red);
+    border-radius:0 8px 8px 0; padding:10px 14px; margin:6px 0;
+    font-family:var(--font-mono); font-size:0.8rem; color:#ff8a80;
+    text-decoration:line-through; text-decoration-color:rgba(255,82,82,0.5);
+  }
+  .example-right {
+    background:rgba(105,240,174,0.08); border-left:3px solid var(--accent-green);
+    border-radius:0 8px 8px 0; padding:10px 14px; margin:6px 0;
+    font-family:var(--font-mono); font-size:0.8rem; color:#b9f6ca;
+  }
+  .example-label { font-size:0.7rem; margin-bottom:3px; font-weight:600; }
+  .example-label.wrong { color:var(--accent-red); }
+  .example-label.right { color:var(--accent-green); }
+  .example-note { font-size:0.75rem; color:var(--text-secondary); margin-top:5px; font-style:italic; }
+
+  .tip-box {
+    background:rgba(255,213,79,0.07); border:1px solid rgba(255,213,79,0.2);
+    border-radius:10px; padding:12px 14px; margin:10px 0;
+    font-size:0.8rem; color:#fff8e1; line-height:1.6;
+  }
+  .tip-box::before { content:'💡 '; }
+
+  .mnemonic-box {
+    background:rgba(187,134,252,0.08); border:1px solid rgba(187,134,252,0.2);
+    border-radius:10px; padding:12px 14px; margin:10px 0;
+    font-size:0.8rem; color:#e1bee7; line-height:1.6;
+  }
+  .mnemonic-box::before { content:'🧠 Mnemonic: '; font-weight:600; color:var(--accent-purple); }
+
+  .exception-box {
+    background:rgba(255,171,64,0.07); border:1px solid rgba(255,171,64,0.2);
+    border-radius:10px; padding:12px 14px; margin:10px 0;
+    font-size:0.8rem; color:#ffe0b2; line-height:1.6;
+  }
+  .exception-box::before { content:'⚠️ Exception: '; font-weight:600; color:var(--accent-orange); }
+
+  .grammar-term {
+    display:inline-block; background:rgba(79,195,247,0.12); border:1px solid rgba(79,195,247,0.25);
+    border-radius:4px; padding:1px 6px; font-family:var(--font-mono); font-size:0.78em;
+    color:var(--accent-cyan); cursor:help; position:relative;
+  }
+
+  /* === QUIZ === */
+  .quiz-section { padding:0 28px 28px; }
+  .quiz-card {
+    background:rgba(255,255,255,0.04); border:1px solid var(--glass-border);
+    border-radius:14px; padding:20px; margin-bottom:14px;
+  }
+  .quiz-q { font-size:0.88rem; color:var(--text-primary); margin-bottom:14px; line-height:1.5; font-weight:500; }
+  .quiz-q span { color:var(--accent-cyan); }
+  .quiz-options { display:flex; flex-direction:column; gap:8px; }
+  .quiz-opt {
+    background:rgba(255,255,255,0.04); border:1px solid var(--glass-border);
+    border-radius:8px; padding:10px 14px; cursor:pointer;
+    font-size:0.8rem; color:var(--text-secondary);
+    transition:all 0.2s; display:flex; align-items:center; gap:8px;
+  }
+  .quiz-opt:hover:not(.answered) { background:rgba(255,255,255,0.08); color:var(--text-primary); border-color:var(--glass-border-hover); }
+  .quiz-opt.correct { background:rgba(105,240,174,0.12); border-color:rgba(105,240,174,0.35); color:#b9f6ca; }
+  .quiz-opt.wrong { background:rgba(255,82,82,0.1); border-color:rgba(255,82,82,0.3); color:#ff8a80; }
+  .quiz-feedback { margin-top:10px; font-size:0.78rem; padding:10px 14px; border-radius:8px; display:none; }
+  .quiz-feedback.show { display:block; }
+  .quiz-feedback.correct-fb { background:rgba(105,240,174,0.1); color:#b9f6ca; border:1px solid rgba(105,240,174,0.2); }
+  .quiz-feedback.wrong-fb { background:rgba(255,82,82,0.08); color:#ff8a80; border:1px solid rgba(255,82,82,0.2); }
+  .quiz-score {
+    text-align:center; padding:16px; background:rgba(79,195,247,0.06);
+    border:1px solid rgba(79,195,247,0.15); border-radius:12px; margin-top:16px; display:none;
+  }
+  .quiz-score.show { display:block; }
+  .quiz-score .score-num { font-size:2rem; font-weight:700; color:var(--accent-cyan); }
+  .quiz-score p { font-size:0.82rem; color:var(--text-secondary); margin-top:6px; }
+
+  /* === FINAL QUIZ === */
+  .final-quiz-wrap { padding:32px 40px; }
+  .final-quiz-wrap h2 { font-family:var(--font-display); font-size:1.8rem; color:var(--accent-cyan); margin-bottom:8px; }
+  .fq-progress { height:5px; background:rgba(255,255,255,0.08); border-radius:3px; margin:16px 0; }
+  .fq-progress-fill { height:100%; background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan)); border-radius:3px; transition:width 0.4s; }
+  .fq-card {
+    background:var(--bg-card); border:1px solid var(--glass-border); border-radius:16px; padding:24px;
+    margin-bottom:16px; backdrop-filter:var(--blur);
+  }
+  .fq-result {
+    text-align:center; padding:40px 24px;
+    background:var(--bg-card); border:1px solid var(--glass-border); border-radius:16px;
+    backdrop-filter:var(--blur); display:none;
+  }
+  .fq-result.show { display:block; }
+  .fq-result .big-score { font-size:4rem; font-weight:900; font-family:var(--font-display); color:var(--accent-cyan); }
+  .fq-result .grade { font-size:1.3rem; color:var(--text-primary); margin:8px 0; }
+  .fq-result p { color:var(--text-secondary); font-size:0.88rem; }
+
+  /* === BACK TO TOP === */
+  .back-top {
+    position:fixed; bottom:28px; right:28px;
+    width:44px;height:44px; border-radius:12px;
+    background:rgba(79,195,247,0.15); border:1px solid rgba(79,195,247,0.3);
+    color:var(--accent-cyan); font-size:1.2rem;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:200; transition:all 0.2s;
+    opacity:0; pointer-events:none;
+    backdrop-filter:var(--blur);
+    box-shadow: var(--neon-glow);
+  }
+  .back-top.visible { opacity:1; pointer-events:all; }
+  .back-top:hover { background:rgba(79,195,247,0.25); transform:translateY(-2px); }
+
+  /* === SECTION COLOR THEMING === */
+  .section[data-s="1"] .section-header { border-left:3px solid var(--s1); }
+  .section[data-s="2"] .section-header { border-left:3px solid var(--s2); }
+  .section[data-s="3"] .section-header { border-left:3px solid var(--s3); }
+  .section[data-s="4"] .section-header { border-left:3px solid var(--s4); }
+  .section[data-s="5"] .section-header { border-left:3px solid var(--s5); }
+  .section[data-s="6"] .section-header { border-left:3px solid var(--s6); }
+  .section[data-s="7"] .section-header { border-left:3px solid var(--s7); }
+  .section[data-s="8"] .section-header { border-left:3px solid var(--s8); }
+  .section[data-s="9"] .section-header { border-left:3px solid var(--s9); }
+  .section[data-s="10"] .section-header { border-left:3px solid var(--s10); }
+
+  .section[data-s="1"] .section-icon { background:rgba(79,195,247,0.12); }
+  .section[data-s="2"] .section-icon { background:rgba(187,134,252,0.12); }
+  .section[data-s="3"] .section-icon { background:rgba(105,240,174,0.12); }
+  .section[data-s="4"] .section-icon { background:rgba(255,171,64,0.12); }
+  .section[data-s="5"] .section-icon { background:rgba(255,82,82,0.12); }
+  .section[data-s="6"] .section-icon { background:rgba(255,215,64,0.12); }
+  .section[data-s="7"] .section-icon { background:rgba(0,229,255,0.12); }
+  .section[data-s="8"] .section-icon { background:rgba(244,143,177,0.12); }
+  .section[data-s="9"] .section-icon { background:rgba(165,214,167,0.12); }
+  .section[data-s="10"] .section-icon { background:rgba(206,147,216,0.12); }
+
+  /* Highlight search matches */
+  .highlight { background:rgba(255,215,64,0.25); border-radius:2px; padding:0 2px; }
+
+  /* Summary table */
+  .summary-table { width:100%; border-collapse:collapse; font-size:0.78rem; margin:12px 0; }
+  .summary-table th { background:rgba(255,255,255,0.07); padding:8px 12px; text-align:left; color:var(--accent-blue); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; }
+  .summary-table td { padding:8px 12px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text-secondary); }
+  .summary-table tr:hover td { background:rgba(255,255,255,0.03); }
+
+  /* Mobile */
+  .hamburger { display:none; position:fixed; top:14px; left:14px; z-index:300; cursor:pointer;
+    background:rgba(5,13,26,0.8); border:1px solid var(--glass-border); border-radius:8px; padding:8px; color:var(--text-primary); }
+  .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:99; }
+
+  @media(max-width:768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.mobile-open { transform: translateX(0); }
+    .sidebar-overlay.active { display:block; }
+    .main { margin-left:0; }
+    .hero { padding:60px 20px 40px; }
+    .content { padding:0 16px; }
+    .controls-bar { padding:12px 16px; }
+    .final-quiz-wrap { padding:24px 16px; }
+    .hamburger { display:flex; }
+    .hero-stats { gap:12px; }
+  }
+
+  /* Print */
+  @media print {
+    .sidebar, .blob-container, .controls-bar, .back-top, .hamburger { display:none !important; }
+    .main { margin-left:0; }
+    .section-body { display:block !important; }
+    .accordion-body { display:block !important; }
+    .tab-content { display:block !important; }
+    body { background:white; color:black; }
+    .section, .accordion, .rule-box, .example-wrong, .example-right { border:1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob-container">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h2>Grammar Pitfalls</h2>
+    <span>Complete Reference Guide</span>
+  </div>
+  <div class="progress-overview">
+    <label>Reading Progress</label>
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="mainProgressBar" style="width:0%"></div></div>
+    <div class="progress-text" id="progressText">0 / 10 sections read</div>
+  </div>
+  <div class="sidebar-search">
+    <input type="text" id="sidebarSearch" placeholder="🔍 Search topics..." oninput="filterNav(this.value)">
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav">
+    <div class="nav-section-item" data-target="cheat" onclick="scrollTo('cheat-sheet-wrap')">
+      <span class="nav-dot" style="background:#4fc3f7"></span> Quick Cheat Sheet
+    </div>
+    <div class="nav-section-item" data-target="s1" onclick="openAndScroll(1)" id="nav-1">
+      <span class="nav-dot" style="background:var(--s1)"></span> 1. Subject-Verb Agreement <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="s2" onclick="openAndScroll(2)" id="nav-2">
+      <span class="nav-dot" style="background:var(--s2)"></span> 2. Pronoun Errors <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="s3" onclick="openAndScroll(3)" id="nav-3">
+      <span class="nav-dot" style="background:var(--s3)"></span> 3. Sentence Structure <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="s4" onclick="openAndScroll(4)" id="nav-4">
+      <span class="nav-dot" style="background:var(--s4)"></span> 4. Verb Tense & Form <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="s5" onclick="openAndScroll(5)" id="nav-5">
+      <span class="nav-dot" style="background:var(--s5)"></span> 5. Punctuation <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="s6" onclick="openAndScroll(6)" id="nav-6">
+      <span class="nav-dot" style="background:var(--s6)"></span> 6. Word Choice / Diction <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="s7" onclick="openAndScroll(7)" id="nav-7">
+      <span class="nav-dot" style="background:var(--s7)"></span> 7. Articles & Determiners <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="s8" onclick="openAndScroll(8)" id="nav-8">
+      <span class="nav-dot" style="background:var(--s8)"></span> 8. Preposition Errors <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="s9" onclick="openAndScroll(9)" id="nav-9">
+      <span class="nav-dot" style="background:var(--s9)"></span> 9. Writing Style <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="s10" onclick="openAndScroll(10)" id="nav-10">
+      <span class="nav-dot" style="background:var(--s10)"></span> 10. Advanced Grammar <span class="nav-check">✓</span>
+    </div>
+    <div class="nav-section-item" data-target="fq" onclick="scrollTo('final-quiz')">
+      <span class="nav-dot" style="background:#ffd740"></span> 🏆 Final Review Quiz
+    </div>
+  </nav>
+</div>
+
+<!-- MAIN -->
+<div class="layout">
+<div class="main">
+
+<div class="hero">
+  <div class="hero-badge">📚 Academic English Mastery</div>
+  <h1>Grammar Pitfalls<br>Complete Reference Guide</h1>
+  <p>Master every grammar trap in academic and formal writing. 10 sections, 100+ rules, interactive quizzes, and memory tricks — all in one place.</p>
+  <div class="hero-stats">
+    <div class="stat-chip"><span class="num">10</span><span class="lbl">Sections</span></div>
+    <div class="stat-chip"><span class="num">100+</span><span class="lbl">Rules</span></div>
+    <div class="stat-chip"><span class="num">200+</span><span class="lbl">Examples</span></div>
+    <div class="stat-chip"><span class="num">60+</span><span class="lbl">Quiz Questions</span></div>
+  </div>
+</div>
+
+<div class="controls-bar">
+  <input class="ctrl-search" type="text" id="globalSearch" placeholder="🔍 Search any rule, word, or topic..." oninput="globalSearchFn(this.value)">
+  <button class="ctrl-btn" onclick="expandAll()">⊞ Expand All</button>
+  <button class="ctrl-btn" onclick="collapseAll()">⊟ Collapse All</button>
+  <button class="ctrl-btn" onclick="toggleDarkMode()" id="themeBtn">☀️ Light Mode</button>
+  <button class="ctrl-btn" onclick="window.print()">🖨️ Print</button>
+</div>
+
+<div class="content">
+
+<!-- CHEAT SHEET -->
+<div class="cheat-sheet" id="cheat-sheet-wrap">
+  <div class="cheat-sheet-header" onclick="toggleCheat()">
+    <h2>⚡ Quick Reference Cheat Sheet</h2>
+    <span id="cheatArrow">▼</span>
+  </div>
+  <div class="cheat-sheet-body" id="cheatBody">
+    <div class="cheat-card">
+      <h4>Subject-Verb Agreement</h4>
+      <ul>
+        <li><strong>Compound "and":</strong> plural verb</li>
+        <li><strong>Or/Nor:</strong> verb matches nearest subject</li>
+        <li><strong>Everyone/each/neither:</strong> singular</li>
+        <li><strong>"The number of":</strong> singular</li>
+        <li><strong>"A number of":</strong> plural</li>
+        <li><strong>Collective nouns:</strong> usually singular</li>
+      </ul>
+    </div>
+    <div class="cheat-card">
+      <h4>Pronoun Cases</h4>
+      <ul>
+        <li><strong>Subject:</strong> I, he, she, we, they, who</li>
+        <li><strong>Object:</strong> me, him, her, us, them, whom</li>
+        <li><strong>Trick:</strong> Remove other nouns to test</li>
+        <li><strong>Reflexive:</strong> only for emphasis/same subject</li>
+        <li><strong>Its/It's:</strong> its = possessive, it's = it is</li>
+      </ul>
+    </div>
+    <div class="cheat-card">
+      <h4>Sentence Errors</h4>
+      <ul>
+        <li><strong>Run-on:</strong> two sentences without punctuation</li>
+        <li><strong>Comma splice:</strong> comma linking two ICs</li>
+        <li><strong>Fragment:</strong> incomplete thought</li>
+        <li><strong>Dangling modifier:</strong> nothing to modify</li>
+        <li><strong>Misplaced modifier:</strong> wrong position</li>
+      </ul>
+    </div>
+    <div class="cheat-card">
+      <h4>Verb Forms</h4>
+      <ul>
+        <li><strong>Subjunctive:</strong> "If I <em>were</em>..."</li>
+        <li><strong>Lay vs Lie:</strong> lay (transitive), lie (intransitive)</li>
+        <li><strong>"Would of":</strong> WRONG — use "would have"</li>
+        <li><strong>Present perfect:</strong> still relevant now</li>
+        <li><strong>Past perfect:</strong> before another past event</li>
+      </ul>
+    </div>
+    <div class="cheat-card">
+      <h4>Punctuation Quick Rules</h4>
+      <ul>
+        <li><strong>Semicolon:</strong> joins 2 independent clauses</li>
+        <li><strong>Colon:</strong> introduces list/explanation</li>
+        <li><strong>Em dash —:</strong> emphasis/interruption</li>
+        <li><strong>Oxford comma:</strong> before final item in series</li>
+        <li><strong>Apostrophe:</strong> possessive + contractions only</li>
+      </ul>
+    </div>
+    <div class="cheat-card">
+      <h4>Confused Word Pairs</h4>
+      <ul>
+        <li><strong>Affect/Effect:</strong> verb/noun (usually)</li>
+        <li><strong>Than/Then:</strong> comparison/time</li>
+        <li><strong>Fewer/Less:</strong> countable/uncountable</li>
+        <li><strong>Imply/Infer:</strong> speaker implies, listener infers</li>
+        <li><strong>Complement/Compliment:</strong> complete/praise</li>
+      </ul>
+    </div>
+    <div class="cheat-card">
+      <h4>Articles at a Glance</h4>
+      <ul>
+        <li><strong>A/An:</strong> first mention, not specific</li>
+        <li><strong>The:</strong> specific/known item</li>
+        <li><strong>Zero article:</strong> plural/uncountable general</li>
+        <li><strong>An hour:</strong> vowel SOUND, not letter</li>
+        <li><strong>The Nile/Alps:</strong> rivers, mountain ranges</li>
+      </ul>
+    </div>
+    <div class="cheat-card">
+      <h4>Common Prepositions</h4>
+      <ul>
+        <li><strong>In time:</strong> years/months/seasons</li>
+        <li><strong>On time:</strong> days/dates</li>
+        <li><strong>At time:</strong> exact hours</li>
+        <li><strong>Different from:</strong> (not "different than")</li>
+        <li><strong>"Between you and me"</strong> — not "I"</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SECTIONS -->
+
+<!-- SECTION 1 -->
+<div class="section" data-s="1" id="section-1">
+  <div class="section-header" onclick="toggleSection(1)">
+    <div class="section-icon">📐</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s1)">Section 1: Subject-Verb Agreement Pitfalls</h2>
+      <div class="section-meta">14 sub-topics · Compound subjects, indefinite pronouns, collective nouns & more</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-1">
+    <div class="topic-tabs" id="tabs-1">
+      <button class="tab-btn active" onclick="showTab(1,'rules')">Rules</button>
+      <button class="tab-btn" onclick="showTab(1,'examples')">Examples</button>
+      <button class="tab-btn" onclick="showTab(1,'quiz')">Quiz</button>
+    </div>
+    <div class="tab-content active" id="tab-1-rules">
+
+      <!-- COMPOUND SUBJECTS -->
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          1.1 Compound Subjects (and, or, nor) <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            Subjects joined by <span class="grammar-term">and</span> take a <strong>plural verb</strong>. Subjects joined by <span class="grammar-term">or</span> or <span class="grammar-term">nor</span> take a verb that agrees with the <strong>nearest subject</strong>.
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">Tom and Sarah is going to the meeting.</div>
+            <div class="example-note">Two subjects joined by "and" → plural needed</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Tom and Sarah are going to the meeting.</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">Neither the students nor the teacher were ready.</div>
+            <div class="example-note">Nearest subject "teacher" is singular</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Neither the students nor the teacher was ready.</div>
+          </div>
+          <div class="mnemonic-box">For "or/nor": think of a SCALE — the verb balances with whichever subject is CLOSEST.</div>
+          <div class="tip-box">Exception: When both subjects are singular, use a singular verb. When both are plural, use a plural verb. The tricky part is when they're mixed!</div>
+        </div>
+      </div>
+
+      <!-- INDEFINITE PRONOUNS -->
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          1.2 Indefinite Pronouns <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            <strong>Always singular:</strong> everyone, everybody, everything, someone, somebody, no one, nobody, nothing, each, either, neither, anyone, anything.<br><br>
+            <strong>Always plural:</strong> both, few, many, several, others.<br><br>
+            <strong>Either singular or plural</strong> (depends on noun after "of"): some, any, none, all, most.
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">Everyone in the classes have submitted their work.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Everyone in the classes has submitted their work.</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct (both valid)</div>
+            <div class="example-right">None of the water is contaminated. (uncountable → singular)</div>
+            <div class="example-right">None of the students were absent. (countable → plural)</div>
+          </div>
+          <div class="mnemonic-box">Remember SENSE: Someone, Everyone, Nobody, Some(one), Each — all singular. Think "one person."</div>
+          <div class="pitfall-box">
+            <div class="pitfall-label">⚠️ Common Pitfall</div>
+            Prepositional phrases trick you: "Each of the <em>students</em>" — ignore "of the students," the subject is still "Each" (singular).
+          </div>
+          <table class="summary-table">
+            <tr><th>Always Singular</th><th>Always Plural</th><th>Either/Or</th></tr>
+            <tr><td>everyone, each, either, neither, nobody, someone</td><td>both, few, many, several</td><td>some, any, none, all, most</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- COLLECTIVE NOUNS -->
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          1.3 Collective Nouns <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            Collective nouns (team, group, committee, jury, audience, family, class, staff) are usually <strong>singular</strong> in American English when acting as a unit. In British English, they can be plural when members act individually.
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ American English</div>
+            <div class="example-right">The team is playing well today. (acting as a unit)</div>
+            <div class="example-label right">✅ British English</div>
+            <div class="example-right">The team are wearing different kits. (acting individually)</div>
+          </div>
+          <div class="tip-box">Key test: Are members acting as ONE unit or as INDIVIDUALS? "The jury has reached a verdict" (unit) vs. "The jury were arguing among themselves" (individuals).</div>
+        </div>
+      </div>
+
+      <!-- INVERTED SENTENCES -->
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          1.4 Inverted Sentences — There is/are, Here is/are <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            In "There is/are" constructions, the subject comes AFTER the verb. Find the real subject and match the verb to it.
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">There is many reasons to study grammar.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">There are many reasons to study grammar.</div>
+            <div class="example-note">Real subject = "reasons" (plural)</div>
+          </div>
+          <div class="mnemonic-box">Flip the sentence: "Many reasons are there" → plural → use "are."</div>
+        </div>
+      </div>
+
+      <!-- THE NUMBER vs A NUMBER -->
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          1.5 "The number of" vs "A number of" <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            <strong>"The number of"</strong> = singular verb (focuses on the number itself)<br>
+            <strong>"A number of"</strong> = plural verb (means "many" or "several")
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">The number of students is increasing every year.</div>
+            <div class="example-right">A number of students are absent today.</div>
+          </div>
+          <div class="mnemonic-box">"THE number" = specific count (singular). "A number" = vague many (plural). THE = one, A = many.</div>
+        </div>
+      </div>
+
+      <!-- SUBJECTS WITH INTERVENING PHRASES -->
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          1.6 Intervening Phrases & "Along with/As well as" <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            Phrases like "along with," "as well as," "together with," "in addition to," and "including" do NOT change the number of the subject. They are parenthetical. Similarly, prepositional phrases between subject and verb do NOT affect agreement.
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">The president, along with his advisors, were briefed.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">The president, along with his advisors, was briefed.</div>
+            <div class="example-note">Real subject = "The president" (singular)</div>
+          </div>
+          <div class="tip-box">Bracket the intervening phrase mentally: "The president [along with his advisors] was briefed." What's left? "The president was." ✓</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">The list of assignments are on the board.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">The list of assignments is on the board.</div>
+            <div class="example-note">Subject = "list" not "assignments"</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AMOUNTS/MONEY/TIME -->
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          1.7 Amounts, Money, Time, Measurements as Subjects <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            When a subject refers to a single unit of time, money, measurement, or amount, use a <strong>singular</strong> verb — even if the noun appears plural.
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Twenty dollars is a reasonable price.</div>
+            <div class="example-right">Three hours is too long to wait.</div>
+            <div class="example-right">Ten miles is a long walk.</div>
+          </div>
+          <div class="tip-box">Think of it as one amount/quantity treated as a single unit. "Twenty dollars" = one sum of money.</div>
+        </div>
+      </div>
+
+      <!-- TITLES AND WORDS-AS-WORDS -->
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          1.8 Titles, Company Names & Words Used as Words <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            Titles of works, names of organizations, and words being referred to as words always take <strong>singular</strong> verbs.
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Harry Potter and the Sorcerer's Stone is my favourite book.</div>
+            <div class="example-right">General Motors has announced new layoffs.</div>
+            <div class="example-right">"Politics" is a difficult word to define.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GERUNDS AND RELATIVE PRONOUNS -->
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          1.9 Gerunds as Subjects & Relative Pronouns (who/which/that) <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            <strong>Gerunds</strong> (-ing forms used as nouns) as subjects always take singular verbs.<br><br>
+            <strong>Relative pronouns</strong> (who, which, that) as subjects take a verb that agrees with their antecedent.
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct (Gerund)</div>
+            <div class="example-right">Swimming every day improves your stamina.</div>
+            <div class="example-right">Writing essays requires careful planning.</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct (Relative Pronoun)</div>
+            <div class="example-right">She is one of those students who excel in exams. (who refers to "students" → plural)</div>
+            <div class="example-right">He is the only student who has submitted early. (who refers to "student" → singular)</div>
+          </div>
+          <div class="pitfall-box">
+            <div class="pitfall-label">⚠️ Pitfall</div>
+            "One of those who" vs "the only one who" — a classic exam trap. "One of those students who work hard" (plural, many work hard). "The only one who works hard" (singular).
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end tab-1-rules -->
+
+    <div class="tab-content" id="tab-1-examples">
+      <table class="summary-table">
+        <tr><th>Structure</th><th>❌ Wrong</th><th>✅ Right</th></tr>
+        <tr><td>A and B</td><td>Tom and Sara is here</td><td>Tom and Sara <strong>are</strong> here</td></tr>
+        <tr><td>A or B (mixed)</td><td>The teacher or students is wrong</td><td>The teacher or students <strong>are</strong> wrong</td></tr>
+        <tr><td>Everyone</td><td>Everyone have a ticket</td><td>Everyone <strong>has</strong> a ticket</td></tr>
+        <tr><td>The number of</td><td>The number of cases are rising</td><td>The number of cases <strong>is</strong> rising</td></tr>
+        <tr><td>A number of</td><td>A number of students has left</td><td>A number of students <strong>have</strong> left</td></tr>
+        <tr><td>There is/are</td><td>There is many errors</td><td>There <strong>are</strong> many errors</td></tr>
+        <tr><td>Money/Time</td><td>Five hours are enough</td><td>Five hours <strong>is</strong> enough</td></tr>
+        <tr><td>Gerund subject</td><td>Running every day improve health</td><td>Running every day <strong>improves</strong> health</td></tr>
+      </table>
+    </div>
+
+    <div class="tab-content" id="tab-1-quiz">
+      <div class="quiz-section" id="quiz-s1">
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">1. Choose the correct verb: "Neither the manager nor the employees _____ been notified."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',0)">A. has</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s1',0)">B. have</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',0)">C. had been</div>
+          </div>
+          <div class="quiz-feedback">Nearest subject = "employees" (plural) → "have"</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">2. "The committee _____ reached a unanimous decision."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',1)">A. has</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',1)">B. have</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',1)">C. were</div>
+          </div>
+          <div class="quiz-feedback">Collective noun acting as unit → singular "has"</div>
+        </div>
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">3. "A number of scientists _____ confirmed the findings."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',2)">A. has</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s1',2)">B. have</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',2)">C. is</div>
+          </div>
+          <div class="quiz-feedback">"A number of" = plural → "have"</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">4. "Each of the answers _____ been verified twice."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',3)">A. has</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',3)">B. have</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',3)">C. were</div>
+          </div>
+          <div class="quiz-feedback">"Each" is always singular → "has"</div>
+        </div>
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">5. "There _____ several mistakes in your report."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',4)">A. is</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s1',4)">B. are</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s1',4)">C. was</div>
+          </div>
+          <div class="quiz-feedback">Inverted sentence: real subject = "mistakes" (plural) → "are"</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s1"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2 -->
+<div class="section" data-s="2" id="section-2">
+  <div class="section-header" onclick="toggleSection(2)">
+    <div class="section-icon">👤</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s2)">Section 2: Pronoun Errors</h2>
+      <div class="section-meta">11 sub-topics · Case, agreement, ambiguity, possessives & more</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-2">
+    <div class="topic-tabs" id="tabs-2">
+      <button class="tab-btn active" onclick="showTab(2,'rules')">Rules</button>
+      <button class="tab-btn" onclick="showTab(2,'examples')">Examples</button>
+      <button class="tab-btn" onclick="showTab(2,'quiz')">Quiz</button>
+    </div>
+    <div class="tab-content active" id="tab-2-rules">
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          2.1 Pronoun Case Errors — I vs Me, Who vs Whom <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            Use <strong>subject pronouns</strong> (I, he, she, we, they, who) as the subject of a verb.<br>
+            Use <strong>object pronouns</strong> (me, him, her, us, them, whom) as objects of verbs or prepositions.
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">Between you and I, this is a mistake. / The letter was for Sara and I.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Between you and me, this is a mistake. / The letter was for Sara and me.</div>
+            <div class="example-note">After prepositions, always use object pronouns</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">Who did you speak to? / To who should I address the letter?</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Whom did you speak to? / To whom should I address the letter?</div>
+          </div>
+          <div class="mnemonic-box">WHO/WHOM test: Replace with he/him. If "him" sounds right → use WHOM. "I spoke to him" → "Whom did I speak to?" ✓</div>
+          <div class="tip-box">Remove other nouns to test: "The award was given to Sara and ___." Remove "Sara and" → "The award was given to me." ✓ Never "I."</div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          2.2 Pronoun-Antecedent Agreement <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            A pronoun must agree with its antecedent in number (singular/plural) and gender. Singular indefinite pronoun antecedents (everyone, each, nobody) traditionally take singular pronouns.
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect (traditional grammar)</div>
+            <div class="example-wrong">Everyone should bring their own pen.</div>
+            <div class="example-label right">✅ Correct (modern/accepted)</div>
+            <div class="example-right">Everyone should bring their own pen. (singular "they" — now widely accepted)</div>
+            <div class="example-right">Every student should bring his or her own pen. (formal traditional)</div>
+          </div>
+          <div class="exception-box">Modern English increasingly accepts "they/their" as singular gender-neutral pronouns for indefinite antecedents. Many style guides (APA, MLA) now endorse this.</div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          2.3 Ambiguous & Vague Pronoun Reference <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            Every pronoun must have a clear, specific antecedent. Avoid "this," "that," "it," and "which" that refer vaguely to a whole idea rather than a specific noun.
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Ambiguous</div>
+            <div class="example-wrong">When Mary met Jane, she was nervous. (Who was nervous?)</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">When Mary met Jane, Mary was nervous.</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Vague reference</div>
+            <div class="example-wrong">He finished the project early. This impressed his boss. (What does "this" refer to?)</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">He finished the project early. This early completion impressed his boss.</div>
+          </div>
+          <div class="tip-box">Quick test: Can you draw an arrow from the pronoun to ONE specific noun? If not, rewrite.</div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          2.4 Reflexive Pronoun Misuse <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            Reflexive pronouns (myself, yourself, himself, herself, itself, ourselves, yourselves, themselves) should ONLY be used for: (1) emphasis, or (2) when the subject and object are the same person.
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">Please send the report to John or myself. / Myself and Tom will attend.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Please send the report to John or me. / Tom and I will attend.</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct uses of reflexive</div>
+            <div class="example-right">She hurt herself. (same subject/object) / I myself wrote this essay. (emphasis)</div>
+          </div>
+          <div class="mnemonic-box">"Myself" is NOT a polite substitute for "me." If you can replace it with "me" or "I," don't use "myself."</div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          2.5 Possessive Pronouns vs. Contractions (its/it's, their/they're, your/you're) <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            Possessive pronouns NEVER use apostrophes: <strong>its, their, your, whose</strong>.<br>
+            Apostrophe versions are CONTRACTIONS (shortened forms): <strong>it's = it is, they're = they are, you're = you are, who's = who is</strong>.
+          </div>
+          <table class="summary-table">
+            <tr><th>Possessive</th><th>Contraction</th><th>Test</th></tr>
+            <tr><td><strong>its</strong> — belonging to it</td><td><strong>it's</strong> = it is / it has</td><td>Expand: "it is" works? Use it's</td></tr>
+            <tr><td><strong>their</strong> — belonging to them</td><td><strong>they're</strong> = they are</td><td>Expand: "they are" works? Use they're</td></tr>
+            <tr><td><strong>your</strong> — belonging to you</td><td><strong>you're</strong> = you are</td><td>Expand: "you are" works? Use you're</td></tr>
+            <tr><td><strong>whose</strong> — belonging to whom</td><td><strong>who's</strong> = who is / who has</td><td>Expand: "who is" works? Use who's</td></tr>
+          </table>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">The dog wagged it's tail. / Their going to the market.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">The dog wagged its tail. / They're going to the market.</div>
+          </div>
+          <div class="mnemonic-box">ACID test — Apostrophe = Contraction Indicates Deletion. If there's no letter missing, no apostrophe needed.</div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          2.6 Pronoun Shifts & Who vs. That for People <span class="acc-chevron">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="rule-box">
+            <div class="rule-label">Rule</div>
+            Don't switch between "one," "you," and "they" within the same context (pronoun shift).<br><br>
+            Use <strong>who/whom</strong> for people. Use <strong>that/which</strong> for things. <em>That</em> for people is acceptable informally but avoid in formal writing.
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Pronoun shift</div>
+            <div class="example-wrong">If one studies hard, you will succeed and they'll pass their exams.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">If one studies hard, one will succeed and pass one's exams.</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ "That" for people (formal writing)</div>
+            <div class="example-wrong">The student that won the prize is my friend.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">The student who won the prize is my friend.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end tab-2-rules -->
+    <div class="tab-content" id="tab-2-examples">
+      <table class="summary-table">
+        <tr><th>Error Type</th><th>❌ Wrong</th><th>✅ Correct</th></tr>
+        <tr><td>Pronoun case after preposition</td><td>between you and I</td><td>between you and <strong>me</strong></td></tr>
+        <tr><td>Who vs. Whom</td><td>Who did you hire?</td><td><strong>Whom</strong> did you hire?</td></tr>
+        <tr><td>Reflexive misuse</td><td>Call myself if you need help</td><td>Call <strong>me</strong> if you need help</td></tr>
+        <tr><td>its vs it's</td><td>The cat hurt it's paw</td><td>The cat hurt <strong>its</strong> paw</td></tr>
+        <tr><td>Vague "this"</td><td>He worked all night. This made him tired.</td><td>He worked all night. <strong>This exhaustion</strong> showed.</td></tr>
+        <tr><td>Who vs. That</td><td>The teacher that helped me</td><td>The teacher <strong>who</strong> helped me</td></tr>
+      </table>
+    </div>
+    <div class="tab-content" id="tab-2-quiz">
+      <div class="quiz-section" id="quiz-s2">
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">1. "The prize was awarded to Ahmed and ___."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',0)">A. I</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s2',0)">B. me</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',0)">C. myself</div>
+          </div>
+          <div class="quiz-feedback">Object of preposition "to" → use "me." Test: "...to me" ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">2. "___ should I send this application to?"</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',1)">A. Who</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s2',1)">B. Whom</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',1)">C. Whose</div>
+          </div>
+          <div class="quiz-feedback">Test: "I should send it to him/her" → object → Whom ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">3. "The organisation published ___ annual report."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',2)">A. its</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',2)">B. it's</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',2)">C. their</div>
+          </div>
+          <div class="quiz-feedback">"its" = possessive, no apostrophe ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">4. Identify the pronoun error: "The scientist that discovered the vaccine was awarded."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',3)">A. "that" should be "who"</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',3)">B. "that" should be "which"</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s2',3)">C. No error</div>
+          </div>
+          <div class="quiz-feedback">In formal writing, "who" is preferred for people ✓</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section" data-s="3" id="section-3">
+  <div class="section-header" onclick="toggleSection(3)">
+    <div class="section-icon">🏗️</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s3)">Section 3: Sentence Structure Errors</h2>
+      <div class="section-meta">13 sub-topics · Run-ons, fragments, modifiers, parallelism & more</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-3">
+    <div class="topic-tabs"><button class="tab-btn active" onclick="showTab(3,'rules')">Rules</button><button class="tab-btn" onclick="showTab(3,'examples')">Examples</button><button class="tab-btn" onclick="showTab(3,'quiz')">Quiz</button></div>
+    <div class="tab-content active" id="tab-3-rules">
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">3.1 Run-on Sentences & Comma Splices <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>A <strong>run-on sentence</strong> joins two independent clauses with no punctuation at all. A <strong>comma splice</strong> joins them with only a comma. Both are errors.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Run-on</div>
+            <div class="example-wrong">She studied all night she passed the exam easily.</div>
+            <div class="example-label wrong">❌ Comma Splice</div>
+            <div class="example-wrong">She studied all night, she passed the exam easily.</div>
+          </div>
+          <div class="rule-box"><div class="rule-label">Four Fixes</div>
+            1. Period: She studied all night. She passed easily.<br>
+            2. Semicolon: She studied all night; she passed easily.<br>
+            3. Conjunction: She studied all night, so she passed easily.<br>
+            4. Subordinate: Because she studied all night, she passed easily.
+          </div>
+          <div class="mnemonic-box">FANBOYS (For, And, Nor, But, Or, Yet, So) can fix comma splices when added after the comma.</div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">3.2 Sentence Fragments <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>A sentence fragment is an incomplete sentence that is missing a subject, a verb, or both — or is a dependent clause standing alone.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Fragment (missing verb)</div>
+            <div class="example-wrong">The tall student with the red backpack.</div>
+            <div class="example-label wrong">❌ Fragment (dependent clause alone)</div>
+            <div class="example-wrong">Although he studied for hours.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">The tall student with the red backpack arrived late.</div>
+            <div class="example-right">Although he studied for hours, he was not fully prepared.</div>
+          </div>
+          <div class="tip-box">Test: Can it stand alone as a complete thought? Does it have a subject + verb? If not, it's a fragment.</div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">3.3 Dangling Modifiers <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>A dangling modifier has nothing in the sentence to logically modify — the noun it should modify is absent.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Dangling</div>
+            <div class="example-wrong">Walking down the street, the trees were beautiful.</div>
+            <div class="example-note">The trees were not walking!</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Walking down the street, I noticed the beautiful trees.</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Dangling</div>
+            <div class="example-wrong">After finishing the exam, the clock struck noon.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">After I finished the exam, the clock struck noon.</div>
+          </div>
+          <div class="mnemonic-box">The subject closest to the modifier must be the DOER of the modifier's action. Ask: "Who is [modifier action]-ing?"</div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">3.4 Misplaced & Squinting Modifiers <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>A <strong>misplaced modifier</strong> is positioned far from the word it should modify, creating confusion. A <strong>squinting modifier</strong> could modify either the word before it or after it.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Misplaced</div>
+            <div class="example-wrong">She only eats vegetables on Tuesdays. (Does she ONLY eat? or only on Tuesdays?)</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">She eats only vegetables on Tuesdays. / She eats vegetables only on Tuesdays.</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Squinting</div>
+            <div class="example-wrong">Students who study frequently pass exams. (frequently study? or frequently pass?)</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Students who frequently study pass exams. / Students who study pass exams frequently.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">3.5 Faulty Parallelism <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>Items in a series, list, or comparison must be in the same grammatical form. If one element is a noun, all should be nouns. If one is an infinitive, all should be infinitives.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Not parallel</div>
+            <div class="example-wrong">She likes reading, to swim, and jogging.</div>
+            <div class="example-label right">✅ Parallel</div>
+            <div class="example-right">She likes reading, swimming, and jogging. (all -ing gerunds)</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Not parallel (correlative conjunctions)</div>
+            <div class="example-wrong">He is not only intelligent but also he works hard.</div>
+            <div class="example-label right">✅ Parallel</div>
+            <div class="example-right">He is not only intelligent but also hardworking.</div>
+          </div>
+          <div class="mnemonic-box">MATCH THE FORM: noun+noun, verb+verb, -ing+-ing, to+to. Think of it as a grammar symmetry check.</div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">3.6 Faulty Predication & Illogical Comparisons <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div><strong>Faulty predication</strong>: subject and predicate don't make logical sense together. Common with "is when," "is where," "the reason is because."<br><br><strong>Illogical comparison</strong>: comparing unlike things.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Faulty predication</div>
+            <div class="example-wrong">The reason I failed is because I didn't study.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">The reason I failed is that I didn't study. / I failed because I didn't study.</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Illogical comparison</div>
+            <div class="example-wrong">My essay is better than John. (comparing essay to person)</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">My essay is better than John's (essay).</div>
+          </div>
+          <div class="tip-box">Always add "that of" or the possessive form when comparing nouns of the same type: "better than that of John" or "better than John's."</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="tab-content" id="tab-3-examples">
+      <table class="summary-table">
+        <tr><th>Error</th><th>❌ Wrong</th><th>✅ Fixed</th></tr>
+        <tr><td>Run-on</td><td>I came I saw I conquered</td><td>I came, I saw, <strong>and</strong> I conquered.</td></tr>
+        <tr><td>Comma splice</td><td>It rained, we stayed inside</td><td>It rained<strong>; therefore,</strong> we stayed inside.</td></tr>
+        <tr><td>Fragment</td><td>Because of the storm.</td><td><strong>We stayed home</strong> because of the storm.</td></tr>
+        <tr><td>Dangling modifier</td><td>Running late, the bus was missed.</td><td>Running late, <strong>he</strong> missed the bus.</td></tr>
+        <tr><td>Misplaced modifier</td><td>I almost drove to every city.</td><td>I drove to <strong>almost</strong> every city.</td></tr>
+        <tr><td>Faulty parallelism</td><td>To read, writing, and study</td><td><strong>Reading, writing, and studying</strong></td></tr>
+        <tr><td>"Reason is because"</td><td>The reason is because...</td><td>The reason is <strong>that</strong>...</td></tr>
+      </table>
+    </div>
+    <div class="tab-content" id="tab-3-quiz">
+      <div class="quiz-section" id="quiz-s3">
+        <div class="quiz-card" data-correct="2">
+          <div class="quiz-q">1. Identify the error: "After studying for hours, the exam seemed easy."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s3',0)">A. Comma splice</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s3',0)">B. Fragment</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,2,'quiz-s3',0)">C. Dangling modifier</div>
+          </div>
+          <div class="quiz-feedback">The exam didn't study! Fix: "After studying for hours, I found the exam easy."</div>
+        </div>
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">2. Which is parallel? "She enjoys ___."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s3',1)">A. to read, writing, and to dance</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s3',1)">B. reading, writing, and dancing</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s3',1)">C. read, to write, and dancing</div>
+          </div>
+          <div class="quiz-feedback">All gerunds (-ing) = parallel structure ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">3. Fix the error: "His performance is better than Ahmed."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s3',2)">A. "...better than Ahmed's"</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s3',2)">B. "...better than that Ahmed"</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s3',2)">C. No error</div>
+          </div>
+          <div class="quiz-feedback">Comparing "performance" to "performance" → "than Ahmed's (performance)" ✓</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4 -->
+<div class="section" data-s="4" id="section-4">
+  <div class="section-header" onclick="toggleSection(4)">
+    <div class="section-icon">⏱️</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s4)">Section 4: Verb Tense & Form Errors</h2>
+      <div class="section-meta">12 sub-topics · Tense shifts, subjunctive, irregular verbs, active/passive</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-4">
+    <div class="topic-tabs"><button class="tab-btn active" onclick="showTab(4,'rules')">Rules</button><button class="tab-btn" onclick="showTab(4,'examples')">Examples</button><button class="tab-btn" onclick="showTab(4,'quiz')">Quiz</button></div>
+    <div class="tab-content active" id="tab-4-rules">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">4.1 Unnecessary Tense Shifts <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>Once you choose a tense for narrating events, stay in that tense unless there's a logical reason to shift (e.g., an action that happened before the main time frame).</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">She walked into the room and sees everyone staring at her. She stopped and looks around.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">She walked into the room and saw everyone staring at her. She stopped and looked around.</div>
+          </div>
+          <div class="tip-box">Note: Literary present tense is acceptable when discussing literature. "In Hamlet, the prince hesitates to act." This is consistent and intentional.</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">4.2 Past Perfect vs. Simple Past <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>Use <strong>past perfect</strong> (had + past participle) for an action that happened BEFORE another past action. Use <strong>simple past</strong> for a single completed action in the past.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">By the time she arrived, we ate all the food.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">By the time she arrived, we had eaten all the food.</div>
+            <div class="example-note">"had eaten" happened before "arrived"</div>
+          </div>
+          <div class="mnemonic-box">Timeline rule: Earlier action = past perfect. Later action = simple past. "By the time X, Y had already happened."</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">4.3 Present Perfect vs. Simple Past <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div><strong>Simple past</strong>: action completed at a specific time. <strong>Present perfect</strong>: action connected to now (result still relevant, or time unspecified).</div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Simple Past (specific time)</div>
+            <div class="example-right">I finished the assignment yesterday.</div>
+            <div class="example-label right">✅ Present Perfect (ongoing relevance)</div>
+            <div class="example-right">I have finished the assignment. (it's now done, relevant to now)</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Wrong with specific time word</div>
+            <div class="example-wrong">I have visited Paris in 2018.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">I visited Paris in 2018.</div>
+            <div class="example-note">Specific time "in 2018" → simple past</div>
+          </div>
+          <div class="mnemonic-box">Clue words for present perfect: just, already, yet, ever, never, since, for, recently. Clue words for simple past: yesterday, last year, ago, in [year].</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">4.4 Subjunctive Mood (If I were / was) <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>Use the <strong>subjunctive mood</strong> for hypothetical/unreal conditions and formal wishes. "Were" (not "was") is used for all subjects in subjunctive "if" clauses.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect (formal)</div>
+            <div class="example-wrong">If I was you, I would apologize. / I wish I was taller.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">If I were you, I would apologize. / I wish I were taller.</div>
+          </div>
+          <div class="exception-box">In very informal speech, "If I was" is increasingly accepted. But for academic/formal writing, always use "If I were."</div>
+          <div class="mnemonic-box">IF = Imaginary → WERE. "If" + unreal scenario = subjunctive = "were" for all persons.</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">4.5 "Would of" and Conditional Errors <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>"Would of," "could of," "should of," "might of" are ALWAYS WRONG. They are mishearings of "would've," "could've" etc. Always write "would have," "could have," "should have."</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">I would of gone if I had known. / She could of won easily.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">I would have gone if I had known. / She could have won easily.</div>
+          </div>
+          <div class="mnemonic-box">"Would OF" = impossible: "of" is a preposition, not an auxiliary verb. You HAVE done things. You never "of" done things.</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">4.6 Lay vs. Lie, Sit vs. Set, Rise vs. Raise <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <table class="summary-table">
+            <tr><th>Verb</th><th>Meaning</th><th>Past</th><th>Past Participle</th><th>Example</th></tr>
+            <tr><td><strong>lie</strong></td><td>to recline (intransitive — no object)</td><td>lay</td><td>lain</td><td>I lie down. I lay down yesterday.</td></tr>
+            <tr><td><strong>lay</strong></td><td>to place something (transitive — needs object)</td><td>laid</td><td>laid</td><td>Lay the book here. She laid the book down.</td></tr>
+            <tr><td><strong>sit</strong></td><td>to be seated (intransitive)</td><td>sat</td><td>sat</td><td>Sit here. He sat quietly.</td></tr>
+            <tr><td><strong>set</strong></td><td>to put/place (transitive)</td><td>set</td><td>set</td><td>Set the table. She set the cups down.</td></tr>
+            <tr><td><strong>rise</strong></td><td>to go up (intransitive)</td><td>rose</td><td>risen</td><td>The sun rises. It rose at 6am.</td></tr>
+            <tr><td><strong>raise</strong></td><td>to lift something (transitive)</td><td>raised</td><td>raised</td><td>Raise your hand. She raised her hand.</td></tr>
+          </table>
+          <div class="mnemonic-box">LIE = no object (you lie yourself down). LAY = needs object (you lay SOMETHING down). "I lay down" uses past tense of "lie" — the most confusing part!</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">4.7 Active vs. Passive Voice — When to Use Each <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div><strong>Active voice</strong>: subject performs the action → stronger, clearer, more direct. Preferred in most writing.<br><strong>Passive voice</strong>: subject receives the action → use when the doer is unknown, irrelevant, or should be de-emphasized.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Weak passive (when active works better)</div>
+            <div class="example-wrong">The report was written by Ahmed.</div>
+            <div class="example-label right">✅ Better active</div>
+            <div class="example-right">Ahmed wrote the report.</div>
+            <div class="example-label right">✅ Good use of passive</div>
+            <div class="example-right">The suspect was arrested. (doer irrelevant/unknown)</div>
+            <div class="example-right">The experiment was conducted in a controlled environment. (scientific writing convention)</div>
+          </div>
+          <div class="tip-box">Science and law writing often prefer passive. Business and journalism prefer active. Know the context.</div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-4-examples">
+      <table class="summary-table">
+        <tr><th>Error</th><th>❌ Wrong</th><th>✅ Correct</th></tr>
+        <tr><td>Would of</td><td>would of known</td><td>would <strong>have</strong> known</td></tr>
+        <tr><td>Subjunctive</td><td>If I was rich</td><td>If I <strong>were</strong> rich</td></tr>
+        <tr><td>Past perfect</td><td>She left before I came</td><td>She <strong>had left</strong> before I came</td></tr>
+        <tr><td>Tense shift</td><td>He walked in and sees...</td><td>He walked in and <strong>saw</strong>...</td></tr>
+        <tr><td>Lay vs Lie</td><td>She laid down for a nap</td><td>She <strong>lay</strong> down for a nap</td></tr>
+        <tr><td>Present perfect with time</td><td>I have visited in 2020</td><td>I <strong>visited</strong> in 2020</td></tr>
+      </table>
+    </div>
+    <div class="tab-content" id="tab-4-quiz">
+      <div class="quiz-section" id="quiz-s4">
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">1. "If she _____ the CEO, she would change everything."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s4',0)">A. was</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s4',0)">B. were</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s4',0)">C. is</div>
+          </div>
+          <div class="quiz-feedback">Hypothetical/unreal condition → subjunctive → "were" ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">2. "By the time the ambulance arrived, the patient _____ the antidote."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s4',1)">A. had already taken</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s4',1)">B. already took</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s4',1)">C. has taken</div>
+          </div>
+          <div class="quiz-feedback">Action before another past action → past perfect "had already taken" ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="2">
+          <div class="quiz-q">3. "I _____ you if I had known about the problem."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s4',2)">A. would of told</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s4',2)">B. would of have told</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,2,'quiz-s4',2)">C. would have told</div>
+          </div>
+          <div class="quiz-feedback">"Would have" — never "would of" ✓</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s4"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5 -->
+<div class="section" data-s="5" id="section-5">
+  <div class="section-header" onclick="toggleSection(5)">
+    <div class="section-icon">✏️</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s5)">Section 5: Punctuation Pitfalls</h2>
+      <div class="section-meta">Commas, semicolons, colons, apostrophes, dashes & more</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-5">
+    <div class="topic-tabs"><button class="tab-btn active" onclick="showTab(5,'rules')">Rules</button><button class="tab-btn" onclick="showTab(5,'examples')">Examples</button><button class="tab-btn" onclick="showTab(5,'quiz')">Quiz</button></div>
+    <div class="tab-content active" id="tab-5-rules">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">5.1 Comma Rules — All Major Rules <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <table class="summary-table">
+            <tr><th>Rule</th><th>Example</th></tr>
+            <tr><td>After introductory element</td><td>After the exam, <strong>,</strong> we celebrated.</td></tr>
+            <tr><td>Before FANBOYS in compound sentence</td><td>He studied hard<strong>,</strong> but he still failed.</td></tr>
+            <tr><td>Series (Oxford comma)</td><td>I bought bread<strong>,</strong> milk<strong>,</strong> and eggs.</td></tr>
+            <tr><td>Nonrestrictive clause (extra info)</td><td>My teacher<strong>,</strong> who is Egyptian<strong>,</strong> is brilliant.</td></tr>
+            <tr><td>Appositive</td><td>My friend Ahmed<strong>,</strong> a doctor<strong>,</strong> helped me.</td></tr>
+            <tr><td>Coordinate adjectives</td><td>a tall<strong>,</strong> handsome man</td></tr>
+          </table>
+          <div class="pitfall-box"><div class="pitfall-label">⚠️ Forbidden Commas</div>
+            ❌ Between subject and verb: "The tall student, ran fast." <br>
+            ❌ Between verb and object: "She wrote, a long essay." <br>
+            ❌ After "that": "He said, that he was ready." (no comma after "that")
+          </div>
+          <div class="rule-box"><div class="rule-label">Restrictive vs Nonrestrictive</div>
+            <strong>Restrictive</strong> (no commas — essential info): The student <em>who cheated</em> was expelled. (identifies which student)<br>
+            <strong>Nonrestrictive</strong> (commas — extra info): My sister, <em>who lives in London</em>, called me. (sister is already identified)
+          </div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">5.2 Semicolons & Colons <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Semicolon Rules</div>
+            1. Joins two independent clauses: "He studied hard; he still failed."<br>
+            2. Before conjunctive adverbs (however, therefore, moreover): "He worked hard; however, he failed."<br>
+            3. In complex lists (when items contain commas): "We visited Cairo, Egypt; Rome, Italy; and Paris, France."
+          </div>
+          <div class="rule-box"><div class="rule-label">Colon Rules</div>
+            1. Before a list: "Bring these items: pen, paper, and ruler."<br>
+            2. Before an explanation: "There is one reason: laziness."<br>
+            3. After a complete independent clause ONLY — not after "such as," "including," "for example."
+          </div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Wrong colon use</div>
+            <div class="example-wrong">The ingredients include: flour, sugar, and eggs.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">The ingredients include flour, sugar, and eggs. (no colon needed)</div>
+            <div class="example-right">You will need the following: flour, sugar, and eggs. (colon after complete clause)</div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">5.3 Apostrophe Errors <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>
+            Apostrophes have TWO uses: (1) possessives and (2) contractions.<br>
+            NEVER use apostrophes for plural nouns.
+          </div>
+          <table class="summary-table">
+            <tr><th>Case</th><th>Rule</th><th>Example</th></tr>
+            <tr><td>Singular possessive</td><td>Add 's</td><td>Ahmed<strong>'s</strong> book</td></tr>
+            <tr><td>Plural possessive (ends in s)</td><td>Add ' only</td><td>students<strong>'</strong> books</td></tr>
+            <tr><td>Irregular plural</td><td>Add 's</td><td>children<strong>'s</strong> toys</td></tr>
+            <tr><td>Plural noun (not possessive)</td><td>NO apostrophe</td><td>students (❌ student's)</td></tr>
+            <tr><td>Contraction</td><td>Replace missing letter</td><td>don<strong>'t</strong>, it<strong>'s</strong></td></tr>
+          </table>
+          <div class="pitfall-box"><div class="pitfall-label">⚠️ The Grocer's Apostrophe Error</div>
+            Signs like "Apple's for sale" or "CD's available" are WRONG. Never apostrophise simple plurals.
+          </div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">5.4 Dashes — Em Dash, En Dash, Hyphen <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <table class="summary-table">
+            <tr><th>Type</th><th>Length</th><th>Use</th><th>Example</th></tr>
+            <tr><td><strong>Hyphen</strong> -</td><td>Short</td><td>Compound words, word division</td><td>well-known, twenty-one</td></tr>
+            <tr><td><strong>En dash</strong> –</td><td>Medium</td><td>Ranges (numbers, dates), scores</td><td>pages 10–20, June–August</td></tr>
+            <tr><td><strong>Em dash</strong> —</td><td>Long</td><td>Interruption, emphasis, apposition (strong)</td><td>He left—without a word.</td></tr>
+          </table>
+          <div class="example-pair">
+            <div class="example-label right">✅ Em dash examples</div>
+            <div class="example-right">She had one dream—to become a doctor. / The answer—whatever it is—must be found now.</div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">5.5 Quotation Marks & Punctuation Placement <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>
+            In American English: commas and periods go INSIDE quotation marks.<br>
+            In British English: punctuation goes OUTSIDE unless part of the quoted material.<br>
+            Colons and semicolons go OUTSIDE quotation marks in both systems.
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ American</div>
+            <div class="example-right">She said, "I understand." / He called it "extraordinary,"</div>
+            <div class="example-label right">✅ British</div>
+            <div class="example-right">She said 'I understand'. / He called it 'extraordinary'.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-5-examples">
+      <table class="summary-table">
+        <tr><th>Mark</th><th>❌ Wrong</th><th>✅ Correct</th></tr>
+        <tr><td>Comma splice</td><td>I like tea, you like coffee</td><td>I like tea<strong>; </strong>you like coffee.</td></tr>
+        <tr><td>Colon misuse</td><td>I need: a pen, paper</td><td>I need the following<strong>:</strong> a pen, paper</td></tr>
+        <tr><td>Apostrophe in plural</td><td>Three doctor's were present</td><td>Three <strong>doctors</strong> were present</td></tr>
+        <tr><td>Em dash</td><td>She left-without a word.</td><td>She left<strong>—</strong>without a word.</td></tr>
+        <tr><td>Comma before "that"</td><td>She believes, that he's right</td><td>She believes that he's right</td></tr>
+        <tr><td>Oxford comma</td><td>bread, butter and jam</td><td>bread, butter<strong>,</strong> and jam</td></tr>
+      </table>
+    </div>
+    <div class="tab-content" id="tab-5-quiz">
+      <div class="quiz-section" id="quiz-s5">
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">1. Which sentence uses the semicolon correctly?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s5',0)">A. I like coffee; sweet and strong.</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s5',0)">B. He worked hard; therefore, he succeeded.</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s5',0)">C. She bought; bread, milk, and eggs.</div>
+          </div>
+          <div class="quiz-feedback">Semicolon + conjunctive adverb (therefore) between two independent clauses ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="2">
+          <div class="quiz-q">2. "The childrens books were all checked out." — What's the error?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s5',1)">A. Should be "children books"</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s5',1)">B. Should be "childrens' books"</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,2,'quiz-s5',1)">C. Should be "children's books"</div>
+          </div>
+          <div class="quiz-feedback">Irregular plural possessive: children's (add 's after irregular plural) ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">3. Which is the correct use of a colon?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s5',2)">A. She had three goals: to study, to travel, and to succeed.</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s5',2)">B. Her goals included: studying, travel, and success.</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s5',2)">C. She wanted to: study, travel, and succeed.</div>
+          </div>
+          <div class="quiz-feedback">A is correct — the colon follows a complete independent clause ✓</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s5"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6 -->
+<div class="section" data-s="6" id="section-6">
+  <div class="section-header" onclick="toggleSection(6)">
+    <div class="section-icon">📝</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s6)">Section 6: Word Choice / Diction Errors</h2>
+      <div class="section-meta">Commonly confused words, redundancy, clichés, jargon & more</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-6">
+    <div class="topic-tabs"><button class="tab-btn active" onclick="showTab(6,'rules')">Rules</button><button class="tab-btn" onclick="showTab(6,'examples')">Examples</button><button class="tab-btn" onclick="showTab(6,'quiz')">Quiz</button></div>
+    <div class="tab-content active" id="tab-6-rules">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">6.1 Commonly Confused Words — Master List <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <table class="summary-table">
+            <tr><th>Pair</th><th>Difference</th><th>Memory Trick</th></tr>
+            <tr><td><strong>affect / effect</strong></td><td>affect = verb (to influence), effect = noun (result)</td><td>RAVEN: Remember Affect Verb Effect Noun</td></tr>
+            <tr><td><strong>than / then</strong></td><td>than = comparison, then = time sequence</td><td>"than" has an 'a' like "compare"</td></tr>
+            <tr><td><strong>fewer / less</strong></td><td>fewer = countable nouns, less = uncountable</td><td>fewer fingers, less water</td></tr>
+            <tr><td><strong>complement / compliment</strong></td><td>complement = completes something, compliment = praise</td><td>compliment has an 'i' like 'I like you'</td></tr>
+            <tr><td><strong>principal / principle</strong></td><td>principal = main/headmaster, principle = rule/belief</td><td>principAL = pAL (a friend), principLE = ruLE</td></tr>
+            <tr><td><strong>imply / infer</strong></td><td>speakers imply, listeners infer</td><td>Imply = Insert (speaker puts in), Infer = Interpret (listener takes out)</td></tr>
+            <tr><td><strong>emigrate / immigrate</strong></td><td>emigrate = leave a country, immigrate = enter a country</td><td>Exit = Emigrate, Enter = Immigrate</td></tr>
+            <tr><td><strong>ensure / insure / assure</strong></td><td>ensure = make certain, insure = buy insurance, assure = tell confidently</td><td>inSURE = for SURE coverage (insurance policy)</td></tr>
+            <tr><td><strong>continual / continuous</strong></td><td>continual = repeated with breaks, continuous = without interruption</td><td>continuOUS = nON-STOP</td></tr>
+            <tr><td><strong>disinterested / uninterested</strong></td><td>disinterested = impartial/unbiased, uninterested = not interested</td><td>Dis = Different from interested, Un = Not interested</td></tr>
+            <tr><td><strong>elicit / illicit</strong></td><td>elicit = draw out (verb), illicit = illegal (adj)</td><td>Illicit = ILLegal + icit</td></tr>
+            <tr><td><strong>farther / further</strong></td><td>farther = physical distance, further = figurative/degree</td><td>fARther has an A for Actual distance</td></tr>
+            <tr><td><strong>allusion / illusion</strong></td><td>allusion = reference, illusion = false impression</td><td>ilLUSION = iLLUSiON (tricks your eyes)</td></tr>
+            <tr><td><strong>precede / proceed</strong></td><td>precede = come before, proceed = go forward</td><td>pROceed = move foRward</td></tr>
+            <tr><td><strong>cite / site / sight</strong></td><td>cite = quote, site = location, sight = vision</td><td>CITE = quote (writing). SITE = spot. SIGHT = seeing.</td></tr>
+            <tr><td><strong>capital / capitol</strong></td><td>capital = city/money/uppercase, capitol = building where legislature meets</td><td>capitOL = the building (O = round dome)</td></tr>
+            <tr><td><strong>stationary / stationery</strong></td><td>stationary = not moving, stationery = writing paper</td><td>stationERY has ER like papER</td></tr>
+            <tr><td><strong>advice / advise</strong></td><td>advice = noun, advise = verb</td><td>advice/advise like practice/practise (noun/verb)</td></tr>
+            <tr><td><strong>lose / loose</strong></td><td>lose = to not win/find, loose = not tight</td><td>lOOse has too many O's — it's loose!</td></tr>
+            <tr><td><strong>conscience / conscious</strong></td><td>conscience = moral sense, conscious = aware</td><td>consCIOUS → knowleDGE. CONscience → MORAL COIN.</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">6.2 Redundancy & Wordiness <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>Avoid using two words that mean the same thing. Avoid padded phrases when one word will do.</div>
+          <table class="summary-table">
+            <tr><th>Wordy / Redundant</th><th>✅ Concise Version</th></tr>
+            <tr><td>advance planning</td><td>planning</td></tr>
+            <tr><td>completely destroy</td><td>destroy</td></tr>
+            <tr><td>end result</td><td>result</td></tr>
+            <tr><td>each and every</td><td>each / every</td></tr>
+            <tr><td>due to the fact that</td><td>because</td></tr>
+            <tr><td>in spite of the fact that</td><td>although</td></tr>
+            <tr><td>at this point in time</td><td>now</td></tr>
+            <tr><td>in the event that</td><td>if</td></tr>
+            <tr><td>a large number of</td><td>many</td></tr>
+            <tr><td>period of time</td><td>period</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">6.3 Nominalization Overuse & Academic Tone <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div><strong>Nominalization</strong> = turning verbs into nouns (-tion, -ment, -ance, -ence endings). Overuse makes writing wordy and dull. Prefer verbs over nominalized nouns where possible.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Overuse of nominalizations</div>
+            <div class="example-wrong">The implementation of the new policy led to an improvement in performance.</div>
+            <div class="example-label right">✅ Better with verbs</div>
+            <div class="example-right">Implementing the new policy improved performance.</div>
+          </div>
+          <div class="tip-box">Clichés to avoid in formal writing: "at the end of the day," "think outside the box," "move the goalposts," "touch base," "level playing field." Replace with precise language.</div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-6-examples">
+      <table class="summary-table">
+        <tr><th>Error</th><th>❌ Wrong</th><th>✅ Correct</th></tr>
+        <tr><td>affect/effect</td><td>The medicine effected his mood.</td><td>The medicine <strong>affected</strong> his mood.</td></tr>
+        <tr><td>fewer/less</td><td>Less students passed this year.</td><td><strong>Fewer</strong> students passed this year.</td></tr>
+        <tr><td>imply/infer</td><td>The article infers that crime is rising.</td><td>The article <strong>implies</strong> that crime is rising.</td></tr>
+        <tr><td>principal/principle</td><td>The school's principle is very strict.</td><td>The school's <strong>principal</strong> is very strict.</td></tr>
+        <tr><td>continuous/continual</td><td>The city has continuous power outages (with breaks).</td><td>The city has <strong>continual</strong> power outages.</td></tr>
+        <tr><td>Redundancy</td><td>The final outcome was a complete failure.</td><td>The <strong>outcome</strong> was a failure.</td></tr>
+      </table>
+    </div>
+    <div class="tab-content" id="tab-6-quiz">
+      <div class="quiz-section" id="quiz-s6">
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">1. "The new law will ___ thousands of workers." (affect or effect?)</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s6',0)">A. affect</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s6',0)">B. effect</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s6',0)">C. Both are correct</div>
+          </div>
+          <div class="quiz-feedback">"Affect" = verb here (to influence). "Effect" as a verb means "to bring about" (rarer) ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">2. "There are ___ options available." (fewer or less?)</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s6',1)">A. less</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s6',1)">B. fewer</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s6',1)">C. Either is fine</div>
+          </div>
+          <div class="quiz-feedback">"Options" is countable → "fewer" ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">3. Identify the redundant phrase: "I made a plan in advance."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s6',2)">A. "in advance" is redundant — planning is always in advance</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s6',2)">B. "made" is the error</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s6',2)">C. No error</div>
+          </div>
+          <div class="quiz-feedback">"Advance planning" and "planned in advance" are redundant. Just "I made a plan" or "I planned" ✓</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s6"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 7 -->
+<div class="section" data-s="7" id="section-7">
+  <div class="section-header" onclick="toggleSection(7)">
+    <div class="section-icon">📖</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s7)">Section 7: Article & Determiner Errors</h2>
+      <div class="section-meta">A/An/The/Zero article, countable/uncountable, proper nouns</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-7">
+    <div class="topic-tabs"><button class="tab-btn active" onclick="showTab(7,'rules')">Rules</button><button class="tab-btn" onclick="showTab(7,'examples')">Examples</button><button class="tab-btn" onclick="showTab(7,'quiz')">Quiz</button></div>
+    <div class="tab-content active" id="tab-7-rules">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">7.1 A vs An — Vowel Sound, Not Vowel Letter <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>Use <strong>"an"</strong> before words that BEGIN with a vowel SOUND (not just a vowel letter). Use <strong>"a"</strong> before words that begin with a consonant sound.</div>
+          <table class="summary-table">
+            <tr><th>Use "an"</th><th>Use "a"</th></tr>
+            <tr><td>an hour (silent h)</td><td>a university (sounds like "you-")</td></tr>
+            <tr><td>an honest man</td><td>a European country</td></tr>
+            <tr><td>an MBA degree (em-bee-ay)</td><td>a one-time offer (sounds like "wun")</td></tr>
+            <tr><td>an heir</td><td>a historical event (h is pronounced)</td></tr>
+          </table>
+          <div class="mnemonic-box">Test: SAY the word aloud. Does it start with a vowel SOUND? If yes → "an." Listen, don't just look.</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">7.2 The vs A/An — Definite vs Indefinite <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>
+            Use <strong>a/an</strong>: first mention, one of many, not specific.<br>
+            Use <strong>the</strong>: second mention, specific/unique, both speaker and listener know which one.<br>
+            Use <strong>no article (zero)</strong>: plural or uncountable nouns in a general sense.
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct sequence</div>
+            <div class="example-right">I saw <em>a</em> dog in the park. <em>The</em> dog was barking loudly.</div>
+            <div class="example-note">First mention = a, second mention = the</div>
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Zero article (general)</div>
+            <div class="example-right">Cats are independent animals. / Water is essential for life.</div>
+            <div class="example-label right">✅ "The" for specific</div>
+            <div class="example-right">The cats in my neighbourhood are noisy. / The water in this bottle is warm.</div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">7.3 Articles with Proper Nouns <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <table class="summary-table">
+            <tr><th>Use "the"</th><th>No article</th></tr>
+            <tr><td>Rivers: the Nile, the Thames</td><td>Lakes: Lake Victoria, Lake Nasser</td></tr>
+            <tr><td>Mountain ranges: the Alps, the Himalayas</td><td>Individual mountains: Mount Everest</td></tr>
+            <tr><td>Oceans/Seas: the Pacific, the Red Sea</td><td>Countries (most): Egypt, France</td></tr>
+            <tr><td>Countries with plural/republic in name: the USA, the UAE, the Netherlands</td><td>Cities: Cairo, London, Paris</td></tr>
+            <tr><td>Newspapers: the Guardian, the Times</td><td>Magazines: Time, Vogue</td></tr>
+            <tr><td>Hotels, museums: the Hilton, the Louvre</td><td>Airports, stations: Heathrow Airport</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-7-examples">
+      <table class="summary-table">
+        <tr><th>Error</th><th>❌ Wrong</th><th>✅ Correct</th></tr>
+        <tr><td>a vs an</td><td>a honest mistake</td><td><strong>an</strong> honest mistake (silent h)</td></tr>
+        <tr><td>a vs an</td><td>an university</td><td><strong>a</strong> university ("you-niversity" sound)</td></tr>
+        <tr><td>The for rivers</td><td>I visited Nile yesterday.</td><td>I visited <strong>the</strong> Nile yesterday.</td></tr>
+        <tr><td>No article for cities</td><td>I live in the Cairo.</td><td>I live in Cairo.</td></tr>
+        <tr><td>General plural</td><td>The books are important for learning.</td><td><strong>Books</strong> are important for learning.</td></tr>
+        <tr><td>Second mention</td><td>I found a wallet. A wallet had $50.</td><td>I found a wallet. <strong>The</strong> wallet had $50.</td></tr>
+      </table>
+    </div>
+    <div class="tab-content" id="tab-7-quiz">
+      <div class="quiz-section" id="quiz-s7">
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">1. "She is ___ MBA student at Oxford."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s7',0)">A. a</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s7',0)">B. an</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s7',0)">C. the</div>
+          </div>
+          <div class="quiz-feedback">MBA sounds like "em-bee-ay" — starts with vowel sound "em" → "an" ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">2. "I love ___ music." (general love of music)</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s7',1)">A. [no article]</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s7',1)">B. the</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s7',1)">C. a</div>
+          </div>
+          <div class="quiz-feedback">General statement about uncountable noun → zero article ✓ "I love music."</div>
+        </div>
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">3. Which is correct?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s7',2)">A. She crossed the Lake Nasser.</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s7',2)">B. She crossed Lake Nasser.</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s7',2)">C. She crossed a Lake Nasser.</div>
+          </div>
+          <div class="quiz-feedback">Named lakes don't use "the" ✓</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s7"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 8 -->
+<div class="section" data-s="8" id="section-8">
+  <div class="section-header" onclick="toggleSection(8)">
+    <div class="section-icon">🔗</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s8)">Section 8: Preposition Errors</h2>
+      <div class="section-meta">In/on/at, prepositional idioms, sentence-ending myths</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-8">
+    <div class="topic-tabs"><button class="tab-btn active" onclick="showTab(8,'rules')">Rules</button><button class="tab-btn" onclick="showTab(8,'examples')">Examples</button><button class="tab-btn" onclick="showTab(8,'quiz')">Quiz</button></div>
+    <div class="tab-content active" id="tab-8-rules">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">8.1 In / On / At — Time and Place <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <table class="summary-table">
+            <tr><th></th><th>Time</th><th>Place</th></tr>
+            <tr><td><strong>IN</strong></td><td>in 2024, in January, in the morning, in summer, in the 21st century</td><td>in Egypt, in the city, in the room, in the car</td></tr>
+            <tr><td><strong>ON</strong></td><td>on Monday, on 5th March, on New Year's Day, on the weekend (AmE)</td><td>on the table, on the wall, on the street, on the bus (surface)</td></tr>
+            <tr><td><strong>AT</strong></td><td>at 3 o'clock, at noon, at midnight, at the weekend (BrE)</td><td>at school, at home, at the station, at the top</td></tr>
+          </table>
+          <div class="mnemonic-box">TIME: Think of it as size — IN (big: years/months) → ON (medium: days/dates) → AT (small/specific: hours/moments). Like a funnel narrowing.</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">8.2 Prepositional Idioms — Fixed Combinations <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <table class="summary-table">
+            <tr><th>Idiom</th><th>Correct Preposition</th><th>Common Error</th></tr>
+            <tr><td>interested</td><td>interested <strong>in</strong></td><td>❌ interested about</td></tr>
+            <tr><td>different</td><td>different <strong>from</strong></td><td>❌ different than/to</td></tr>
+            <tr><td>consist</td><td>consist <strong>of</strong></td><td>❌ consist in</td></tr>
+            <tr><td>depend</td><td>depend <strong>on</strong></td><td>❌ depend of</td></tr>
+            <tr><td>agree</td><td>agree <strong>with</strong> (person), agree <strong>on</strong> (thing)</td><td>❌ agree to someone</td></tr>
+            <tr><td>responsible</td><td>responsible <strong>for</strong></td><td>❌ responsible of</td></tr>
+            <tr><td>proud</td><td>proud <strong>of</strong></td><td>❌ proud about</td></tr>
+            <tr><td>capable</td><td>capable <strong>of</strong></td><td>❌ capable to</td></tr>
+            <tr><td>afraid</td><td>afraid <strong>of</strong></td><td>❌ afraid from</td></tr>
+            <tr><td>search</td><td>search <strong>for</strong></td><td>❌ search about</td></tr>
+          </table>
+          <div class="tip-box">Prepositional idioms must be memorised — there are no consistent rules. Learning them in context (reading) is the best approach.</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">8.3 Ending a Sentence with a Preposition — Myth vs Reality <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">The Reality</div>The "rule" against ending sentences with prepositions is a myth based on Latin grammar. In English, ending with a preposition is perfectly acceptable, especially when the alternative is awkward.</div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Both are correct</div>
+            <div class="example-right">That's the book I was telling you about. (natural)</div>
+            <div class="example-right">That's the book about which I was telling you. (formal, sometimes awkward)</div>
+          </div>
+          <div class="tip-box">Winston Churchill mockingly said: "This is the sort of pedantry up with which I will not put." — illustrating how forced avoidance of sentence-final prepositions sounds worse than the "error" itself.</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">8.4 "Between you and me" — Not "I" <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>After prepositions (between, for, with, to, from, by, at), always use object pronouns: me, him, her, us, them — NEVER I, he, she, we, they.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Incorrect</div>
+            <div class="example-wrong">Between you and I, this is confidential.</div>
+            <div class="example-wrong">This is a secret between he and she.</div>
+            <div class="example-label right">✅ Correct</div>
+            <div class="example-right">Between you and me, this is confidential.</div>
+            <div class="example-right">This is a secret between him and her.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-8-examples">
+      <table class="summary-table">
+        <tr><th>Error</th><th>❌ Wrong</th><th>✅ Correct</th></tr>
+        <tr><td>in/on/at time</td><td>I'll see you at Monday</td><td>I'll see you <strong>on</strong> Monday</td></tr>
+        <tr><td>in/on/at time</td><td>She was born on 1990</td><td>She was born <strong>in</strong> 1990</td></tr>
+        <tr><td>Idiom</td><td>He is different than me</td><td>He is different <strong>from</strong> me</td></tr>
+        <tr><td>Idiom</td><td>I am interested about history</td><td>I am interested <strong>in</strong> history</td></tr>
+        <tr><td>After preposition</td><td>between you and I</td><td>between you and <strong>me</strong></td></tr>
+        <tr><td>Unnecessary preposition</td><td>Where is he at?</td><td>Where is he?</td></tr>
+      </table>
+    </div>
+    <div class="tab-content" id="tab-8-quiz">
+      <div class="quiz-section" id="quiz-s8">
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">1. "She has been studying ___ 2019."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s8',0)">A. for</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s8',0)">B. since</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s8',0)">C. from</div>
+          </div>
+          <div class="quiz-feedback">"Since" is used with a specific point in time (2019). "For" is used with a duration of time.</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">2. "This project is different ___ the previous one."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s8',1)">A. from</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s8',1)">B. than</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s8',1)">C. to</div>
+          </div>
+          <div class="quiz-feedback">"Different from" is the standard formal idiom ✓</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s8"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 9 -->
+<div class="section" data-s="9" id="section-9">
+  <div class="section-header" onclick="toggleSection(9)">
+    <div class="section-icon">🎨</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s9)">Section 9: Writing Style Pitfalls</h2>
+      <div class="section-meta">Wordiness, passive overuse, tone, sentence variety</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-9">
+    <div class="topic-tabs"><button class="tab-btn active" onclick="showTab(9,'rules')">Rules</button><button class="tab-btn" onclick="showTab(9,'examples')">Examples</button><button class="tab-btn" onclick="showTab(9,'quiz')">Quiz</button></div>
+    <div class="tab-content active" id="tab-9-rules">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">9.1 Wordy Constructions & How to Fix Them <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <table class="summary-table">
+            <tr><th>Wordy</th><th>✅ Concise</th></tr>
+            <tr><td>In order to succeed, you must...</td><td>To succeed, you must...</td></tr>
+            <tr><td>It is important to note that...</td><td>Notably...</td></tr>
+            <tr><td>The fact that he was late meant...</td><td>His lateness meant...</td></tr>
+            <tr><td>There were many students who failed.</td><td>Many students failed.</td></tr>
+            <tr><td>She was a woman who was famous.</td><td>She was a famous woman.</td></tr>
+          </table>
+          <div class="rule-box"><div class="rule-label">Expletive Constructions</div>"There is/are" and "It is" constructions often waste words. Usually, the real subject can lead the sentence instead.</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Weak expletive</div>
+            <div class="example-wrong">There are three reasons why this policy failed.</div>
+            <div class="example-label right">✅ Stronger</div>
+            <div class="example-right">This policy failed for three reasons.</div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">9.2 Hedging Language Overuse & "I think/I believe" <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>Avoid opening every sentence with "I think," "I believe," "In my opinion." In academic writing, these phrases weaken claims and can be redundant (it's your essay — obviously it's your opinion).</div>
+          <div class="example-pair">
+            <div class="example-label wrong">❌ Weak</div>
+            <div class="example-wrong">I think that Shakespeare was a great writer. I believe his works explore universal themes.</div>
+            <div class="example-label right">✅ Stronger</div>
+            <div class="example-right">Shakespeare was undeniably a great writer whose works explore universal themes.</div>
+          </div>
+          <div class="tip-box">Use hedging strategically — for genuine uncertainty or research claims: "Evidence suggests..." "It appears that..." These are legitimate and sound more academic than "I think."</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">9.3 Sentence Variety & Informal Tone in Academic Writing <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>Vary sentence length and structure. Avoid starting every sentence the same way. Avoid informal contractions, slang, and first/second person in formal essays.</div>
+          <table class="summary-table">
+            <tr><th>Informal (avoid in formal essays)</th><th>✅ Formal alternative</th></tr>
+            <tr><td>it's, don't, can't, won't</td><td>it is, do not, cannot, will not</td></tr>
+            <tr><td>a lot of, lots of</td><td>many, numerous, a significant number of</td></tr>
+            <tr><td>stuff, things</td><td>items, elements, aspects, factors</td></tr>
+            <tr><td>kind of, sort of</td><td>somewhat, relatively, arguably</td></tr>
+            <tr><td>guys, kids</td><td>individuals, children, young people</td></tr>
+            <tr><td>You can see that...</td><td>It is evident that... / This demonstrates...</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-9-examples">
+      <table class="summary-table">
+        <tr><th>Issue</th><th>❌ Problematic</th><th>✅ Improved</th></tr>
+        <tr><td>Expletive</td><td>There are many problems with this approach.</td><td>This approach has many problems.</td></tr>
+        <tr><td>"I think" overuse</td><td>I think this shows that I believe Shakespeare...</td><td>This demonstrates that Shakespeare...</td></tr>
+        <tr><td>Contractions</td><td>The policy didn't work because it wasn't...</td><td>The policy did not work because it was not...</td></tr>
+        <tr><td>Slang</td><td>There was a lot of stuff wrong with the plan.</td><td>Numerous fundamental flaws undermined the plan.</td></tr>
+        <tr><td>Choppy sentences</td><td>He tried. He failed. He tried again.</td><td>Although he failed repeatedly, he persisted.</td></tr>
+      </table>
+    </div>
+    <div class="tab-content" id="tab-9-quiz">
+      <div class="quiz-section" id="quiz-s9">
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">1. Which is more appropriate for a formal essay?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s9',0)">A. I think there are lots of problems with this idea.</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s9',0)">B. This idea presents numerous significant problems.</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s9',0)">C. You can see that there's a lot wrong here.</div>
+          </div>
+          <div class="quiz-feedback">B is formal, third-person, specific, and avoids hedging/slang ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">2. Tighten this: "Due to the fact that he worked hard, he succeeded."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s9',1)">A. "Because he worked hard, he succeeded."</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s9',1)">B. "In spite of the fact that he worked, he succeeded."</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s9',1)">C. "There was the fact that working hard led him to success."</div>
+          </div>
+          <div class="quiz-feedback">"Because" replaces 5 words with 1 — clean and precise ✓</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s9"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 10 -->
+<div class="section" data-s="10" id="section-10">
+  <div class="section-header" onclick="toggleSection(10)">
+    <div class="section-icon">🔬</div>
+    <div class="section-title-group">
+      <h2 style="color:var(--s10)">Section 10: Advanced Grammar Pitfalls</h2>
+      <div class="section-meta">Correlative conjunctions, that/which, participial phrases, absolute phrases</div>
+    </div>
+    <span class="section-read-badge">✓ Read</span>
+    <span class="section-chevron">▼</span>
+  </div>
+  <div class="section-body" id="body-10">
+    <div class="topic-tabs"><button class="tab-btn active" onclick="showTab(10,'rules')">Rules</button><button class="tab-btn" onclick="showTab(10,'examples')">Examples</button><button class="tab-btn" onclick="showTab(10,'quiz')">Quiz</button></div>
+    <div class="tab-content active" id="tab-10-rules">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">10.1 Correlative Conjunctions — Parallelism Required <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>Correlative conjunctions (either...or, neither...nor, not only...but also, both...and, whether...or) require parallel grammatical forms on both sides.</div>
+          <table class="summary-table">
+            <tr><th>Conjunction Pair</th><th>❌ Wrong</th><th>✅ Correct</th></tr>
+            <tr><td>not only...but also</td><td>She not only sings but also dancing</td><td>She not only sings but also dances</td></tr>
+            <tr><td>either...or</td><td>Either you leave or staying</td><td>Either you leave or you stay</td></tr>
+            <tr><td>both...and</td><td>Both tired and she was hungry</td><td>She was both tired and hungry</td></tr>
+            <tr><td>neither...nor</td><td>He neither smiled nor he spoke</td><td>He neither smiled nor spoke</td></tr>
+          </table>
+          <div class="mnemonic-box">The structure AFTER the first conjunction must MIRROR the structure AFTER the second. Balance like a seesaw.</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">10.2 Restrictive vs Nonrestrictive Clauses — That vs Which <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>
+            <strong>That</strong>: restrictive clause (essential to meaning — no commas). Removing it changes meaning.<br>
+            <strong>Which</strong>: nonrestrictive clause (extra information — use commas). Removing it doesn't change core meaning.
+          </div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Restrictive (that)</div>
+            <div class="example-right">The report that was submitted late will be penalised. (identifies which report)</div>
+            <div class="example-label right">✅ Nonrestrictive (which)</div>
+            <div class="example-right">The annual report, which is 50 pages long, was well-received. (extra info about a specific report)</div>
+          </div>
+          <div class="mnemonic-box">THAT = essential (no commas, can't be removed). WHICH = extra (commas, removable). "THAT matters, WHICH doesn't."</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">10.3 Participial Phrases & Absolute Phrases <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Participial Phrases</div>A participial phrase opens with a participle (-ing or past participle). The subject of the main clause must be the one performing the action. Misuse = dangling modifier.</div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct participial phrase</div>
+            <div class="example-right">Having finished the exam, she submitted her paper. (she finished AND she submitted)</div>
+            <div class="example-right">Frustrated by the delay, the passengers demanded refunds.</div>
+          </div>
+          <div class="rule-box"><div class="rule-label">Absolute Phrases</div>An absolute phrase consists of a noun + participle. It modifies the entire sentence and doesn't dangle because it has its own noun.</div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Absolute phrases</div>
+            <div class="example-right">The exam finished, the students breathed a collective sigh of relief.</div>
+            <div class="example-right">Her eyes closed, she concentrated on the music.</div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">10.4 Garden-Path Sentences & Elliptical Constructions <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Garden-Path Sentences</div>Sentences that lead the reader to a wrong initial interpretation. Awareness helps you write clearer sentences.</div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Classic examples (parsed correctly when re-read)</div>
+            <div class="example-right">"The horse raced past the barn fell." → The horse [that was] raced past the barn fell. (initially confusing)</div>
+            <div class="example-right">"I convinced her children are noisy." → ambiguous: convinced her THAT children are noisy, or convinced her children?</div>
+          </div>
+          <div class="rule-box"><div class="rule-label">Elliptical Constructions</div>Omitting words understood from context. Must be grammatically parallel — the omitted words must work in the slot.</div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Correct ellipsis</div>
+            <div class="example-right">She works harder than he does. (not "than him" in formal writing)</div>
+            <div class="example-right">He can play piano, and she guitar. (implied "can play")</div>
+            <div class="example-label wrong">❌ Faulty ellipsis</div>
+            <div class="example-wrong">I like mathematics more than Ahmed. (do you like it more than Ahmed does, or more than you like Ahmed?)</div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAcc(this)">10.5 Appositives — Punctuation & Placement <span class="acc-chevron">▼</span></div>
+        <div class="accordion-body">
+          <div class="rule-box"><div class="rule-label">Rule</div>An <strong>appositive</strong> renames or describes the noun next to it. If it's <strong>nonrestrictive</strong> (not essential), set it off with commas. If <strong>restrictive</strong> (identifies which one), no commas.</div>
+          <div class="example-pair">
+            <div class="example-label right">✅ Nonrestrictive appositive (commas)</div>
+            <div class="example-right">My brother, Ahmed, is a doctor. (I only have one brother — the name is extra info)</div>
+            <div class="example-label right">✅ Restrictive appositive (no commas)</div>
+            <div class="example-right">My brother Ahmed is a doctor. (I have multiple brothers — "Ahmed" identifies which one)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-10-examples">
+      <table class="summary-table">
+        <tr><th>Error</th><th>❌ Wrong</th><th>✅ Correct</th></tr>
+        <tr><td>Correlative</td><td>not only studies but also dancing</td><td>not only studies but also <strong>dances</strong></td></tr>
+        <tr><td>That vs Which</td><td>The book which I lost was expensive.</td><td>The book <strong>that</strong> I lost was expensive.</td></tr>
+        <tr><td>That vs Which</td><td>The novel, that was written in 1960, is a classic.</td><td>The novel<strong>, which</strong> was written in 1960, is a classic.</td></tr>
+        <tr><td>Appositive</td><td>My sister, Sara is a teacher.</td><td>My sister Sara is a teacher. (restrictive — multiple sisters)</td></tr>
+      </table>
+    </div>
+    <div class="tab-content" id="tab-10-quiz">
+      <div class="quiz-section" id="quiz-s10">
+        <div class="quiz-card" data-correct="1">
+          <div class="quiz-q">1. "She is not only talented ___ hardworking."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s10',0)">A. but she is also</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,1,'quiz-s10',0)">B. but also</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s10',0)">C. and also she is</div>
+          </div>
+          <div class="quiz-feedback">"not only [adj] but also [adj]" → parallel adjectives ✓</div>
+        </div>
+        <div class="quiz-card" data-correct="0">
+          <div class="quiz-q">2. "The theory ___ Einstein proposed changed physics."</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s10',1)">A. that</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s10',1)">B. which</div>
+            <div class="quiz-opt" onclick="answerQuiz(this,0,'quiz-s10',1)">C. who</div>
+          </div>
+          <div class="quiz-feedback">Restrictive clause (identifies which theory — the one Einstein proposed) → "that" ✓</div>
+        </div>
+        <div class="quiz-score" id="score-quiz-s10"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL QUIZ -->
+<div class="final-quiz-wrap" id="final-quiz">
+  <h2>🏆 Final Comprehensive Review Quiz</h2>
+  <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:20px;">20 questions covering all 10 sections. Test your mastery!</p>
+  <div class="fq-progress"><div class="fq-progress-fill" id="fqProgress" style="width:0%"></div></div>
+  <div id="fqQuestions"></div>
+  <div class="fq-result" id="fqResult">
+    <div class="big-score" id="fqScore">0/20</div>
+    <div class="grade" id="fqGrade"></div>
+    <p id="fqMsg"></p>
+    <br>
+    <button class="ctrl-btn" onclick="resetFinalQuiz()" style="margin:auto;">🔄 Retake Quiz</button>
+  </div>
+</div>
+
+</div><!-- end content -->
+</div><!-- end main -->
+</div><!-- end layout -->
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const readSections = new Set();
+let quizScores = {};
+
+const finalQuizData = [
+  { q: "Choose the correct verb: 'Neither the doctor nor the nurses ___ been informed.'", opts:["A. has","B. have","C. was"], ans:1, exp:"Nearest subject = nurses (plural) → have" },
+  { q: "Which sentence has correct subject-verb agreement?", opts:["A. The team are playing tonight.","B. Everyone have a pen.","C. A number of errors have been found."], ans:2, exp:"'A number of' = plural → have ✓" },
+  { q: "Identify the correct pronoun: 'The award was given to Ahmed and ___.'", opts:["A. I","B. me","C. myself"], ans:1, exp:"Object of preposition 'to' → 'me'" },
+  { q: "'If she ___ the president, she would change everything.' Subjunctive:", opts:["A. was","B. were","C. is"], ans:1, exp:"Hypothetical condition → subjunctive → 'were'" },
+  { q: "Which is the correct sentence?", opts:["A. Walking to school, the rain started.","B. Walking to school, I got drenched.","C. While walking, the rain started heavily."], ans:1, exp:"'I' is the one walking → no dangling modifier ✓" },
+  { q: "'She ___ the problem before I arrived.' (past perfect)", opts:["A. solved","B. had solved","C. has solved"], ans:1, exp:"Action before another past action → past perfect 'had solved'" },
+  { q: "Which sentence uses parallel structure?", opts:["A. She enjoys reading, to swim, and dance.","B. She enjoys reading, swimming, and dancing.","C. She enjoys to read, swimming, and to dance."], ans:1, exp:"All gerunds (-ing) = parallel ✓" },
+  { q: "'The dog wagged ___ tail carefully.'", opts:["A. it's","B. its","C. their"], ans:1, exp:"Possessive pronoun — no apostrophe → 'its' ✓" },
+  { q: "Which is a CORRECT use of the colon?", opts:["A. She brought: bread and butter.","B. She brought the following: bread and butter.","C. She: brought bread and butter."], ans:1, exp:"Colon follows a complete independent clause ✓" },
+  { q: "'The medicine ___ his mood.' (affect or effect)", opts:["A. effected","B. affected","C. effectuated"], ans:1, exp:"'Affect' = verb (to influence) ✓" },
+  { q: "'___ students passed this year than last year.' (fewer/less)", opts:["A. Less","B. Fewer","C. Little"], ans:1, exp:"'Students' is countable → 'fewer' ✓" },
+  { q: "'She is ___ MBA student at Harvard.'", opts:["A. a","B. an","C. the"], ans:1, exp:"MBA sounds like 'em-bee-ay' → vowel sound → 'an' ✓" },
+  { q: "Which uses 'that' correctly (restrictive clause)?", opts:["A. The car, that I bought, is red.","B. The car that I bought is red.","C. The car which I bought is red."], ans:1, exp:"Restrictive clause = 'that' without commas ✓" },
+  { q: "'He is not only smart ___ creative.'", opts:["A. and also he is","B. but also","C. but he is also"], ans:1, exp:"Parallel structure: not only [adj] but also [adj] ✓" },
+  { q: "Which sentence is correct?", opts:["A. I would of helped you.","B. I would have helped you.","C. I would of have helped."], ans:1, exp:"Always 'would have' — never 'would of' ✓" },
+  { q: "'___ did you send the report to?' (formal)", opts:["A. Who","B. Whom","C. Whose"], ans:1, exp:"Object of preposition 'to' → 'Whom' ✓" },
+  { q: "Which shows correct use of semicolon?", opts:["A. He worked hard; and succeeded.","B. He worked hard; however, he failed.","C. He worked; hard all day."], ans:1, exp:"Semicolon + conjunctive adverb between two ICs ✓" },
+  { q: "'The reason he failed ___ he didn't study.'", opts:["A. is because","B. is that","C. is due to the fact"], ans:1, exp:"'The reason is that' — avoid 'reason is because' (faulty predication) ✓" },
+  { q: "Which is the most appropriate for a formal essay?", opts:["A. I think there are lots of issues.","B. Numerous significant issues exist.","C. You can see that there's stuff wrong."], ans:1, exp:"Formal, third-person, avoids hedging/slang ✓" },
+  { q: "'He neither smiled ___ spoke a word.'", opts:["A. or","B. nor","C. and"], ans:1, exp:"'Neither...nor' is the paired conjunction ✓" }
+];
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  buildFinalQuiz();
+  window.addEventListener('scroll', handleScroll);
+  updateProgress();
+}
+
+function handleScroll() {
+  const bt = document.getElementById('backTop');
+  bt.classList.toggle('visible', window.scrollY > 400);
+}
+
+// ============================================================
+// SECTION TOGGLE
+// ============================================================
+function toggleSection(n) {
+  const body = document.getElementById('body-' + n);
+  const header = body.previousElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  header.classList.toggle('open', !isOpen);
+  if (!isOpen) {
+    markRead(n);
+  }
+}
+
+function markRead(n) {
+  if (!readSections.has(n)) {
+    readSections.add(n);
+    document.getElementById('section-' + n).classList.add('read');
+    const nav = document.getElementById('nav-' + n);
+    if (nav) nav.classList.add('read');
+    updateProgress();
+  }
+}
+
+function updateProgress() {
+  const pct = (readSections.size / 10) * 100;
+  document.getElementById('mainProgressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = readSections.size + ' / 10 sections read';
+}
+
+function openAndScroll(n) {
+  const sec = document.getElementById('section-' + n);
+  const body = document.getElementById('body-' + n);
+  const header = body.previousElementSibling;
+  body.classList.add('open');
+  header.classList.add('open');
+  markRead(n);
+  sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+function scrollTo(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+function expandAll() {
+  for (let i = 1; i <= 10; i++) {
+    const body = document.getElementById('body-' + i);
+    const header = body.previousElementSibling;
+    body.classList.add('open');
+    header.classList.add('open');
+    markRead(i);
+  }
+}
+
+function collapseAll() {
+  for (let i = 1; i <= 10; i++) {
+    const body = document.getElementById('body-' + i);
+    const header = body.previousElementSibling;
+    body.classList.remove('open');
+    header.classList.remove('open');
+  }
+}
+
+// ============================================================
+// ACCORDION
+// ============================================================
+function toggleAcc(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  header.classList.toggle('open', !isOpen);
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function showTab(sectionNum, tabName) {
+  const tabs = document.querySelectorAll('#tab-' + sectionNum + '-rules, #tab-' + sectionNum + '-examples, #tab-' + sectionNum + '-quiz');
+  tabs.forEach(t => t.classList.remove('active'));
+  const target = document.getElementById('tab-' + sectionNum + '-' + tabName);
+  if (target) target.classList.add('active');
+
+  const sectionBody = document.getElementById('body-' + sectionNum);
+  const btns = sectionBody.querySelectorAll('.tab-btn');
+  btns.forEach(b => b.classList.remove('active'));
+  const map = { rules: 0, examples: 1, quiz: 2 };
+  if (btns[map[tabName]]) btns[map[tabName]].classList.add('active');
+}
+
+// ============================================================
+// QUIZ (SECTION)
+// ============================================================
+function answerQuiz(opt, chosenIdx, quizId, qIdx) {
+  const quizContainer = document.getElementById(quizId);
+  const cards = quizContainer.querySelectorAll('.quiz-card');
+  const card = cards[qIdx];
+  if (card.classList.contains('answered')) return;
+  card.classList.add('answered');
+
+  const correctIdx = parseInt(card.dataset.correct);
+  const opts = card.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.style.pointerEvents = 'none');
+  opts[correctIdx].classList.add('correct');
+  if (chosenIdx !== correctIdx) opt.classList.add('wrong');
+
+  const fb = card.querySelector('.quiz-feedback');
+  fb.classList.add('show');
+  fb.classList.add(chosenIdx === correctIdx ? 'correct-fb' : 'wrong-fb');
+
+  // Check if all done
+  const allAnswered = [...cards].every(c => c.classList.contains('answered'));
+  if (allAnswered) {
+    let correct = 0;
+    cards.forEach((c, i) => {
+      const cIdx = parseInt(c.dataset.correct);
+      const chosen = c.querySelectorAll('.quiz-opt.correct')[0];
+      if (chosen && !c.querySelectorAll('.quiz-opt.wrong')[0]) correct++;
+      // actually count selected correct
+    });
+    // Recount
+    correct = 0;
+    cards.forEach(c => {
+      const cIdx = parseInt(c.dataset.correct);
+      const opts = c.querySelectorAll('.quiz-opt');
+      if (opts[cIdx].classList.contains('correct') && !c.querySelectorAll('.quiz-opt.wrong')[0] ||
+          opts[cIdx].classList.contains('correct') && !opts[cIdx].classList.contains('wrong')) {
+        // Check if user chose the correct one
+      }
+    });
+    // Simple approach
+    correct = [...cards].filter(c => {
+      const cIdx = parseInt(c.dataset.correct);
+      const opts = c.querySelectorAll('.quiz-opt');
+      return opts[cIdx].classList.contains('correct') &&
+             [...opts].every((o, i) => i !== cIdx ? !o.classList.contains('correct') : true) &&
+             !c.querySelectorAll('.quiz-opt.wrong').length;
+    }).length;
+
+    const scoreEl = quizContainer.querySelector('.quiz-score');
+    if (scoreEl) {
+      scoreEl.classList.add('show');
+      const total = cards.length;
+      scoreEl.innerHTML = `<div class="score-num">${correct}/${total}</div><p>${correct === total ? '🎉 Perfect score!' : correct >= total*0.7 ? '👍 Good job!' : '📖 Review the rules above and try again.'}</p>`;
+    }
+  }
+}
+
+// ============================================================
+// CHEAT SHEET
+// ============================================================
+function toggleCheat() {
+  const body = document.getElementById('cheatBody');
+  const arrow = document.getElementById('cheatArrow');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.textContent = isOpen ? '▼' : '▲';
+}
+
+// ============================================================
+// DARK MODE
+// ============================================================
+let isDark = true;
+function toggleDarkMode() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? '' : 'light');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+
+// ============================================================
+// SEARCH
+// ============================================================
+function globalSearchFn(val) {
+  clearHighlights();
+  if (!val.trim()) return;
+  const v = val.toLowerCase();
+  const allText = document.querySelectorAll('.accordion-body, .tab-content');
+  allText.forEach(el => {
+    if (el.innerHTML.toLowerCase().includes(v)) {
+      // Open parent section
+      let parent = el.closest('.section-body');
+      if (parent) {
+        parent.classList.add('open');
+        parent.previousElementSibling.classList.add('open');
+        const sNum = parent.id.replace('body-','');
+        if (sNum) markRead(parseInt(sNum));
+      }
+      let parentAcc = el.closest('.accordion-body');
+      if (parentAcc) {
+        parentAcc.classList.add('open');
+        parentAcc.previousElementSibling.classList.add('open');
+      }
+      parent = el.closest('.tab-content');
+      if (parent) parent.classList.add('active');
+    }
+  });
+}
+
+function filterNav(val) {
+  const items = document.querySelectorAll('#sidebarNav .nav-section-item');
+  items.forEach(item => {
+    item.style.display = (!val || item.textContent.toLowerCase().includes(val.toLowerCase())) ? '' : 'none';
+  });
+}
+
+function clearHighlights() {}
+
+// ============================================================
+// SIDEBAR MOBILE
+// ============================================================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.querySelector('.sidebar-overlay').classList.toggle('active');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.querySelector('.sidebar-overlay').classList.remove('active');
+}
+
+// ============================================================
+// FINAL QUIZ
+// ============================================================
+let fqAnswers = {};
+let fqBuilt = false;
+
+function buildFinalQuiz() {
+  const container = document.getElementById('fqQuestions');
+  container.innerHTML = '';
+  fqAnswers = {};
+
+  finalQuizData.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'fq-card';
+    card.id = 'fq-card-' + i;
+    card.innerHTML = `
+      <div class="quiz-q"><span>Q${i+1}.</span> ${q.q}</div>
+      <div class="quiz-options" id="fq-opts-${i}">
+        ${q.opts.map((o,j) => `<div class="quiz-opt" onclick="fqAnswer(${i},${j})">${o}</div>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="fq-fb-${i}"></div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function fqAnswer(qIdx, chosenIdx) {
+  if (fqAnswers[qIdx] !== undefined) return;
+  fqAnswers[qIdx] = chosenIdx;
+
+  const opts = document.querySelectorAll(`#fq-opts-${qIdx} .quiz-opt`);
+  opts.forEach(o => o.style.pointerEvents = 'none');
+  const correct = finalQuizData[qIdx].ans;
+  opts[correct].classList.add('correct');
+  if (chosenIdx !== correct) opts[chosenIdx].classList.add('wrong');
+
+  const fb = document.getElementById('fq-fb-' + qIdx);
+  fb.textContent = finalQuizData[qIdx].exp;
+  fb.classList.add('show', chosenIdx === correct ? 'correct-fb' : 'wrong-fb');
+
+  const progress = (Object.keys(fqAnswers).length / finalQuizData.length) * 100;
+  document.getElementById('fqProgress').style.width = progress + '%';
+
+  if (Object.keys(fqAnswers).length === finalQuizData.length) {
+    setTimeout(showFQResult, 600);
+  }
+}
+
+function showFQResult() {
+  const correct = Object.entries(fqAnswers).filter(([i, v]) => v === finalQuizData[i].ans).length;
+  const total = finalQuizData.length;
+  const pct = (correct / total) * 100;
+  const res = document.getElementById('fqResult');
+  document.getElementById('fqScore').textContent = correct + '/' + total;
+  const grades = [[90,'A — Outstanding! 🏆'], [80,'B — Excellent! 🎉'], [70,'C — Good! 👍'], [60,'D — Keep Practising 📖'], [0,'F — Review all sections 📚']];
+  const grade = grades.find(g => pct >= g[0]);
+  document.getElementById('fqGrade').textContent = grade[1];
+  const msgs = [
+    [90,'You have mastered English grammar pitfalls. Excellent academic writing awaits!'],
+    [70,'Great work! Focus on the sections where you made errors and you\'ll be at the top.'],
+    [50,'Solid effort! The guide is here — go back and review the trickier sections.'],
+    [0,'Don\'t give up! Grammar is a skill that improves with practice. Read each section again.']
+  ];
+  document.getElementById('fqMsg').textContent = msgs.find(m => pct >= m[0])[1];
+  res.classList.add('show');
+  res.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function resetFinalQuiz() {
+  document.getElementById('fqResult').classList.remove('show');
+  document.getElementById('fqProgress').style.width = '0%';
+  buildFinalQuiz();
+  document.getElementById('fqQuestions').scrollIntoView({ behavior:'smooth' });
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
