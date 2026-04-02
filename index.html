@@ -191,6 +191,125 @@
     .social-link span{display:none} .social-link{padding:12px 14px}
     .chapter-grid{grid-template-columns:1fr}
   }
+
+  /* ═══════════════════════════════════════════
+     IFRAME PORTAL OVERLAY
+  ═══════════════════════════════════════════ */
+  .portal-overlay{
+    position:fixed;inset:0;z-index:9000;
+    display:flex;flex-direction:column;
+    opacity:0;pointer-events:none;
+    transition:opacity 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .portal-overlay.open{opacity:1;pointer-events:all;}
+
+  /* Blurred backdrop */
+  .portal-backdrop{
+    position:absolute;inset:0;
+    background:rgba(5,5,12,0.85);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+  }
+  [data-theme="light"] .portal-backdrop{background:rgba(220,228,255,0.88);}
+
+  /* Portal window */
+  .portal-window{
+    position:relative;z-index:1;
+    display:flex;flex-direction:column;
+    width:calc(100% - 40px);
+    max-width:1400px;
+    height:calc(100vh - 40px);
+    margin:20px auto;
+    border-radius:20px;
+    overflow:hidden;
+    border:1px solid var(--card-border);
+    box-shadow:0 40px 120px rgba(0,0,0,0.6);
+    transform:translateY(24px) scale(0.98);
+    transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .portal-overlay.open .portal-window{transform:translateY(0) scale(1);}
+
+  /* Top bar */
+  .portal-bar{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 16px;
+    background:rgba(12,12,24,0.95);
+    border-bottom:1px solid var(--card-border);
+    backdrop-filter:blur(20px);
+    flex-shrink:0;
+    user-select:none;
+  }
+  [data-theme="light"] .portal-bar{background:rgba(235,238,255,0.97);}
+
+  .portal-dots{display:flex;gap:6px;align-items:center}
+  .portal-dot{width:12px;height:12px;border-radius:50%;}
+  .portal-dot.close-dot{background:#ff5f57;cursor:pointer;transition:filter 0.2s ease;}
+  .portal-dot.close-dot:hover{filter:brightness(1.3);}
+  .portal-dot.min-dot{background:#febc2e;}
+  .portal-dot.max-dot{background:#28c840;}
+
+  .portal-url-bar{
+    flex:1;display:flex;align-items:center;gap:8px;
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:8px;padding:6px 12px;
+    font-size:12.5px;font-family:'DM Sans',sans-serif;
+    color:var(--text-sub);
+    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  }
+  .portal-lock{font-size:11px;opacity:0.5;flex-shrink:0;}
+  .portal-url-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  .portal-actions{display:flex;gap:8px;align-items:center;}
+  .portal-action-btn{
+    width:30px;height:30px;border-radius:8px;
+    background:var(--glass-bg);border:1px solid var(--glass-border);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:13px;color:var(--text-sub);
+    transition:all 0.2s ease;
+    text-decoration:none;
+  }
+  .portal-action-btn:hover{background:var(--card-bg);color:var(--text);transform:scale(1.08);}
+
+  /* Label chip */
+  .portal-chip{
+    display:flex;align-items:center;gap:6px;
+    padding:4px 12px;border-radius:100px;
+    font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;
+    flex-shrink:0;
+  }
+  .portal-chip.bio{background:var(--bio-dim);color:var(--bio);border:1px solid rgba(0,255,170,0.25);}
+  .portal-chip.chem{background:var(--chem-dim);color:var(--chem);border:1px solid rgba(167,139,250,0.25);}
+
+  /* iframe */
+  .portal-iframe{
+    flex:1;width:100%;border:none;
+    background:#fff;
+    display:block;
+  }
+
+  /* Loading state */
+  .portal-loader{
+    position:absolute;bottom:0;left:0;right:0;
+    height:3px;
+    background:linear-gradient(90deg,var(--bio),var(--chem));
+    transform-origin:left;
+    transform:scaleX(0);
+    transition:transform 0.3s ease;
+    border-radius:0 0 0 0;
+  }
+  .portal-loader.loading{animation:loadBar 1.5s ease-in-out infinite;}
+  @keyframes loadBar{
+    0%{transform:scaleX(0);transform-origin:left;}
+    50%{transform:scaleX(0.7);transform-origin:left;}
+    50.01%{transform-origin:right;}
+    100%{transform:scaleX(0);transform-origin:right;}
+  }
+
+  /* Mobile: full screen */
+  @media(max-width:600px){
+    .portal-window{width:100%;height:100vh;margin:0;border-radius:0;border:none;}
+  }
 </style>
 </head>
 <body>
@@ -198,6 +317,41 @@
 <div class="scroll-line" id="scrollLine"></div>
 <div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
 <canvas id="particles"></canvas>
+
+<!-- ═══════ IFRAME PORTAL OVERLAY ═══════ -->
+<div class="portal-overlay" id="portalOverlay">
+  <div class="portal-backdrop" id="portalBackdrop"></div>
+  <div class="portal-window">
+    <div class="portal-bar">
+      <!-- macOS-style dots -->
+      <div class="portal-dots">
+        <div class="portal-dot close-dot" id="portalClose" title="Close"></div>
+        <div class="portal-dot min-dot"></div>
+        <div class="portal-dot max-dot"></div>
+      </div>
+      <!-- Chip -->
+      <div class="portal-chip" id="portalChip">🧬 IG-Bio</div>
+      <!-- URL bar -->
+      <div class="portal-url-bar">
+        <span class="portal-lock">🔒</span>
+        <span class="portal-url-text" id="portalUrlText">ig-bio.vercel.app</span>
+      </div>
+      <!-- Actions -->
+      <div class="portal-actions">
+        <a class="portal-action-btn" id="portalExternal" href="#" target="_blank" title="Open in new tab">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <div class="portal-action-btn" id="portalCloseBtn" title="Close" onclick="closePortal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+    </div>
+    <!-- Loading bar -->
+    <div class="portal-loader" id="portalLoader"></div>
+    <!-- THE IFRAME -->
+    <iframe class="portal-iframe" id="portalIframe" src="about:blank" allow="fullscreen" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"></iframe>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav>
@@ -226,20 +380,22 @@
   <p class="hero-sub">One platform. Two sciences. Built for IGCSE students who want clarity, depth, and results — from Cairo to the world.</p>
   <p class="hero-author">By Mohamed Mostafa Abdelsalam ⭐️</p>
   <div class="cards">
-    <a class="card card-bio" href="https://ig-bio.vercel.app">
+    <!-- BIO CARD — opens portal -->
+    <div class="card card-bio" onclick="openPortal('https://ig-bio.vercel.app','bio')">
       <span class="card-icon">🧬</span>
       <span class="card-tag">CIE 0610</span>
       <h2>IG-Bio</h2>
       <p>Full chapter explanations, mind maps, 50 MCQs per chapter, audio lectures, revision notes — all downloadable, all free.</p>
       <span class="card-btn">Start Learning <span class="arrow">→</span></span>
-    </a>
-    <a class="card card-chem" href="https://ig-chem.vercel.app">
+    </div>
+    <!-- CHEM CARD — opens portal -->
+    <div class="card card-chem" onclick="openPortal('https://ig-chem.vercel.app','chem')">
       <span class="card-icon">⚗️</span>
       <span class="card-tag">CIE 0620</span>
       <h2>IG-Chem</h2>
       <p>Reaction mechanics, periodic table analysis, smart formulae, infographics, lab simulations — built for exam success.</p>
       <span class="card-btn">Start Reactions <span class="arrow">→</span></span>
-    </a>
+    </div>
   </div>
 </section>
 
@@ -254,52 +410,25 @@
     <div class="chapter-card bio-card reveal reveal-delay-1">
       <div class="chapter-card-title">📚 Full Chapter Explanation</div>
       <div class="resource-list">
-        <div class="resource-item">
-          <div class="resource-icon">🗺️</div>
-          <div class="resource-text"><strong>Detailed Mind Map</strong>Full visual breakdown of every concept in the chapter</div>
-        </div>
-        <div class="resource-item">
-          <div class="resource-icon">❓</div>
-          <div class="resource-text"><strong>50 MCQ Questions</strong>Deep exam practice with complete chapter coverage</div>
-        </div>
-        <div class="resource-item">
-          <div class="resource-icon">📄</div>
-          <div class="resource-text"><strong>Downloadable PDF</strong>Full explanation exported as a free PDF to study offline</div>
-        </div>
+        <div class="resource-item"><div class="resource-icon">🗺️</div><div class="resource-text"><strong>Detailed Mind Map</strong>Full visual breakdown of every concept in the chapter</div></div>
+        <div class="resource-item"><div class="resource-icon">❓</div><div class="resource-text"><strong>50 MCQ Questions</strong>Deep exam practice with complete chapter coverage</div></div>
+        <div class="resource-item"><div class="resource-icon">📄</div><div class="resource-text"><strong>Downloadable PDF</strong>Full explanation exported as a free PDF to study offline</div></div>
       </div>
     </div>
     <div class="chapter-card bio-card reveal reveal-delay-2">
       <div class="chapter-card-title">🎧 Chapter Summary Pack</div>
       <div class="resource-list">
-        <div class="resource-item">
-          <div class="resource-icon">🔊</div>
-          <div class="resource-text"><strong>Audio Lecture</strong>Listen and learn — with a downloadable transcript included</div>
-        </div>
-        <div class="resource-item">
-          <div class="resource-icon">📝</div>
-          <div class="resource-text"><strong>Revision Notes</strong>Concise, downloadable notes built for last-minute review</div>
-        </div>
-        <div class="resource-item">
-          <div class="resource-icon">🗂️</div>
-          <div class="resource-text"><strong>Mini Mind Map + ~10 MCQs</strong>Quick-recap map and a focused quiz set per chapter</div>
-        </div>
+        <div class="resource-item"><div class="resource-icon">🔊</div><div class="resource-text"><strong>Audio Lecture</strong>Listen and learn — with a downloadable transcript included</div></div>
+        <div class="resource-item"><div class="resource-icon">📝</div><div class="resource-text"><strong>Revision Notes</strong>Concise, downloadable notes built for last-minute review</div></div>
+        <div class="resource-item"><div class="resource-icon">🗂️</div><div class="resource-text"><strong>Mini Mind Map + ~10 MCQs</strong>Quick-recap map and a focused quiz set per chapter</div></div>
       </div>
     </div>
     <div class="chapter-card chem-card reveal reveal-delay-3">
       <div class="chapter-card-title">🎮 Interactive & Visual</div>
       <div class="resource-list">
-        <div class="resource-item">
-          <div class="resource-icon">🧪</div>
-          <div class="resource-text"><strong>Lab Simulations</strong>Virtual practicals to understand experiments hands-on</div>
-        </div>
-        <div class="resource-item">
-          <div class="resource-icon">🖼️</div>
-          <div class="resource-text"><strong>Infographics, Whiteboards & Slides</strong>Visual sketches and PowerPoint decks per topic</div>
-        </div>
-        <div class="resource-item">
-          <div class="resource-icon">🕹️</div>
-          <div class="resource-text"><strong>Educational Games</strong>Learn through play — science concepts made interactive</div>
-        </div>
+        <div class="resource-item"><div class="resource-icon">🧪</div><div class="resource-text"><strong>Lab Simulations</strong>Virtual practicals to understand experiments hands-on</div></div>
+        <div class="resource-item"><div class="resource-icon">🖼️</div><div class="resource-text"><strong>Infographics, Whiteboards & Slides</strong>Visual sketches and PowerPoint decks per topic</div></div>
+        <div class="resource-item"><div class="resource-icon">🕹️</div><div class="resource-text"><strong>Educational Games</strong>Learn through play — science concepts made interactive</div></div>
       </div>
     </div>
   </div>
@@ -342,16 +471,11 @@
         <p class="p6-desc">A full breakdown of everything Paper 6 tests — strategy, analysis, skills, and how to answer every question type with maximum marks. Built so no student goes into that exam room unprepared.</p>
       </div>
       <div class="p6-tags">
-        <span class="p6-tag">📋 What P6 Tests</span>
-        <span class="p6-tag">🎯 Strategy</span>
-        <span class="p6-tag">📊 Exam Analysis</span>
-        <span class="p6-tag">🔬 Chapters</span>
-        <span class="p6-tag">🛠️ Skills</span>
-        <span class="p6-tag">🧫 Experiments</span>
-        <span class="p6-tag">✍️ Command Words</span>
-        <span class="p6-tag">📝 Mark Scheme</span>
-        <span class="p6-tag">⚠️ Common Mistakes</span>
-        <span class="p6-tag">📅 Revision Plan</span>
+        <span class="p6-tag">📋 What P6 Tests</span><span class="p6-tag">🎯 Strategy</span>
+        <span class="p6-tag">📊 Exam Analysis</span><span class="p6-tag">🔬 Chapters</span>
+        <span class="p6-tag">🛠️ Skills</span><span class="p6-tag">🧫 Experiments</span>
+        <span class="p6-tag">✍️ Command Words</span><span class="p6-tag">📝 Mark Scheme</span>
+        <span class="p6-tag">⚠️ Common Mistakes</span><span class="p6-tag">📅 Revision Plan</span>
         <span class="p6-tag">✅ Checklist</span>
       </div>
     </div>
@@ -408,55 +532,129 @@
 </footer>
 
 <script>
-const btn = document.getElementById('themeBtn');
-const html = document.documentElement;
-btn.addEventListener('click', () => { html.setAttribute('data-theme', html.getAttribute('data-theme')==='dark'?'light':'dark'); });
+/* ─── PORTAL LOGIC ─── */
+const overlay   = document.getElementById('portalOverlay');
+const iframe    = document.getElementById('portalIframe');
+const chip      = document.getElementById('portalChip');
+const urlText   = document.getElementById('portalUrlText');
+const extLink   = document.getElementById('portalExternal');
+const loader    = document.getElementById('portalLoader');
+const backdrop  = document.getElementById('portalBackdrop');
 
+function openPortal(url, type) {
+  // Update chip
+  chip.className = 'portal-chip ' + type;
+  chip.textContent = type === 'bio' ? '🧬 IG-Bio' : '⚗️ IG-Chem';
+
+  // Update URL bar
+  urlText.textContent = url.replace('https://', '');
+
+  // Update external link
+  extLink.href = url;
+
+  // Show loading bar
+  loader.classList.add('loading');
+
+  // Load iframe
+  iframe.src = url;
+
+  // On iframe load, stop loader
+  iframe.onload = () => loader.classList.remove('loading');
+
+  // Lock body scroll
+  document.body.style.overflow = 'hidden';
+
+  // Open overlay
+  overlay.classList.add('open');
+}
+
+function closePortal() {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  // Small delay then clear src to save memory
+  setTimeout(() => {
+    if (!overlay.classList.contains('open')) {
+      iframe.src = 'about:blank';
+      loader.classList.remove('loading');
+    }
+  }, 400);
+}
+
+// Close on backdrop click
+backdrop.addEventListener('click', closePortal);
+
+// Close on macOS dot
+document.getElementById('portalClose').addEventListener('click', closePortal);
+
+// Close on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && overlay.classList.contains('open')) closePortal();
+});
+
+/* ─── THEME ─── */
+const btn  = document.getElementById('themeBtn');
+const html = document.documentElement;
+btn.addEventListener('click', () => {
+  html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+
+/* ─── SCROLL LINE ─── */
 const scrollLine = document.getElementById('scrollLine');
 window.addEventListener('scroll', () => {
   const max = document.body.scrollHeight - window.innerHeight;
-  scrollLine.style.width = (max>0?(window.scrollY/max)*100:0)+'%';
+  scrollLine.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
 });
 
-const reveals = document.querySelectorAll('.reveal');
+/* ─── REVEAL ─── */
+const reveals  = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);} });
-},{threshold:0.08});
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, {threshold: 0.08});
 reveals.forEach(r => observer.observe(r));
 
+/* ─── PARTICLES ─── */
 const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-let particles=[], W, H;
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+const ctx    = canvas.getContext('2d');
+let particles = [], W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
 resize();
-window.addEventListener('resize',()=>{resize();initParticles();});
-function initParticles(){
-  particles=[];
-  const count=Math.floor((W*H)/18000);
-  for(let i=0;i<count;i++) particles.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.3,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,color:Math.random()>0.5?'#00ffaa':'#a78bfa',alpha:Math.random()*0.4+0.1});
+window.addEventListener('resize', () => { resize(); initParticles(); });
+function initParticles() {
+  particles = [];
+  const count = Math.floor((W * H) / 18000);
+  for (let i = 0; i < count; i++) particles.push({
+    x: Math.random() * W, y: Math.random() * H,
+    r: Math.random() * 1.5 + 0.3,
+    vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+    color: Math.random() > 0.5 ? '#00ffaa' : '#a78bfa',
+    alpha: Math.random() * 0.4 + 0.1
+  });
 }
 initParticles();
-function drawParticles(){
-  ctx.clearRect(0,0,W,H);
-  const isDark=html.getAttribute('data-theme')==='dark';
-  particles.forEach(p=>{
-    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle=p.color+Math.floor(p.alpha*(isDark?180:100)).toString(16).padStart(2,'0');
+function drawParticles() {
+  ctx.clearRect(0, 0, W, H);
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  particles.forEach(p => {
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + Math.floor(p.alpha * (isDark ? 180 : 100)).toString(16).padStart(2, '0');
     ctx.fill();
-    p.x+=p.vx;p.y+=p.vy;
-    if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
   });
   requestAnimationFrame(drawParticles);
 }
 drawParticles();
 
-document.querySelectorAll('.card').forEach(card=>{
-  card.addEventListener('mousemove',e=>{
-    const r=card.getBoundingClientRect();
-    const x=(e.clientX-r.left)/r.width-0.5, y=(e.clientY-r.top)/r.height-0.5;
-    card.style.transform=`translateY(-10px) scale(1.02) rotateY(${x*8}deg) rotateX(${-y*8}deg)`;
+/* ─── CARD TILT ─── */
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `translateY(-10px) scale(1.02) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
   });
-  card.addEventListener('mouseleave',()=>{card.style.transform='';});
+  card.addEventListener('mouseleave', () => { card.style.transform = ''; });
 });
 </script>
 </body>
