@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IG-bio | The Ultimate IGCSE Biology Resource</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <style>
+    /* ── CLAIRO TOP BAR ── */
+    #clairo-topbar {
+        position: fixed; top: 0; left: 0; right: 0;
+        z-index: 99999; height: 36px;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(4,4,10,0.95);
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border-bottom: 1px solid rgba(0,255,170,0.2);
+        box-shadow: 0 2px 24px rgba(0,0,0,0.6), 0 1px 0 rgba(0,255,170,0.1);
+    }
+    #clairo-topbar a { display:flex; align-items:center; gap:8px; text-decoration:none; transition:opacity .2s, transform .2s; }
+    #clairo-topbar a:hover { opacity:.8; transform:scale(1.03); }
+    #clairo-topbar img { height:22px; filter:drop-shadow(0 0 6px rgba(0,255,170,0.3)); }
+    #clairo-topbar .topbar-label { font-family:'Outfit',sans-serif; font-size:11px; font-weight:400; color:rgba(255,255,255,0.4); letter-spacing:1.5px; text-transform:uppercase; }
+    #clairo-topbar .topbar-dot { width:4px; height:4px; border-radius:50%; background:#00ffaa; box-shadow:0 0 6px #00ffaa; animation:topbar-pulse 2s ease infinite; }
+    @keyframes topbar-pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    body { padding-top: 36px; }
+    #main-app nav { top: 36px !important; }
+    #auth-screen { padding-top: 36px; }
+
+    /* ── FILE VIEWER ── */
+    #fileViewerOverlay {
+        display: none; position: fixed;
+        top: 36px; left: 0; right: 0; bottom: 0;
+        z-index: 9999; flex-direction: column;
+        background: var(--bg, #0f0f1a);
+        animation: fvSlideIn 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+    #fileViewerOverlay.open { display: flex; }
+    @keyframes fvSlideIn { from{opacity:0;transform:translateY(18px);} to{opacity:1;transform:translateY(0);} }
+    #fileViewerNav {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 20px; height: 58px; flex-shrink: 0;
+        background: rgba(255,255,255,0.04);
+        backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+    }
+    .fv-logo { display:flex; align-items:center; gap:10px; }
+    .fv-logo-icon { font-size:1.35rem; color:var(--primary,#6c63ff); filter:drop-shadow(0 0 8px var(--primary,#6c63ff)); }
+    .fv-logo-text { font-family:'Outfit',sans-serif; font-weight:800; font-size:1.25rem; color:var(--primary,#6c63ff); letter-spacing:-0.5px; }
+    .fv-nav-right { display:flex; align-items:center; gap:10px; }
+    .fv-close-btn {
+        display:flex; align-items:center; justify-content:center;
+        width:38px; height:38px; border-radius:50%; border:none;
+        background:rgba(255,255,255,0.07); color:var(--text,#fff);
+        font-size:1.15rem; cursor:pointer; transition:background .2s, transform .15s;
+    }
+    .fv-close-btn:hover { background:rgba(255,255,255,0.15); transform:scale(1.08); }
+
+    /* The viewer body holds iframe + chat panel side by side */
+    #fvBody { display:flex; flex:1; overflow:hidden; position:relative; }
+    #fileViewerIframe { flex:1; border:none; background:#fff; transition:flex .35s cubic-bezier(0.4,0,0.2,1); min-width:0; }
+
+    /* ── CLAIRO AI CHAT PANEL (inside viewer) ── */
+    #clairoPanel {
+        width: 0; flex-shrink: 0;
+        display: flex; flex-direction: column;
+        background: #0d0d1a;
+        border-left: 1px solid rgba(108,99,255,0.25);
+        overflow: hidden;
+        transition: width .35s cubic-bezier(0.4,0,0.2,1);
+        font-family: 'Outfit', system-ui, sans-serif;
+    }
+    #clairoPanel.cp-open { width: 360px; }
+    #clairoPanel.cp-min  { width: 44px; }
+    #clairoPanel.cp-min .cp-body,
+    #clairoPanel.cp-min .cp-input-row { display: none; }
+    #clairoPanel.cp-min .cp-header { flex-direction: column; gap:6px; padding: 10px 0; justify-content: flex-start; }
+    #clairoPanel.cp-min .cp-header-info { display: none; }
+    #clairoPanel.cp-min .cp-controls { flex-direction: column; }
+
+    .cp-header {
+        display: flex; align-items: center; gap: 10px;
+        padding: 0 14px; height: 52px;
+        background: rgba(108,99,255,0.1);
+        border-bottom: 1px solid rgba(108,99,255,0.2);
+        flex-shrink: 0; user-select: none;
+        transition: all .3s;
+    }
+    .cp-avatar {
+        width: 30px; height: 30px; border-radius: 50%;
+        background: linear-gradient(135deg, #6c63ff, #a78bfa);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; color: #fff; flex-shrink: 0;
+    }
+    .cp-header-info { flex: 1; min-width: 0; }
+    .cp-header-info strong { display:block; font-size:13px; font-weight:600; color:#e2e2ff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cp-header-info span { font-size:11px; color:rgba(180,180,255,0.5); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+    .cp-controls { display:flex; gap:6px; flex-shrink:0; }
+    .cp-ctrl {
+        width:28px; height:28px; border-radius:50%; border:none;
+        background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.6);
+        font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+        transition:background .15s, color .15s; line-height:1; font-family:monospace;
+    }
+    .cp-ctrl:hover { background:rgba(255,255,255,0.18); color:#fff; }
+
+    .cp-body {
+        flex:1; overflow-y:auto; padding:14px 14px 8px;
+        display:flex; flex-direction:column; gap:10px;
+        scrollbar-width:thin; scrollbar-color:rgba(108,99,255,0.3) transparent;
+    }
+    .cp-msg { max-width:88%; font-size:13px; line-height:1.55; }
+    .cp-msg.bot { align-self:flex-start; }
+    .cp-msg.user { align-self:flex-end; }
+    .cp-bubble { padding:9px 13px; display:inline-block; max-width:100%; word-break:break-word; }
+    .cp-msg.bot  .cp-bubble { background:rgba(108,99,255,0.14); color:#c8c8f0; border-radius:4px 14px 14px 14px; }
+    .cp-msg.user .cp-bubble { background:linear-gradient(135deg,#6c63ff,#8b5cf6); color:#fff; border-radius:14px 4px 14px 14px; }
+    .cp-time { font-size:10px; color:rgba(255,255,255,0.22); margin-top:3px; padding:0 2px; }
+
+    .cp-typing { display:flex; gap:5px; align-items:center; padding:10px 13px; background:rgba(108,99,255,0.1); border-radius:4px 14px 14px 14px; }
+    .cp-typing span { width:6px; height:6px; border-radius:50%; background:rgba(108,99,255,0.7); animation:cpBlink 1.2s infinite; }
+    .cp-typing span:nth-child(2){animation-delay:.2s;}
+    .cp-typing span:nth-child(3){animation-delay:.4s;}
+    @keyframes cpBlink{0%,60%,100%{opacity:.2}30%{opacity:1}}
+
+    .cp-input-row {
+        display:flex; gap:8px; padding:10px 12px 14px;
+        border-top:1px solid rgba(255,255,255,0.06); flex-shrink:0;
+        background:#0d0d1a;
+    }
+    .cp-input {
+        flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(108,99,255,0.2);
+        border-radius:22px; padding:9px 15px; font-size:13px; color:#e2e2ff;
+        outline:none; font-family:'Outfit',inherit; transition:border-color .2s;
+    }
+    .cp-input::placeholder { color:rgba(180,180,255,0.35); }
+    .cp-input:focus { border-color:rgba(108,99,255,0.55); }
+    .cp-send {
+        width:36px; height:36px; border-radius:50%; border:none;
+        background:linear-gradient(135deg,#6c63ff,#a78bfa);
+        color:#fff; font-size:14px; cursor:pointer; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center; align-self:center;
+        transition:transform .15s, box-shadow .15s;
+    }
+    .cp-send:hover { transform:scale(1.1); box-shadow:0 4px 16px rgba(108,99,255,0.5); }
+
+    /* ── OPEN CLAIRO BUTTON in viewer nav ── */
+    .fv-clairo-btn {
+        display: flex; align-items: center; gap: 7px;
+        padding: 7px 14px; border-radius: 20px; border: 1px solid rgba(108,99,255,0.4);
+        background: rgba(108,99,255,0.1); color: #a78bfa;
+        font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+        cursor: pointer; transition: all .2s; white-space: nowrap;
+        letter-spacing: 0.3px;
+    }
+    .fv-clairo-btn:hover { background:rgba(108,99,255,0.22); border-color:rgba(108,99,255,0.7); color:#c4b5fd; }
+    .fv-clairo-btn i { font-size: 13px; }
+    .fv-clairo-btn.active { background:rgba(108,99,255,0.25); border-color:#6c63ff; color:#c4b5fd; }
+
+    /* Minimized pill tab on right edge */
+    #cpMinTab {
+        display: none; position: absolute; right: 0; top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(180deg,#6c63ff,#a78bfa);
+        color: #fff; border: none; border-radius: 10px 0 0 10px;
+        padding: 12px 8px; cursor: pointer; z-index: 10000;
+        font-size: 11px; font-family:'Outfit',sans-serif; font-weight:600;
+        letter-spacing:1px; writing-mode:vertical-rl; text-orientation:mixed;
+        box-shadow: -3px 0 16px rgba(108,99,255,0.4);
+        transition: padding .2s; align-items:center; gap:6px;
+    }
+    #cpMinTab:hover { padding: 14px 10px; }
+
+    /* ── HOMEPAGE floating bot ── */
+    .ai-tutor-float {
+        position: fixed; bottom: 28px; left: 28px; z-index: 9998;
+        width: 54px; height: 54px; border-radius: 50%;
+        background: linear-gradient(135deg, #276749, #38a169);
+        color: #fff; display: flex; align-items: center; justify-content: center;
+        font-size: 1.35rem;
+        box-shadow: 0 4px 24px rgba(56,161,105,0.45), 0 2px 8px rgba(0,0,0,0.4);
+        text-decoration: none;
+        transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .2s, background .2s;
+        animation: floatPulse 3s ease-in-out infinite;
+    }
+    .ai-tutor-float:hover {
+        transform: scale(1.13) translateY(-3px);
+        box-shadow: 0 8px 32px rgba(56,161,105,0.6), 0 2px 12px rgba(0,0,0,0.5);
+        background: linear-gradient(135deg, #2f855a, #48bb78);
+    }
+    .ai-tutor-float::after {
+        content: 'Clairo.ai';
+        position: absolute; left: 64px;
+        background: rgba(10,14,10,0.92); color: #68d391;
+        font-family: 'Outfit',sans-serif; font-size: 0.72rem; font-weight: 700;
+        letter-spacing: 0.5px; padding: 5px 11px; border-radius: 8px;
+        border: 1px solid rgba(104,211,145,0.2); white-space: nowrap;
+        opacity: 0; pointer-events: none; transform: translateX(-6px);
+        transition: opacity .2s, transform .2s;
+    }
+    .ai-tutor-float:hover::after { opacity:1; transform:translateX(0); }
+    @keyframes floatPulse {
+        0%,100%{box-shadow:0 4px 24px rgba(56,161,105,0.45),0 2px 8px rgba(0,0,0,0.4);}
+        50%{box-shadow:0 4px 32px rgba(56,161,105,0.7),0 2px 8px rgba(0,0,0,0.4);}
+    }
+    </style>
+</head>
+<body>
+
+    <!-- ── CLAIRO TOP BAR ── -->
+    <div id="clairo-topbar">
+        <a href="https://clairo.web.app" target="_blank">
+            <span class="topbar-label">Part of</span>
+            <img src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png" alt="Clairo"/>
+            <span class="topbar-dot"></span>
+        </a>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="auth-screen">
+        <div class="auth-container">
+            <div class="auth-logo"><i class="fa-solid fa-dna"></i> IG-bio</div>
+            <p class="auth-subtitle">The Ultimate IGCSE Biology Resource <br> By Mohamed Mostafa Abdelsalam ⭐️</p>
+            <h2 id="authTitle" style="color:var(--text); margin-bottom:15px;">Sign In</h2>
+            <input type="email" id="email" class="auth-input" placeholder="Email Address">
+            <div id="signupExtras" style="display:none;">
+                <input type="text" id="username" class="auth-input" placeholder="Username">
+                <div class="gender-options">
+                    <div class="gender-option"><input type="radio" name="gender" value="male" id="g_male" checked><label for="g_male"><i class="fa-solid fa-user-tie"></i> Male</label></div>
+                    <div class="gender-option"><input type="radio" name="gender" value="female" id="g_female"><label for="g_female"><i class="fa-solid fa-user-nurse"></i> Female</label></div>
+                </div>
+            </div>
+            <input type="password" id="password" class="auth-input" placeholder="Password">
+            <button onclick="handleAuthAction()" class="cta-btn auth-btn" id="authActionBtn">Login</button>
+            <button onclick="enterAsGuest()" class="cta-btn guest-btn">Enter as a Guest</button>
+            <p id="authError"></p>
+            <p style="margin-top:20px;font-size:.9rem;cursor:pointer;color:var(--primary);text-decoration:underline;" onclick="toggleAuthMode()" id="authToggle">New here? Create an account</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app">
+        <nav>
+            <div style="font-weight:800;font-size:1.5rem;color:var(--primary);">IG-bio</div>
+            <ul id="nav-links">
+                <li><a href="#chapters"><i class="fa-solid fa-book"></i> <span>Chapters</span></a></li>
+                <li><a href="#edu-games"><i class="fa-solid fa-gamepad"></i> <span>Games</span></a></li>
+            </ul>
+            <div class="nav-profile-area">
+                <span class="admin-badge" id="adminBadge">ADMIN</span>
+                <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle dark/light mode"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
+                <img src="" id="topRightAvatar" class="profile-avatar" onclick="openProfileSettings()" alt="Profile">
+            </div>
+        </nav>
+
+        <header>
+            <div id="userDashboard">
+                <div style="text-align:left;"><h3 id="welcomeMsg" style="margin:0;color:var(--text);">Welcome!</h3></div>
+                <div class="progress-container">
+                    <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:5px;">
+                        <span style="color:var(--text);">Course Progress</span>
+                        <span id="progressText" style="font-weight:800;color:var(--primary);font-size:1rem;">0%</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
+                </div>
+            </div>
+            <div class="hero-content">
+                <h1>Master Biology.</h1>
+                <h3>By Mohamed Mostafa Abdelsalam ⭐️</h3>
+                <p>Access audio lectures, smart notes, and interactive quizzes for CIE 0610.</p>
+                <div class="hero-btn-group">
+                    <a href="#chapters" class="cta-btn"><i class="fa-solid fa-book"></i> Start Learning</a>
+                    <a href="#edu-games" class="cta-btn btn-games"><i class="fa-solid fa-gamepad"></i> Play Games</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="features">
+            <div class="feature-card"><i class="fa-solid fa-headphones feature-icon"></i><h3>Audio Lectures</h3></div>
+            <div class="feature-card" style="border-top-color:#10b981;"><i class="fa-solid fa-book-open feature-icon" style="color:#10b981;"></i><h3>Smart Notes</h3></div>
+            <div class="feature-card" style="border-top-color:#f59e0b;"><i class="fa-solid fa-sitemap feature-icon" style="color:#f59e0b;"></i><h3>Mind Maps</h3></div>
+            <div class="feature-card" style="border-top-color:#ef4444;"><i class="fa-solid fa-clipboard-check feature-icon" style="color:#ef4444;"></i><h3>Exam Quizzes</h3></div>
+        </div>
+
+        <div id="content-sections-wrapper">
+            <section class="chapters-section" id="chapters">
+                <div class="section-header"><i class="fa-solid fa-bars section-drag-handle"></i><h2>Course Content</h2></div>
+                <div class="search-row">
+                    <div class="search-container"><i class="fa-solid fa-magnifying-glass search-icon"></i><input type="text" class="search-bar" placeholder="Search chapters..." onkeyup="filterGrid('grid', this.value)"></div>
+                    <button class="select-mode-btn" data-grid="grid" onclick="toggleSelectionMode('grid')"><i class="fa-regular fa-square-check"></i> Select</button>
+                    <button class="create-folder-btn" data-grid="grid" onclick="openCreateFolderDirect('grid')"><i class="fa-solid fa-folder-plus"></i> New Folder</button>
+                </div>
+                <div class="chapter-grid" id="grid">
+                    <div class="chapter-card add-card" id="add-btn-chapters" onclick="openAdminModal('chapters')"><i class="fa-solid fa-plus"></i></div>
+                </div>
+            </section>
+
+            <section class="chapters-section" id="edu-games">
+                <div class="section-header"><i class="fa-solid fa-bars section-drag-handle"></i><h2>Edu-Games</h2></div>
+                <div class="search-row">
+                    <div class="search-container"><i class="fa-solid fa-magnifying-glass search-icon"></i><input type="text" class="search-bar" placeholder="Search games..." onkeyup="filterGrid('gameGrid', this.value)"></div>
+                    <button class="select-mode-btn" data-grid="gameGrid" onclick="toggleSelectionMode('gameGrid')"><i class="fa-regular fa-square-check"></i> Select</button>
+                    <button class="create-folder-btn" data-grid="gameGrid" onclick="openCreateFolderDirect('gameGrid')"><i class="fa-solid fa-folder-plus"></i> New Folder</button>
+                </div>
+                <div class="chapter-grid" id="gameGrid">
+                    <div class="chapter-card add-card" id="add-btn-games" onclick="openAdminModal('edu-games')"><i class="fa-solid fa-plus"></i></div>
+                </div>
+            </section>
+        </div>
+
+        <div id="addSectionBtn" onclick="openAdminModal('NEW_SECTION')"><i class="fa-solid fa-plus"></i> Add New Section</div>
+        <footer><p>© 2026 IG-bio. Designed for CIE IGCSE Syllabus 0610.</p></footer>
+    </div>
+
+    <!-- MODALS -->
+    <div id="profileModal" class="modal-overlay"><div class="modal-box"><img src="" id="profileModalAvatar" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--primary);margin-bottom:15px;"><h2 id="profileUsername" style="margin-bottom:20px;">User</h2><button onclick="logout()" class="cta-btn btn-danger" style="width:100%;">Log Out</button><button onclick="document.getElementById('profileModal').style.display='none'" class="close-btn">Close</button></div></div>
+    <div id="adminAddModal" class="modal-overlay"><div class="modal-box"><h2 id="adminModalTitle" style="color:var(--primary);margin-bottom:15px;">Add New Item</h2><input type="hidden" id="adminTargetSection"><div style="text-align:left;margin-bottom:10px;"><label style="font-size:.8rem;font-weight:bold;">Title</label><input type="text" id="adminTitle" class="auth-input"></div><div style="text-align:left;margin-bottom:10px;" id="adminNumDiv"><label style="font-size:.8rem;font-weight:bold;">Chapter Number (Optional)</label><input type="text" id="adminNum" class="auth-input"></div><div style="text-align:left;margin-bottom:15px;"><label style="font-size:.8rem;font-weight:bold;">HTML File Name</label><input type="text" id="adminFile" class="auth-input"></div><button onclick="saveAdminItem()" class="cta-btn" style="width:100%;">Save & Add</button><button onclick="document.getElementById('adminAddModal').style.display='none'" class="close-btn">Cancel</button></div></div>
+    <div id="adminEditModal" class="modal-overlay"><div class="modal-box"><h2 style="color:var(--primary);margin-bottom:15px;">Edit Item</h2><input type="hidden" id="editItemId"><div style="text-align:left;margin-bottom:10px;"><label style="font-size:.8rem;font-weight:bold;">Title</label><input type="text" id="editTitle" class="auth-input"></div><div style="text-align:left;margin-bottom:10px;"><label style="font-size:.8rem;font-weight:bold;">Subtitle / Number</label><input type="text" id="editSubtitle" class="auth-input"></div><div style="text-align:left;margin-bottom:15px;"><label style="font-size:.8rem;font-weight:bold;">File Name</label><input type="text" id="editFile" class="auth-input"></div><div style="display:flex;gap:10px;"><button onclick="saveEditItem()" class="cta-btn" style="flex:1;">Save</button><button onclick="deleteItem()" class="cta-btn btn-danger" style="flex:1;">Delete</button></div><button onclick="document.getElementById('adminEditModal').style.display='none'" class="close-btn">Cancel</button></div></div>
+    <div id="guestLimitModal" class="modal-overlay"><div class="modal-box"><i class="fa-solid fa-lock" style="font-size:3rem;color:var(--primary);margin-bottom:15px;"></i><h2 style="margin-bottom:10px;">Account Required</h2><p style="margin-bottom:20px;color:var(--text-light);">You must be signed in to track your progress and save completed chapters.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="location.reload()" class="cta-btn">Sign In / Create Account</button><button onclick="document.getElementById('guestLimitModal').style.display='none'" class="cta-btn btn-secondary">Complete as Guest</button></div></div></div>
+
+    <!-- ── HOMEPAGE floating bot → links normally ── -->
+    <a href="https://ig-bio.vercel.app/clairo.ai" class="ai-tutor-float" id="homepageFloatBtn" title="Clairo.ai">
+        <i class="fa-solid fa-robot"></i>
+    </a>
+
+    <div class="selection-toolbar" id="selectionToolbar"><span class="sel-count-badge" id="selCount">0 selected</span><button class="sel-action-btn sel-btn-move" id="toolbarMoveBtn" onclick="openMoveModal()"><i class="fa-solid fa-arrows-turn-right"></i> Move</button><button class="sel-action-btn sel-btn-folder" id="toolbarFolderBtn" onclick="promptCreateFolder()"><i class="fa-solid fa-folder-plus"></i> New Folder</button><button class="sel-action-btn sel-btn-remove" id="toolbarRemoveBtn" onclick="removeSelectedFromFolder()" style="display:none;"><i class="fa-solid fa-arrow-right-from-bracket"></i> To Homepage</button><button class="sel-action-btn sel-btn-delete" onclick="deleteSelectedCards()"><i class="fa-solid fa-trash"></i> Delete</button><button class="sel-action-btn sel-btn-cancel" onclick="exitSelectionMode()"><i class="fa-solid fa-xmark"></i> Cancel</button></div>
+    <div id="folderNameModal" class="modal-overlay"><div class="modal-box"><div class="folder-modal-icon"><i class="fa-solid fa-folder-plus"></i></div><h2 style="color:var(--text);margin-bottom:6px;">Create Folder</h2><p style="color:var(--text-light);font-size:.9rem;margin-bottom:20px;">Group the selected cards into a folder</p><div style="text-align:left;margin-bottom:18px;"><label style="font-size:.8rem;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;">Folder Name</label><input type="text" id="folderNameInput" class="auth-input" placeholder="e.g. Unit 1 — Cell Biology" onkeydown="if(event.key==='Enter') confirmCreateFolder()"></div><button onclick="confirmCreateFolder()" class="cta-btn" style="width:100%;"><i class="fa-solid fa-folder-plus"></i> Create Folder</button><button onclick="document.getElementById('folderNameModal').style.display='none'" class="close-btn">Cancel</button></div></div>
+    <div id="renameFolderModal" class="modal-overlay"><div class="modal-box"><div class="folder-modal-icon"><i class="fa-solid fa-pen"></i></div><h2 style="color:var(--text);margin-bottom:6px;">Rename Folder</h2><p style="color:var(--text-light);font-size:.9rem;margin-bottom:20px;">The folder page title will update automatically</p><input type="hidden" id="renameFolderId"><div style="text-align:left;margin-bottom:18px;"><label style="font-size:.8rem;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;">New Name</label><input type="text" id="renameFolderInput" class="auth-input" onkeydown="if(event.key==='Enter') confirmRenameFolder()"></div><button onclick="confirmRenameFolder()" class="cta-btn" style="width:100%;"><i class="fa-solid fa-check"></i> Save Name</button><button onclick="document.getElementById('renameFolderModal').style.display='none'" class="close-btn">Cancel</button></div></div>
+    <div id="moveToFolderModal" class="modal-overlay"><div class="modal-box" style="max-width:520px;"><div class="folder-modal-icon"><i class="fa-solid fa-arrows-turn-right"></i></div><h2 style="color:var(--text);margin-bottom:6px;">Move to…</h2><p style="color:var(--text-light);font-size:.9rem;margin-bottom:16px;">Choose a destination for the selected items</p><div id="moveDestScroll"></div><button onclick="document.getElementById('moveToFolderModal').style.display='none'" class="close-btn" style="margin-top:16px;">Cancel</button></div></div>
+
+    <div class="folder-page" id="folderPage"><div class="folder-page-header"><button class="folder-back-btn" onclick="closeFolderPage()" title="Back"><i class="fa-solid fa-arrow-left"></i></button><div class="folder-page-icon"><i class="fa-solid fa-folder-open"></i></div><div class="folder-page-title" id="folderPageTitle">Folder</div><button class="folder-select-btn" id="folderPageSelectBtn" onclick="toggleFolderSelectionMode()"><i class="fa-regular fa-square-check"></i> Select</button><button class="folder-rename-btn" id="folderPageRenameBtn" onclick="openRenameFolderModal()"><i class="fa-solid fa-pen"></i> Rename</button></div><div class="folder-page-body"><div class="chapter-grid" id="folderPageGrid"><div class="chapter-card add-card" id="folderAddCardBtn" onclick="openAdminModalInFolder()" style="display:none;"><i class="fa-solid fa-plus"></i></div></div></div></div>
+
+    <!-- ── FILE VIEWER with split AI panel ── -->
+    <div id="fileViewerOverlay">
+        <div id="fileViewerNav">
+            <div class="fv-logo">
+                <i class="fa-solid fa-dna fv-logo-icon"></i>
+                <span class="fv-logo-text">IG-bio</span>
+            </div>
+            <div class="fv-nav-right">
+                <button class="fv-clairo-btn" id="fvClairoBtn" onclick="cpToggle()">
+                    <i class="fa-solid fa-robot"></i>
+                    <span id="fvClairoBtnLabel">Ask Clairo.ai</span>
+                </button>
+                <button class="fv-close-btn" onclick="closeFileViewer()" title="Go Back">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="fvBody">
+            <iframe id="fileViewerIframe" src="" allow="fullscreen"></iframe>
+
+            <button id="cpMinTab" onclick="cpRestore()" title="Open Clairo.ai">
+                <i class="fa-solid fa-robot" style="writing-mode:horizontal-tb;font-size:13px;"></i>
+                &nbsp;Clairo
+            </button>
+
+            <div id="clairoPanel">
+                <div class="cp-header">
+                    <div class="cp-avatar"><i class="fa-solid fa-robot" style="font-size:13px;"></i></div>
+                    <div class="cp-header-info">
+                        <strong>Clairo.ai</strong>
+                        <span id="cpChapterLabel">Your biology tutor</span>
+                    </div>
+                    <div class="cp-controls">
+                        <button class="cp-ctrl" id="cpMinBtn" onclick="cpMinimize()" title="Minimise">&#8722;</button>
+                        <button class="cp-ctrl" onclick="cpClose()" title="Close">&#10005;</button>
+                    </div>
+                </div>
+                <iframe id="clairoIframe" src="" style="flex:1;border:none;width:100%;background:#0d0d1a;" allow="microphone; clipboard-write"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <!-- ── CLAIRO AI PANEL LOGIC ── -->
+    <script>
+    (function () {
+        const CLAIRO_URL = 'https://ig-bio.vercel.app/clairo.ai';
+
+        let panelOpen      = false;
+        let panelMinimized = false;
+
+        const panel       = document.getElementById('clairoPanel');
+        const clairoIframe= document.getElementById('clairoIframe');
+        const minBtn      = document.getElementById('cpMinBtn');
+        const minTab      = document.getElementById('cpMinTab');
+        const fvClairoBtn = document.getElementById('fvClairoBtn');
+        const chLabel     = document.getElementById('cpChapterLabel');
+        const btnLabel    = document.getElementById('fvClairoBtnLabel');
+
+        window.cpToggle = function () {
+            if (panelMinimized) { cpRestore(); return; }
+            if (panelOpen) { cpClose(); } else { cpOpen(); }
+        };
+
+        function cpOpen() {
+            panelOpen = true; panelMinimized = false;
+            panel.classList.add('cp-open'); panel.classList.remove('cp-min');
+            minTab.style.display = 'none';
+            fvClairoBtn.classList.add('active');
+            btnLabel.textContent = 'Close Clairo';
+            // Load iframe only once
+            if (!clairoIframe.src || clairoIframe.src === window.location.href) {
+                clairoIframe.src = CLAIRO_URL;
+            }
+        }
+
+        window.cpClose = function () {
+            panelOpen = false; panelMinimized = false;
+            panel.classList.remove('cp-open', 'cp-min');
+            minTab.style.display = 'none';
+            fvClairoBtn.classList.remove('active');
+            btnLabel.textContent = 'Ask Clairo.ai';
+            minBtn.innerHTML = '&#8722;';
+        };
+
+        window.cpMinimize = function () {
+            panelMinimized = true; panelOpen = false;
+            panel.classList.remove('cp-open'); panel.classList.add('cp-min');
+            minTab.style.display = 'flex';
+            fvClairoBtn.classList.remove('active');
+            btnLabel.textContent = 'Ask Clairo.ai';
+        };
+
+        window.cpRestore = function () {
+            panelMinimized = false; panelOpen = true;
+            panel.classList.add('cp-open'); panel.classList.remove('cp-min');
+            minTab.style.display = 'none';
+            fvClairoBtn.classList.add('active');
+            btnLabel.textContent = 'Close Clairo';
+        };
+
+        window.addEventListener('load', function () {
+            const _origOpen = window.openFileViewer;
+            window.openFileViewer = function (fileSrc, title) {
+                chLabel.textContent = title || 'Biology';
+                cpClose();
+                if (typeof _origOpen === 'function') _origOpen.apply(this, arguments);
+            };
+
+            const _origClose = window.closeFileViewer;
+            window.closeFileViewer = function () {
+                cpClose();
+                if (typeof _origClose === 'function') _origClose.apply(this, arguments);
+            };
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && panelOpen) cpClose();
+        });
+
+    })();
+    </script>
+
+</body>
+</html>

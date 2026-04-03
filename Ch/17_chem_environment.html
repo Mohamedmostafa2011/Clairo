@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IG-Chem | Chemistry of Our Environment</title>
+
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- PDF Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+    :root {
+        --primary: #059669;   /* Emerald Green */
+        --primary-dark: #064e3b;
+        --secondary: #0f172a;
+        --accent: #34d399;    /* Mint Green */
+        --bg: #f0fdf4;
+        --text: #1e293b;
+        --sidebar-w: 280px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Space Grotesk', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
+    }
+
+    /* --- NAVIGATION --- */
+    .menu-toggle {
+        display: none;
+        position: fixed; top: 20px; left: 20px; z-index: 3000;
+        background: var(--secondary); color: white; border: none;
+        width: 50px; height: 50px; border-radius: 12px;
+        font-size: 1.4rem; cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        align-items: center; justify-content: center;
+        transition: 0.2s;
+    }
+    .menu-toggle:active { transform: scale(0.95); }
+
+    .overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); z-index: 1999;
+        opacity: 0; visibility: hidden; transition: 0.3s;
+        backdrop-filter: blur(3px);
+    }
+    .overlay.active { opacity: 1; visibility: visible; }
+
+    aside {
+        width: var(--sidebar-w);
+        background: var(--secondary);
+        color: #e2e8f0;
+        display: flex; flex-direction: column;
+        padding: 30px 20px;
+        flex-shrink: 0; z-index: 2000;
+        border-right: 4px solid var(--primary);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .brand {
+        font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 40px;
+        display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px;
+    }
+    .brand i { color: var(--accent); text-shadow: 0 0 10px rgba(52,211,153,0.5); }
+
+    .nav-item {
+        padding: 16px; margin-bottom: 8px; border-radius: 8px;
+        cursor: pointer; color: #94a3b8; font-weight: 600;
+        display: flex; align-items: center; gap: 15px; transition: 0.2s;
+        border: 1px solid transparent;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .nav-item.active {
+        background: var(--primary); color: white;
+        box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+    }
+
+    /* --- CONTENT AREA --- */
+    main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+    .view-panel {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        overflow-y: auto; padding: 0; display: none; opacity: 0;
+        transition: opacity 0.4s;
+    }
+    .view-panel.active { display: block; opacity: 1; }
+
+    /* --- NOTES STYLING --- */
+    .paper {
+        max-width: 950px; margin: 0 auto; background: white;
+        padding: 80px; min-height: 100vh;
+        box-shadow: 0 0 50px rgba(0,0,0,0.08);
+    }
+
+    h1 { font-size: 2.8rem; color: var(--secondary); margin-bottom: 10px; letter-spacing: -1.5px; line-height: 1.1; }
+    .meta { color: var(--primary); text-transform: uppercase; font-weight: bold; font-size: 0.85rem; letter-spacing: 2px; }
+
+    h2 {
+        font-family: 'Space Grotesk', sans-serif; font-size: 1.7rem; color: var(--secondary);
+        margin-top: 60px; margin-bottom: 25px; padding-bottom: 10px;
+        border-bottom: 4px solid var(--accent); display: inline-block;
+    }
+
+    h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; color: var(--primary-dark); margin-top: 35px; margin-bottom: 15px; }
+
+    p {
+        font-family: 'Lora', serif; font-size: 1.15rem; line-height: 1.8;
+        color: #475569; margin-bottom: 20px;
+    }
+    li { font-family: 'Lora', serif; font-size: 1.1rem; line-height: 1.7; margin-bottom: 8px; margin-left: 20px; color: #475569; }
+
+    /* Concept Box */
+    .concept-box {
+        background: #ecfdf5; border: 2px solid var(--primary);
+        padding: 25px; margin: 30px 0; border-radius: 12px;
+        position: relative;
+    }
+    .concept-box::before {
+        content: 'KEY CONCEPT'; position: absolute; top: -12px; left: 20px;
+        background: var(--primary); color: white; padding: 2px 10px;
+        font-size: 0.8rem; font-weight: bold; border-radius: 4px;
+    }
+
+    .mnemonic {
+        background: #f0fdf4; border-left: 5px solid var(--accent);
+        padding: 20px; margin: 20px 0; font-family: 'Space Grotesk', sans-serif;
+        color: #065f46; font-weight: bold; font-size: 1.2rem;
+        display: flex; align-items: center; gap: 15px;
+    }
+
+    /* Tables */
+    .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #cbd5e1; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th { background: var(--secondary); color: white; padding: 16px; text-align: left; font-family: 'Space Grotesk', sans-serif; }
+    td { padding: 16px; border-bottom: 1px solid #e2e8f0; font-family: 'Lora', serif; }
+    tr:nth-child(even) { background: #f8fafc; }
+
+    /* Chemical Equations */
+    .chem-eq {
+        font-family: 'Space Grotesk', monospace; background: #1e293b; color: #6ee7b7;
+        padding: 15px; border-radius: 8px; text-align: center; font-size: 1.2rem;
+        margin: 20px 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        border: 1px solid #334155; overflow-x: auto;
+    }
+
+    /* --- MIND MAP --- */
+    .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #cbd5e1; min-height: 100%; }
+    .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+    .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+    .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #64748b; width: 50%; height: 20px; }
+    .tree li::after { right: auto; left: 50%; border-left: 2px solid #64748b; }
+    .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+    .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+    .tree li:last-child::before { border-right: 2px solid #64748b; border-radius: 0 5px 0 0; }
+    .tree li:first-child::after { border-radius: 5px 0 0 0; }
+    .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #64748b; width: 0; height: 20px; }
+
+    .node {
+        background: white; border: 2px solid #94a3b8; padding: 12px 18px; border-radius: 6px;
+        display: inline-block; min-width: 130px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--secondary);
+        box-shadow: 0 4px 0px #cbd5e1; position: relative; z-index: 2; transition: 0.2s;
+    }
+    .node:hover { transform: translateY(-3px); box-shadow: 0 7px 0 #94a3b8; }
+    .root-node { background: var(--secondary); color: var(--accent); border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    .sub-node { border-color: var(--primary); color: var(--primary); }
+
+    /* --- QUIZ --- */
+    .quiz-area { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    .q-card { background: white; padding: 30px; margin-bottom: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    .q-opt {
+        display: flex; align-items: center; gap: 15px; padding: 15px; border: 2px solid #f1f5f9;
+        margin-top: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-family: 'Space Grotesk', sans-serif;
+    }
+    .q-opt:hover { background: #ecfdf5; border-color: var(--primary); }
+    .q-let {
+        font-weight: 800; color: #64748b; background: #e2e8f0;
+        width: 35px; height: 35px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    .q-opt.correct { background: #dcfce7; border-color: #22c55e; }
+    .q-opt.correct .q-let { background: #22c55e; color: white; }
+    .q-opt.wrong { background: #fee2e2; border-color: #ef4444; }
+    .q-opt.wrong .q-let { background: #ef4444; color: white; }
+
+    /* --- MOBILE --- */
+    @media (max-width: 768px) {
+        .menu-toggle { display: flex; }
+        aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        aside.active { left: 0; }
+        .paper { padding: 30px 20px; }
+        h1 { font-size: 2rem; }
+        .mm-wrapper { justify-content: flex-start; padding: 40px; transform: scale(0.6); transform-origin: top left; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-leaf"></i> IG-CHEM ENV</div>
+
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Study Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-project-diagram"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-flask"></i> 50 Qs Quiz
+        </div>
+
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #334155;">
+             <div class="nav-item" onclick="genPDF()" style="color:var(--accent); border-color:#334155;">
+                 <i class="fa-solid fa-file-pdf"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+
+        <!-- 1. NOTES PANEL -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Chemistry 0620 • Chapter 17</span>
+                <h1>Chemistry of Our Environment</h1>
+                <p>This chapter studies Earth's atmosphere, the threats it faces from human activity, water chemistry, and how industrial processes interact with the natural world.</p>
+
+                <!-- ===================== SECTION 1 ===================== -->
+                <h2>1. The Atmosphere</h2>
+                <p>The atmosphere is the layer of gases surrounding Earth. Its composition has remained roughly stable for the past 200 million years — until industrialisation.</p>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Gas</th><th>Approximate % by Volume</th></tr>
+                        <tr><td><strong>Nitrogen (N<sub>2</sub>)</strong></td><td>~78%</td></tr>
+                        <tr><td><strong>Oxygen (O<sub>2</sub>)</strong></td><td>~21%</td></tr>
+                        <tr><td><strong>Argon (Ar)</strong></td><td>~1%</td></tr>
+                        <tr><td><strong>Carbon Dioxide (CO<sub>2</sub>)</strong></td><td>~0.04%</td></tr>
+                        <tr><td><strong>Water Vapour + Traces</strong></td><td>Variable</td></tr>
+                    </table>
+                </div>
+
+                <div class="mnemonic">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    78-21-1: "Neon Lights Are Off" → N<sub>2</sub>, O<sub>2</sub>, Ar, Other
+                </div>
+
+                <!-- ===================== SECTION 2 ===================== -->
+                <h2>2. Air Pollution & Pollutant Gases</h2>
+                <p>Burning fossil fuels releases gases that pollute the atmosphere and cause serious environmental problems.</p>
+
+                <div class="concept-box">
+                    <strong>The Main Pollutant Gases:</strong><br><br>
+                    <strong>Carbon Monoxide (CO)</strong> — from incomplete combustion of carbon fuels.<br>
+                    <strong>Sulfur Dioxide (SO<sub>2</sub>)</strong> — from burning sulfur-containing fuels (coal, oil).<br>
+                    <strong>Oxides of Nitrogen (NO, NO<sub>2</sub>)</strong> — formed at high temperatures in car engines.<br>
+                    <strong>Carbon Dioxide (CO<sub>2</sub>)</strong> — from complete combustion; the main greenhouse gas.<br>
+                    <strong>Methane (CH<sub>4</sub>)</strong> — from decomposition of organic matter, cattle, rice paddies.
+                </div>
+
+                <h3>Carbon Monoxide (CO)</h3>
+                <ul>
+                    <li><strong>Source:</strong> Incomplete combustion when there is limited Oxygen.
+                        <div class="chem-eq">2C + O<sub>2</sub> &rarr; 2CO</div>
+                    </li>
+                    <li><strong>Problem:</strong> Colourless, odourless — very toxic gas. Binds to haemoglobin in blood, blocking Oxygen transport. Can be fatal.</li>
+                </ul>
+
+                <h3>Sulfur Dioxide (SO<sub>2</sub>) & Acid Rain</h3>
+                <ul>
+                    <li><strong>Source:</strong> Burning fossil fuels containing Sulfur impurities.
+                        <div class="chem-eq">S + O<sub>2</sub> &rarr; SO<sub>2</sub></div>
+                    </li>
+                    <li><strong>Acid Rain Formation:</strong> SO<sub>2</sub> reacts with water and Oxygen in the atmosphere:
+                        <div class="chem-eq">2SO<sub>2</sub> + O<sub>2</sub> + 2H<sub>2</sub>O &rarr; 2H<sub>2</sub>SO<sub>4</sub></div>
+                    </li>
+                    <li><strong>Effects of Acid Rain:</strong>
+                        <ul>
+                            <li>Damages and kills trees and vegetation.</li>
+                            <li>Acidifies lakes and rivers — kills aquatic life.</li>
+                            <li>Corrodes limestone buildings and statues.</li>
+                            <li>Corrodes metals in structures and bridges.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Reducing SO<sub>2</sub>:</strong> Use low-sulfur fuels; scrub waste gases with Calcium Oxide (CaO).</li>
+                </ul>
+
+                <h3>Oxides of Nitrogen (NO<sub>x</sub>)</h3>
+                <ul>
+                    <li><strong>Source:</strong> Car engines and power stations — very high temperatures cause N<sub>2</sub> and O<sub>2</sub> in air to react.
+                        <div class="chem-eq">N<sub>2</sub> + O<sub>2</sub> &rarr; 2NO</div>
+                    </li>
+                    <li>NO then reacts with more Oxygen to form NO<sub>2</sub>, which dissolves in rain to form nitric acid (HNO<sub>3</sub>) — also contributing to Acid Rain.</li>
+                    <li><strong>Reduction:</strong> Catalytic converters in cars convert NO<sub>x</sub> to harmless N<sub>2</sub>.
+                        <div class="chem-eq">2CO + 2NO &rarr; 2CO<sub>2</sub> + N<sub>2</sub></div>
+                    </li>
+                </ul>
+
+                <!-- ===================== SECTION 3 ===================== -->
+                <h2>3. The Greenhouse Effect & Climate Change</h2>
+                <p>The greenhouse effect is a <strong>natural process</strong> that keeps Earth warm enough to support life. Problems arise when human activity <strong>enhances</strong> this effect.</p>
+
+                <div class="concept-box">
+                    <strong>How the Greenhouse Effect Works:</strong><br><br>
+                    1. The Sun emits short-wave radiation that passes through the atmosphere and warms Earth's surface.<br>
+                    2. Earth re-emits long-wave (infrared) radiation.<br>
+                    3. Greenhouse gases absorb this infrared radiation and re-radiate it back to Earth — trapping heat.<br>
+                    4. The more greenhouse gases → more heat trapped → global temperatures rise.
+                </div>
+
+                <h3>Greenhouse Gases</h3>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Gas</th><th>Main Human Source</th></tr>
+                        <tr><td><strong>Carbon Dioxide (CO<sub>2</sub>)</strong></td><td>Burning fossil fuels, deforestation</td></tr>
+                        <tr><td><strong>Methane (CH<sub>4</sub>)</strong></td><td>Livestock, landfill, rice cultivation</td></tr>
+                        <tr><td><strong>Water Vapour (H<sub>2</sub>O)</strong></td><td>Natural; amplified by warming</td></tr>
+                        <tr><td><strong>Nitrous Oxide (N<sub>2</sub>O)</strong></td><td>Fertilisers, agriculture</td></tr>
+                    </table>
+                </div>
+
+                <h3>Consequences of Enhanced Greenhouse Effect</h3>
+                <ul>
+                    <li>Rising average global temperatures (<strong>Global Warming</strong>).</li>
+                    <li>Melting of polar ice caps and glaciers → rising sea levels.</li>
+                    <li>Flooding of low-lying coastal areas.</li>
+                    <li>More extreme weather events (droughts, storms, floods).</li>
+                    <li>Disruption to ecosystems and loss of biodiversity.</li>
+                    <li>Changed patterns of crop growth — threat to food security.</li>
+                </ul>
+
+                <h3>Reducing Greenhouse Gas Emissions</h3>
+                <ul>
+                    <li>Switch to <strong>renewable energy</strong> (solar, wind, hydroelectric).</li>
+                    <li>Improve <strong>energy efficiency</strong> (insulation, electric cars).</li>
+                    <li><strong>Reforestation</strong> — trees absorb CO<sub>2</sub> via photosynthesis.</li>
+                    <li>Reduce use of fossil fuels (coal, oil, natural gas).</li>
+                    <li>Carbon capture and storage (CCS) technology.</li>
+                </ul>
+
+                <!-- ===================== SECTION 4 ===================== -->
+                <h2>4. The Ozone Layer</h2>
+                <p>The ozone layer is found in the stratosphere, about 15–40 km above Earth's surface. It absorbs harmful ultraviolet (UV) radiation from the Sun.</p>
+
+                <div class="concept-box">
+                    <strong>Ozone (O<sub>3</sub>) Formation and Depletion:</strong><br><br>
+                    <strong>Formation:</strong> O<sub>2</sub> absorbs UV radiation and splits; atomic oxygen combines with O<sub>2</sub>:<br>
+                    O<sub>2</sub> → 2O (UV) &nbsp;then&nbsp; O + O<sub>2</sub> → O<sub>3</sub><br><br>
+                    <strong>Destruction by CFCs:</strong> Chlorofluorocarbons (CFCs) — from old aerosols and fridges — release Chlorine radicals that catalytically destroy ozone:<br>
+                    Cl + O<sub>3</sub> → ClO + O<sub>2</sub> &nbsp;&nbsp; then &nbsp;&nbsp; ClO + O → Cl + O<sub>2</sub><br><br>
+                    (One Cl atom can destroy ~100,000 O<sub>3</sub> molecules — it is a catalyst!)
+                </div>
+
+                <ul>
+                    <li><strong>Effects of ozone depletion:</strong> More UV reaches Earth's surface → increased rates of skin cancer, cataracts, damage to marine ecosystems.</li>
+                    <li><strong>Solution:</strong> CFCs have been banned under the Montreal Protocol (1987) and replaced with safer HFCs.</li>
+                </ul>
+
+                <!-- ===================== SECTION 5 ===================== -->
+                <h2>5. Water</h2>
+                <p>Water is an essential resource. Understanding its chemistry — purity, treatment, and safe supply — is a key part of environmental chemistry.</p>
+
+                <h3>Water Purity</h3>
+                <ul>
+                    <li>Pure water contains only H<sub>2</sub>O molecules. It boils at <strong>100°C</strong> and freezes at <strong>0°C</strong>.</li>
+                    <li>Natural water contains <strong>dissolved salts, minerals, and bacteria</strong> — it is not chemically pure.</li>
+                    <li>Dissolved ions (e.g. Ca<sup>2+</sup>, Mg<sup>2+</sup>) make water <strong>hard</strong>.</li>
+                </ul>
+
+                <h3>Water Treatment (Potable Water)</h3>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Step</th><th>Process</th><th>Purpose</th></tr>
+                        <tr><td>1</td><td><strong>Sedimentation / Filtration</strong></td><td>Remove large solid particles and mud.</td></tr>
+                        <tr><td>2</td><td><strong>Coagulation / Flocculation</strong></td><td>Aluminium sulfate added to clump fine particles together.</td></tr>
+                        <tr><td>3</td><td><strong>Sand Filtration</strong></td><td>Slow sand filter removes finer particles.</td></tr>
+                        <tr><td>4</td><td><strong>Chlorination</strong></td><td>Chlorine gas added to kill harmful bacteria and micro-organisms.</td></tr>
+                    </table>
+                </div>
+
+                <div class="mnemonic">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    SFSC: Settle → Filter → Sand → Chlorinate
+                </div>
+
+                <h3>Hard Water</h3>
+                <ul>
+                    <li>Caused by dissolved <strong>Ca<sup>2+</sup></strong> and <strong>Mg<sup>2+</sup></strong> ions from limestone/chalk rocks.</li>
+                    <li><strong>Problem:</strong> Does not lather well with soap; forms scum. Causes limescale in boilers and kettles (wastes energy).</li>
+                    <li><strong>Temporary Hardness</strong> — caused by Ca(HCO<sub>3</sub>)<sub>2</sub>. Removed by boiling:
+                        <div class="chem-eq">Ca(HCO<sub>3</sub>)<sub>2</sub> &rarr; CaCO<sub>3</sub> + H<sub>2</sub>O + CO<sub>2</sub></div>
+                    </li>
+                    <li><strong>Permanent Hardness</strong> — caused by CaSO<sub>4</sub>. Cannot be removed by boiling. Removed by adding Na<sub>2</sub>CO<sub>3</sub> (washing soda) which precipitates Ca<sup>2+</sup>.</li>
+                    <li><strong>Ion Exchange Resins</strong> — remove both types of hardness by exchanging Ca<sup>2+</sup>/Mg<sup>2+</sup> ions for Na<sup>+</sup> or H<sup>+</sup>.</li>
+                </ul>
+
+                <h3>Water Pollution</h3>
+                <ul>
+                    <li><strong>Sewage:</strong> Contains harmful bacteria and pathogens → treated in sewage works.</li>
+                    <li><strong>Fertiliser run-off (Eutrophication):</strong> Nitrates/phosphates from farms wash into rivers → algae blooms → algae die → bacteria decompose them → bacteria use up Oxygen → fish and aquatic life die.</li>
+                    <li><strong>Heavy metals</strong> (e.g. lead from old pipes) — toxic even in small concentrations.</li>
+                    <li><strong>Oil spills</strong> — harm marine wildlife; difficult to clean up.</li>
+                </ul>
+
+                <!-- ===================== SECTION 6 ===================== -->
+                <h2>6. Summary: Pollutant, Source & Effect</h2>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Pollutant</th><th>Source</th><th>Problem</th><th>Solution</th></tr>
+                        <tr><td><strong>CO</strong></td><td>Incomplete combustion</td><td>Toxic — blocks O<sub>2</sub> in blood</td><td>Catalytic converter; better combustion</td></tr>
+                        <tr><td><strong>SO<sub>2</sub></strong></td><td>Burning sulfur-rich fuels</td><td>Acid rain</td><td>Low-sulfur fuel; scrubbers; CaO</td></tr>
+                        <tr><td><strong>NO<sub>x</sub></strong></td><td>Car engines (high temp)</td><td>Acid rain; smog</td><td>Catalytic converter</td></tr>
+                        <tr><td><strong>CO<sub>2</sub></strong></td><td>All combustion; deforestation</td><td>Enhanced greenhouse effect</td><td>Renewables; reforestation; CCS</td></tr>
+                        <tr><td><strong>CH<sub>4</sub></strong></td><td>Livestock; landfill</td><td>Greenhouse gas (×25 more potent than CO<sub>2</sub>)</td><td>Reduce livestock; capture landfill gas</td></tr>
+                        <tr><td><strong>CFCs</strong></td><td>Old aerosols, fridges</td><td>Ozone depletion</td><td>Montreal Protocol — banned</td></tr>
+                    </table>
+                </div>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">CHEM OF THE<br>ENVIRONMENT</div>
+                            <ul>
+                                <li>
+                                    <div class="node sub-node">Atmosphere</div>
+                                    <ul>
+                                        <li><div class="node"><small>78% N<sub>2</sub></small></div></li>
+                                        <li><div class="node"><small>21% O<sub>2</sub></small></div></li>
+                                        <li><div class="node"><small>1% Ar + CO<sub>2</sub></small></div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node sub-node">Air Pollution</div>
+                                    <ul>
+                                        <li>
+                                            <div class="node">CO</div>
+                                            <ul><li><div class="node"><small>Toxic to blood</small></div></li></ul>
+                                        </li>
+                                        <li>
+                                            <div class="node">SO<sub>2</sub></div>
+                                            <ul><li><div class="node"><small>Acid Rain</small></div></li></ul>
+                                        </li>
+                                        <li>
+                                            <div class="node">NO<sub>x</sub></div>
+                                            <ul><li><div class="node"><small>Acid Rain/Smog</small></div></li></ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node sub-node">Greenhouse</div>
+                                    <ul>
+                                        <li><div class="node"><small>CO<sub>2</sub> & CH<sub>4</sub></small></div></li>
+                                        <li><div class="node"><small>Traps IR heat</small></div></li>
+                                        <li><div class="node"><small>Rising sea level</small></div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node sub-node">Ozone Layer</div>
+                                    <ul>
+                                        <li><div class="node"><small>UV absorber</small></div></li>
+                                        <li><div class="node"><small>CFCs destroy it</small></div></li>
+                                        <li><div class="node"><small>Montreal 1987</small></div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node sub-node">Water</div>
+                                    <ul>
+                                        <li><div class="node"><small>Treatment: SFSC</small></div></li>
+                                        <li><div class="node"><small>Hard Water: Ca²⁺/Mg²⁺</small></div></li>
+                                        <li><div class="node"><small>Eutrophication</small></div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container">
+                <!-- JavaScript loads questions here -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI FUNCTIONS ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            element.style.width = '900px';
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Chem_Ch17_Environment.pdf');
+            });
+        }
+
+        // --- QUIZ DATA (50 Questions) ---
+        const qData = [
+            {q:"What percentage of the atmosphere is Nitrogen?", o:["~78%","~21%","~1%","~0.04%"], a:0},
+            {q:"What percentage of the atmosphere is Oxygen?", o:["~21%","~78%","~1%","~0.04%"], a:0},
+            {q:"Which gas is the main greenhouse gas produced by human activity?", o:["Carbon Dioxide","Nitrogen","Argon","Oxygen"], a:0},
+            {q:"What is the main source of Carbon Monoxide (CO)?", o:["Incomplete combustion","Complete combustion","Volcanic eruptions","Decomposition"], a:0},
+            {q:"Why is Carbon Monoxide dangerous to humans?", o:["Binds to haemoglobin blocking O<sub>2</sub> transport","It is acidic","It destroys ozone","It causes acid rain"], a:0},
+            {q:"Which gas is responsible for acid rain when burned in fossil fuels?", o:["Sulfur Dioxide (SO<sub>2</sub>)","Carbon Dioxide","Methane","Nitrogen"], a:0},
+            {q:"What acid does SO<sub>2</sub> form in the atmosphere?", o:["Sulfuric acid (H<sub>2</sub>SO<sub>4</sub>)","Hydrochloric acid","Nitric acid","Carbonic acid"], a:0},
+            {q:"What is one effect of acid rain on lakes?", o:["Kills aquatic life by lowering pH","Makes water drinkable","Increases fish population","Removes hard water ions"], a:0},
+            {q:"Oxides of Nitrogen are formed in car engines because of...", o:["High temperatures causing N<sub>2</sub> and O<sub>2</sub> to react","Burning diesel","Incomplete combustion","Water vapour reacting with petrol"], a:0},
+            {q:"What does a catalytic converter do?", o:["Converts harmful CO and NO<sub>x</sub> into CO<sub>2</sub> and N<sub>2</sub>","Removes CO<sub>2</sub> from exhaust","Increases fuel efficiency","Produces O<sub>2</sub>"], a:0},
+            {q:"The greenhouse effect is caused by gases that...", o:["Absorb and re-radiate infrared radiation","Reflect sunlight","Produce UV radiation","Destroy ozone"], a:0},
+            {q:"Which is NOT a greenhouse gas?", o:["Nitrogen (N<sub>2</sub>)","Methane (CH<sub>4</sub>)","Carbon Dioxide (CO<sub>2</sub>)","Water Vapour"], a:0},
+            {q:"What human activity is a major source of CO<sub>2</sub> emissions?", o:["Burning fossil fuels","Farming animals only","Drinking water","Recycling"], a:0},
+            {q:"Deforestation increases greenhouse effect because...", o:["Fewer trees to absorb CO<sub>2</sub>","More water evaporates","More SO<sub>2</sub> is released","It cools the atmosphere"], a:0},
+            {q:"Which is a consequence of global warming?", o:["Rising sea levels","Ozone layer thickening","Less extreme weather","Decreased CO<sub>2</sub>"], a:0},
+            {q:"What is the ozone layer's role?", o:["Absorbs harmful UV radiation","Reflects infrared radiation","Produces Oxygen","Traps heat"], a:0},
+            {q:"Which substance destroys the ozone layer?", o:["CFCs (Chlorofluorocarbons)","CO<sub>2</sub>","SO<sub>2</sub>","Methane"], a:0},
+            {q:"How do CFCs destroy ozone? They release...", o:["Chlorine radicals that catalytically break down O<sub>3</sub>","Fluorine that absorbs UV","Carbon that reacts with O<sub>2</sub>","Bromine that heats the stratosphere"], a:0},
+            {q:"What international agreement banned CFCs?", o:["Montreal Protocol (1987)","Kyoto Protocol","Paris Agreement","Rio Convention"], a:0},
+            {q:"Effect of ozone depletion on humans:", o:["Increased skin cancer risk","Lower temperatures","More rainfall","Better crop growth"], a:0},
+            {q:"Pure water boils at:", o:["100°C","0°C","37°C","50°C"], a:0},
+            {q:"What makes water 'hard'?", o:["Dissolved Ca<sup>2+</sup> and Mg<sup>2+</sup> ions","Dissolved CO<sub>2</sub>","High temperature","Presence of bacteria"], a:0},
+            {q:"Temporary hardness is caused by:", o:["Ca(HCO<sub>3</sub>)<sub>2</sub>","CaSO<sub>4</sub>","MgSO<sub>4</sub>","NaCl"], a:0},
+            {q:"How is temporary hardness removed?", o:["Boiling the water","Adding washing soda","Using an acid","Ion exchange only"], a:0},
+            {q:"Permanent hardness is caused by:", o:["CaSO<sub>4</sub>","Ca(HCO<sub>3</sub>)<sub>2</sub>","CO<sub>2</sub>","NaCl"], a:0},
+            {q:"What chemical is added to remove permanent hardness?", o:["Sodium Carbonate (Na<sub>2</sub>CO<sub>3</sub>)","Sodium Chloride","Hydrochloric Acid","Calcium Oxide"], a:0},
+            {q:"Problem caused by hard water in kettles:", o:["Limescale deposits reduce efficiency","Kettle becomes too light","Produces poisonous gas","Makes water taste better"], a:0},
+            {q:"First step in water treatment is:", o:["Sedimentation/Filtration","Chlorination","Sand filtration","Adding alum"], a:0},
+            {q:"Why is Chlorine added during water treatment?", o:["To kill harmful bacteria","To remove hardness","To remove SO<sub>2</sub>","To neutralise acid"], a:0},
+            {q:"What does Aluminium Sulfate do in water treatment?", o:["Clumps fine particles together (flocculation)","Kills bacteria","Removes chlorine","Softens water"], a:0},
+            {q:"Eutrophication is caused by:", o:["Fertiliser run-off (nitrates/phosphates) into rivers","Oil spills","Acid rain","Hard water"], a:0},
+            {q:"What happens during eutrophication after algae die?", o:["Bacteria decompose algae, using up dissolved O<sub>2</sub>","Fish multiply rapidly","Water becomes alkaline","Algae grow faster"], a:0},
+            {q:"What is the result of eutrophication on aquatic life?", o:["Fish and organisms die due to lack of O<sub>2</sub>","Fish grow larger","Water becomes cleaner","More plant growth"], a:0},
+            {q:"Which is a renewable energy source?", o:["Solar power","Coal","Oil","Natural Gas"], a:0},
+            {q:"What does CCS stand for?", o:["Carbon Capture and Storage","Chlorine Compound Scrubbing","Carbon Combustion System","Chemical Compound Separation"], a:0},
+            {q:"Methane (CH<sub>4</sub>) as a greenhouse gas is approximately how many times more potent than CO<sub>2</sub>?", o:["25 times","2 times","100 times","10 times"], a:0},
+            {q:"Equation for incomplete combustion of Carbon:", o:["2C + O<sub>2</sub> &rarr; 2CO","C + O<sub>2</sub> &rarr; CO<sub>2</sub>","C + 2O<sub>2</sub> &rarr; CO<sub>2</sub>","2C + O<sub>2</sub> &rarr; C<sub>2</sub>O"], a:0},
+            {q:"Which gas makes up ~1% of the atmosphere?", o:["Argon","Helium","Neon","Krypton"], a:0},
+            {q:"What type of radiation does the ozone layer absorb?", o:["Ultraviolet (UV)","Infrared","Visible light","Microwave"], a:0},
+            {q:"Which acid contributes to acid rain from NO<sub>x</sub>?", o:["Nitric Acid (HNO<sub>3</sub>)","Sulfuric Acid","Hydrochloric Acid","Phosphoric Acid"], a:0},
+            {q:"Ion exchange resins remove hard water by:", o:["Replacing Ca<sup>2+</sup>/Mg<sup>2+</sup> with Na<sup>+</sup> or H<sup>+</sup>","Boiling","Adding acid","Filtering particles"], a:0},
+            {q:"The greenhouse effect is a natural process that:", o:["Keeps Earth warm enough to support life","Makes Earth too hot","Destroys the ozone layer","Produces acid rain"], a:0},
+            {q:"What is produced by boiling water containing temporary hardness?", o:["CaCO<sub>3</sub> (limescale) + CO<sub>2</sub>","Ca(OH)<sub>2</sub>","CaSO<sub>4</sub>","CO only"], a:0},
+            {q:"The catalytic converter equation shows:", o:["2CO + 2NO &rarr; 2CO<sub>2</sub> + N<sub>2</sub>","CO + NO &rarr; CO<sub>2</sub>","CO<sub>2</sub> + N<sub>2</sub> &rarr; CO + NO","2NO &rarr; N<sub>2</sub> + O<sub>2</sub>"], a:0},
+            {q:"Which gas produced by livestock contributes to the greenhouse effect?", o:["Methane (CH<sub>4</sub>)","Sulfur Dioxide","Carbon Monoxide","Nitrogen"], a:0},
+            {q:"What is the correct order of water treatment?", o:["Filtration → Flocculation → Sand filter → Chlorination","Chlorination → Filtration → Boiling → Sand","Boiling → Chlorination → Filtration → Settling","Sand filter → Chlorination → Flocculation → Settling"], a:0},
+            {q:"One Cl atom from CFCs can destroy approximately:", o:["100,000 ozone molecules","10 ozone molecules","1 ozone molecule","1,000,000 ozone molecules"], a:0},
+            {q:"What type of hardness CANNOT be removed by boiling?", o:["Permanent hardness","Temporary hardness","Both types","Neither type"], a:0},
+            {q:"Melting of polar ice caps is a consequence of:", o:["Enhanced Greenhouse Effect","Ozone depletion","Acid rain","Hard water"], a:0},
+            {q:"Which process by trees helps reduce CO<sub>2</sub> levels?", o:["Photosynthesis","Respiration","Transpiration","Decomposition"], a:0}
+        ];
+
+        // --- RENDER QUIZ ---
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem; color:#334155;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const correctTxt = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerHTML.includes(correctTxt)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

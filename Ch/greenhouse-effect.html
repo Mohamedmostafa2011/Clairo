@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Greenhouse Effect & Climate Change</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #05090f;
+      --surface: #0d1521;
+      --surface2: #111e30;
+      --accent: #38bdf8;
+      --accent2: #fb923c;
+      --accent3: #4ade80;
+      --text: #e2eaf4;
+      --muted: #7a95b2;
+      --border: rgba(56,189,248,0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── Stars background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 8%,  rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 75%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 45% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 20% 70%, rgba(255,255,255,0.4) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      overflow: hidden;
+    }
+
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+    .hero-orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(56,189,248,0.18) 0%, transparent 70%);
+      top: -100px; left: 50%; transform: translateX(-50%);
+    }
+    .hero-orb-2 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(251,146,60,0.12) 0%, transparent 70%);
+      bottom: 50px; right: -80px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56,189,248,0.1);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 18px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent) 0%, #60a5fa 50%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+
+    .btn-watch {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--accent), #60a5fa);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 30px rgba(56,189,248,0.3);
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+    .btn-watch:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 40px rgba(56,189,248,0.45);
+    }
+    .btn-watch svg { width: 18px; height: 18px; }
+
+    /* ── SCROLL INDICATOR ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      animation: fadeIn 1s ease 1s both;
+    }
+    .scroll-hint .line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollLine 1.5s ease-in-out infinite;
+    }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+    }
+
+    /* ── SECTION DIVIDER ── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 2.5rem;
+    }
+    .section-label .tag {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(56,189,248,0.1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 12px;
+    }
+    .section-label .line-h {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    /* ── BIG SECTION WRAPPER ── */
+    .big-section { margin-bottom: 6rem; }
+
+    .section-intro {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 640px;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── CARD GRID ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.8rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(56,189,248,0.35);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 18px 18px 0 0;
+    }
+    .card.blue::before  { background: linear-gradient(90deg, var(--accent), transparent); }
+    .card.orange::before { background: linear-gradient(90deg, var(--accent2), transparent); }
+    .card.green::before  { background: linear-gradient(90deg, var(--accent3), transparent); }
+
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.1rem;
+    }
+    .card.blue .card-icon  { background: rgba(56,189,248,0.12); }
+    .card.orange .card-icon { background: rgba(251,146,60,0.12); }
+    .card.green .card-icon  { background: rgba(74,222,128,0.12); }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.6rem;
+    }
+    .card p { color: var(--muted); font-size: 0.9rem; line-height: 1.65; }
+
+    /* ── STEP FLOW ── */
+    .step-flow { display: flex; flex-direction: column; gap: 0; }
+
+    .step {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 1.2rem;
+      position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 27px; top: 56px; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, rgba(56,189,248,0.4), transparent);
+    }
+
+    .step-num {
+      width: 56px; height: 56px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .step-body {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.3rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .step-body h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+    .step-body p { color: var(--muted); font-size: 0.875rem; }
+
+    /* ── CAUSE BLOCKS ── */
+    .cause-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    @media(max-width:580px){ .cause-grid { grid-template-columns: 1fr; } }
+
+    .cause-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.8rem;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .cause-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+    }
+    .cause-formula {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
+    }
+    .co2 { color: var(--accent2); }
+    .ch4 { color: #a78bfa; }
+
+    .cause-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 0.8rem;
+      color: var(--text);
+    }
+    .cause-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .cause-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    .cause-list li::before {
+      content: '▸';
+      color: var(--accent);
+      font-size: 0.75rem;
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ── IMPACT CARDS ── */
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .impact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.8rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .impact-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .impact-card .bg-icon {
+      position: absolute;
+      bottom: -10px; right: -10px;
+      font-size: 5rem;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+    .impact-card .emoji {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .impact-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .impact-card p { color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+
+    /* ── DEFINITION BOX ── */
+    .def-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+    @media(max-width:580px){ .def-box { grid-template-columns: 1fr; } }
+
+    .def-item {
+      background: var(--surface2);
+      border-left: 3px solid;
+      border-radius: 0 12px 12px 0;
+      padding: 1.2rem 1.5rem;
+    }
+    .def-item.warm { border-color: var(--accent2); }
+    .def-item.change { border-color: var(--accent); }
+    .def-item .def-label {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.4rem;
+    }
+    .def-item.warm .def-label  { color: var(--accent2); }
+    .def-item.change .def-label { color: var(--accent); }
+    .def-item p { color: var(--muted); font-size: 0.875rem; }
+
+    /* ── VIDEO CTA ── */
+    .video-cta {
+      margin-top: 5rem;
+      background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(251,146,60,0.06));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .video-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .video-cta h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.6rem;
+    }
+    .video-cta p { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.8rem; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes scrollLine {
+      0%,100% { opacity: 1; transform: scaleY(1); }
+      50%      { opacity: 0.3; transform: scaleY(0.5); }
+    }
+
+    /* Reveal on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:640px){
+      .card-grid { grid-template-columns: 1fr; }
+      .impact-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+
+    <div class="hero-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+      Climate Science · Video Notes
+    </div>
+
+    <h1>The <span>Greenhouse Effect</span><br>& Climate Change</h1>
+    <p class="hero-sub">A structured breakdown of the mechanisms, causes, and consequences of our planet's warming climate.</p>
+
+    <a class="btn-watch" href="https://youtu.be/5ZzDxYY48HQ?si=aHEQFRC4ol0jmrFS" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Watch the Full Video
+    </a>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="line"></div>
+    </div>
+  </section>
+
+  <!-- ══ MAIN ══ -->
+  <main>
+
+    <!-- ── SECTION 1: Greenhouse Effect ── -->
+    <div class="big-section reveal">
+      <div class="section-label">
+        <span class="tag">01 — Greenhouse Effect</span>
+        <div class="line-h"></div>
+      </div>
+      <h2 class="section-title">How the Earth Stays Warm</h2>
+      <p class="section-intro">The atmosphere surrounding Earth acts like a giant insulating blanket — trapping just enough heat to support life on the surface.</p>
+
+      <div class="step-flow">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>☀️ Solar Radiation Arrives</h4>
+            <p>The Sun sends energy to Earth as <strong>short wavelength radiation</strong>, which passes easily through the atmosphere and hits the ground.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>🌍 Earth Absorbs & Re-emits</h4>
+            <p>The ground absorbs this energy, heats up, then re-emits it as <strong>long wavelength radiation</strong> (infrared heat) back upward.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>🌫️ Greenhouse Gases Trap Heat</h4>
+            <p>Greenhouse gases absorb this long-wave radiation and scatter it in all directions — including <strong>back toward Earth</strong>, keeping the surface warm.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-grid" style="margin-top:1.5rem;">
+        <div class="card blue">
+          <div class="card-icon">💧</div>
+          <div class="card-title">Water Vapour</div>
+          <p>Naturally present in the atmosphere — one of the most abundant greenhouse gases, playing a key role in the natural cycle.</p>
+        </div>
+        <div class="card orange">
+          <div class="card-icon">🏭</div>
+          <div class="card-title">Carbon Dioxide (CO₂)</div>
+          <p>Produced by breathing, burning, and decomposition. The primary gas amplified by human industrial activity.</p>
+        </div>
+        <div class="card green">
+          <div class="card-icon">🐄</div>
+          <div class="card-title">Methane (CH₄)</div>
+          <p>A potent greenhouse gas released by livestock digestion and waste decomposition in landfills.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: Causes ── -->
+    <div class="big-section reveal">
+      <div class="section-label">
+        <span class="tag">02 — Human Causes</span>
+        <div class="line-h"></div>
+      </div>
+      <h2 class="section-title">Why Levels Are Rising</h2>
+      <p class="section-intro">Human activities are pumping these gases into the atmosphere at unprecedented rates, turbocharging the natural greenhouse effect.</p>
+
+      <div class="cause-grid">
+        <div class="cause-card">
+          <div class="cause-formula co2">CO₂</div>
+          <h4>Carbon Dioxide Sources</h4>
+          <ul class="cause-list">
+            <li>Burning fossil fuels (coal, oil, gas) releases carbon that was stored underground for millions of years</li>
+            <li>Deforestation removes trees that normally absorb CO₂ through photosynthesis, reducing Earth's carbon sink</li>
+          </ul>
+        </div>
+        <div class="cause-card">
+          <div class="cause-formula ch4">CH₄</div>
+          <h4>Methane Sources</h4>
+          <ul class="cause-list">
+            <li>Farm animals (like cattle) release methane as a byproduct of their digestive process</li>
+            <li>Waste in landfills is broken down by microorganisms which produce methane during decomposition</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: Consequences ── -->
+    <div class="big-section reveal">
+      <div class="section-label">
+        <span class="tag">03 — Consequences</span>
+        <div class="line-h"></div>
+      </div>
+      <h2 class="section-title">The Resulting Climate Change</h2>
+      <p class="section-intro">It's important to distinguish between two related — but different — terms before exploring the impacts.</p>
+
+      <div class="def-box">
+        <div class="def-item warm">
+          <div class="def-label">🌡️ Global Warming</div>
+          <p>The rise in Earth's average surface <strong>temperature</strong> caused by the enhanced greenhouse effect.</p>
+        </div>
+        <div class="def-item change">
+          <div class="def-label">🌀 Climate Change</div>
+          <p>The long-term <strong>shifts in weather patterns</strong> that result from global warming — a broader, more complex outcome.</p>
+        </div>
+      </div>
+
+      <div class="impact-grid">
+        <div class="impact-card">
+          <span class="bg-icon">🌪️</span>
+          <span class="emoji">🌪️</span>
+          <h4>Extreme Weather Events</h4>
+          <p>Increased frequency and severity of droughts, hurricanes, and floods as atmospheric energy levels rise.</p>
+        </div>
+        <div class="impact-card">
+          <span class="bg-icon">🌊</span>
+          <span class="emoji">🌊</span>
+          <h4>Sea-Level Rise</h4>
+          <p>Caused by melting ice caps and glaciers, combined with the thermal expansion of warming seawater, threatening coastal communities.</p>
+        </div>
+        <div class="impact-card">
+          <span class="bg-icon">🦋</span>
+          <span class="emoji">🦋</span>
+          <h4>Biodiversity Loss</h4>
+          <p>Species unable to survive, adapt, or migrate fast enough as rainfall and temperature patterns shift dramatically across habitats.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIDEO CTA ── -->
+    <div class="video-cta reveal">
+      <h3>Watch the Full Explanation</h3>
+      <p>See these concepts brought to life with animations and detailed visuals.</p>
+      <a class="btn-watch" href="https://youtu.be/5ZzDxYY48HQ?si=aHEQFRC4ol0jmrFS" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>
+        Open on YouTube
+      </a>
+    </div>
+
+  </main>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(r => observer.observe(r));
+  </script>
+</body>
+</html>

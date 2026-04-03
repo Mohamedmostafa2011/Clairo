@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electrolysis & Electroplating - Interactive Learning | Clairo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 25px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #667eea;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .simulation-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 25px 0;
+            border: 2px solid #667eea;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .info-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);
+        }
+
+        .card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .timeline-time {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 80px;
+        }
+
+        .stats-display {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .tab-btn {
+                min-width: 100%;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .control-group {
+                width: 100%;
+            }
+        }
+
+        .quiz-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .quiz-option {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            border-color: #667eea;
+            background: #667eea15;
+        }
+
+        .quiz-option.correct {
+            border-color: #28a745;
+            background: #28a74515;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #dc3545;
+            background: #dc354515;
+        }
+
+        .footer {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 50px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png" alt="Clairo Logo" class="logo">
+        <h1>Interactive Electrolysis & Electroplating Laboratory</h1>
+        <p>Explore the science of copper purification and metal coating through interactive simulations</p>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="openTab('copper-purification')">
+                🔬 Copper Purification
+            </button>
+            <button class="tab-btn" onclick="openTab('electroplating')">
+                ⚡ Electroplating
+            </button>
+            <button class="tab-btn" onclick="openTab('theory')">
+                📚 Theory & Concepts
+            </button>
+            <button class="tab-btn" onclick="openTab('quiz')">
+                🎯 Knowledge Quiz
+            </button>
+        </div>
+
+        <!-- Copper Purification Tab -->
+        <div id="copper-purification" class="tab-content active">
+            <h2>🔬 Copper Purification by Electrolysis</h2>
+            
+            <div class="info-card">
+                <h4>Why Purify Copper?</h4>
+                <p>Copper extracted through smelting is often not pure enough for electrical conductivity. Electrolysis uses electrical energy to purify it to 99.99% purity, essential for electrical wiring and electronics.</p>
+            </div>
+
+            <div class="simulation-container">
+                <h3>Interactive Simulation</h3>
+                <div class="canvas-container">
+                    <canvas id="copperCanvas" width="800" height="500"></canvas>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #FF6B6B;"></div>
+                        <span>Impure Copper Anode</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #FF8C42;"></div>
+                        <span>Pure Copper Cathode</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4ECDC4;"></div>
+                        <span>Cu²⁺ Ions</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #FFD700;"></div>
+                        <span>Gold/Silver (Anode Sludge)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #95E1D3;"></div>
+                        <span>Reactive Impurities (Zn)</span>
+                    </div>
+                </div>
+
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <div class="stat-value" id="anodeSize">100</div>
+                        <div class="stat-label">Anode Mass (g)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="cathodeSize">50</div>
+                        <div class="stat-label">Cathode Mass (g)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="sludgeAmount">0</div>
+                        <div class="stat-label">Anode Sludge (g)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="purityLevel">100</div>
+                        <div class="stat-label">Cathode Purity (%)</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="currentStrength">Current Strength (Amperes): <span id="currentValue">2</span>A</label>
+                        <input type="range" id="currentStrength" min="1" max="10" value="2" step="0.5">
+                    </div>
+                    <div class="control-group">
+                        <label for="impurityLevel">Anode Impurity Level: <span id="impurityValue">5</span>%</label>
+                        <input type="range" id="impurityLevel" min="1" max="20" value="5" step="1">
+                    </div>
+                    <button id="startCopperBtn" onclick="toggleCopperSimulation()">▶ Start Electrolysis</button>
+                    <button onclick="resetCopperSimulation()">🔄 Reset</button>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <h3>Process Timeline</h3>
+                <div class="timeline-item">
+                    <div class="timeline-time">0:11-0:25</div>
+                    <div>
+                        <strong>Introduction:</strong> Understanding why copper purification is necessary after initial smelting extraction.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">0:29-0:53</div>
+                    <div>
+                        <strong>The Process:</strong> Electrical energy drives the purification process through an electrolytic circuit.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">1:18-2:02</div>
+                    <div>
+                        <strong>Ion Movement:</strong> Cu²⁺ ions migrate to the cathode where they're deposited as pure copper, causing cathode growth.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">2:02-2:37</div>
+                    <div>
+                        <strong>Anode Dissolution:</strong> Impure copper at the anode dissolves into solution, gradually disappearing.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">2:53-3:21</div>
+                    <div>
+                        <strong>Anode Sludge:</strong> Less reactive impurities (Ag, Au) fall as sludge, collected for valuable metal recovery.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">3:23-3:37</div>
+                    <div>
+                        <strong>Reactive Contaminants:</strong> More reactive metals (Zn) dissolve; high concentration requires electrolyte replacement.
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="card">
+                    <h4>⚡ At the Cathode (Reduction)</h4>
+                    <p><strong>Reaction:</strong> Cu²⁺(aq) + 2e⁻ → Cu(s)</p>
+                    <p>Copper ions gain electrons and deposit as pure copper metal, increasing cathode mass.</p>
+                </div>
+                <div class="card">
+                    <h4>🔋 At the Anode (Oxidation)</h4>
+                    <p><strong>Reaction:</strong> Cu(s) → Cu²⁺(aq) + 2e⁻</p>
+                    <p>Impure copper metal loses electrons and dissolves into the electrolyte solution.</p>
+                </div>
+                <div class="card">
+                    <h4>💎 Valuable By-products</h4>
+                    <p>Anode sludge contains precious metals like gold and silver, making copper purification economically viable.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Electroplating Tab -->
+        <div id="electroplating" class="tab-content">
+            <h2>⚡ Electroplating Process</h2>
+
+            <div class="info-card">
+                <h4>What is Electroplating?</h4>
+                <p>Electroplating is a process that uses electrolysis to coat one metal object with another, improving aesthetics, preventing corrosion, and enhancing durability.</p>
+            </div>
+
+            <div class="simulation-container">
+                <h3>Interactive Electroplating Simulation</h3>
+                <div class="canvas-container">
+                    <canvas id="platingCanvas" width="800" height="500"></canvas>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #C0C0C0;"></div>
+                        <span>Base Metal Object (Cathode)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #FFD700;"></div>
+                        <span>Plating Metal Anode</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4A90E2;"></div>
+                        <span>Metal Ions</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #E74C3C;"></div>
+                        <span>Electrons</span>
+                    </div>
+                </div>
+
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <div class="stat-value" id="platingThickness">0</div>
+                        <div class="stat-label">Coating Thickness (μm)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="platingTime">0</div>
+                        <div class="stat-label">Plating Time (min)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="anodeMass">200</div>
+                        <div class="stat-label">Anode Mass (g)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="coverage">0</div>
+                        <div class="stat-label">Surface Coverage (%)</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="platingMetal">Select Plating Metal:</label>
+                        <select id="platingMetal" style="padding: 10px; border-radius: 5px; border: 2px solid #667eea;">
+                            <option value="gold">Gold (Au)</option>
+                            <option value="silver">Silver (Ag)</option>
+                            <option value="chrome">Chrome (Cr)</option>
+                            <option value="nickel">Nickel (Ni)</option>
+                            <option value="copper">Copper (Cu)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="platingCurrent">Current (A): <span id="platingCurrentValue">1.5</span>A</label>
+                        <input type="range" id="platingCurrent" min="0.5" max="5" value="1.5" step="0.1">
+                    </div>
+                    <button id="startPlatingBtn" onclick="togglePlatingSimulation()">▶ Start Plating</button>
+                    <button onclick="resetPlatingSimulation()">🔄 Reset</button>
+                </div>
+            </div>
+
+            <h3>Why Electroplate Metals?</h3>
+            <div class="info-grid">
+                <div class="card">
+                    <h4>✨ Aesthetics (0:36-0:45)</h4>
+                    <p><strong>Purpose:</strong> Improve appearance and visual appeal</p>
+                    <ul>
+                        <li>Gold-plated jewelry for luxury appearance</li>
+                        <li>Silver-plated cutlery for elegance</li>
+                        <li>Chrome-plated fixtures for shine</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🛡️ Protection (0:47-1:08)</h4>
+                    <p><strong>Purpose:</strong> Prevent corrosion and wear</p>
+                    <ul>
+                        <li>Chrome-plated car rims resist rust</li>
+                        <li>Tin-coated steel cans prevent food contamination</li>
+                        <li>Zinc-plated bolts for outdoor durability</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>⚙️ Functional Enhancement</h4>
+                    <p><strong>Purpose:</strong> Improve performance characteristics</p>
+                    <ul>
+                        <li>Increase electrical conductivity</li>
+                        <li>Reduce friction in mechanical parts</li>
+                        <li>Improve solderability in electronics</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>The Electroplating Mechanism</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-time">1:40-1:46</div>
+                    <div>
+                        <strong>Electrode Setup:</strong> Anode (+) is the plating metal source; Cathode (-) is the object being plated.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">2:27-2:44</div>
+                    <div>
+                        <strong>At the Cathode:</strong> Positive ions move toward the negative cathode, gain electrons (reduction), and deposit as metal coating.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">2:46-3:06</div>
+                    <div>
+                        <strong>At the Anode:</strong> Metal atoms lose electrons (oxidation), dissolving into the electrolyte to replenish ions. Electrons flow through external wire.
+                    </div>
+                </div>
+            </div>
+
+            <h3>Key Considerations</h3>
+            <div class="info-grid">
+                <div class="card">
+                    <h4>⚡ Current Strength (3:42-3:47)</h4>
+                    <p>Plating speed is directly proportional to current strength. Higher current = faster plating, but quality may suffer.</p>
+                </div>
+                <div class="card">
+                    <h4>🔗 Material Compatibility (4:06-4:19)</h4>
+                    <p>Not all metals form alloys. Multiple layers may be needed (e.g., copper layer before silver-plating steel).</p>
+                </div>
+                <div class="card">
+                    <h4>♻️ Environmental Impact (4:23-4:36)</h4>
+                    <p>Some processes (chrome plating) produce hazardous waste requiring expensive, careful treatment.</p>
+                </div>
+                <div class="card">
+                    <h4>💧 Electrolyte State (4:42-4:51)</h4>
+                    <p>For current flow, electrolyte compound must be molten or dissolved in solution—solid forms don't conduct.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theory Tab -->
+        <div id="theory" class="tab-content">
+            <h2>📚 Theory & Fundamental Concepts</h2>
+
+            <div class="info-card">
+                <h4>What is Electrolysis?</h4>
+                <p>Electrolysis is the process of using electrical energy to drive a non-spontaneous chemical reaction. It involves the decomposition of an electrolyte by passing an electric current through it.</p>
+            </div>
+
+            <h3>Fundamental Principles</h3>
+            <div class="info-grid">
+                <div class="card">
+                    <h4>⚡ Oxidation-Reduction Reactions</h4>
+                    <p><strong>Oxidation (at anode):</strong> Loss of electrons</p>
+                    <p><strong>Reduction (at cathode):</strong> Gain of electrons</p>
+                    <p>Mnemonic: <strong>OIL RIG</strong> - Oxidation Is Loss, Reduction Is Gain</p>
+                </div>
+                <div class="card">
+                    <h4>🔋 Electrode Identification</h4>
+                    <p><strong>Anode:</strong> Positive electrode where oxidation occurs</p>
+                    <p><strong>Cathode:</strong> Negative electrode where reduction occurs</p>
+                    <p>Mnemonic: <strong>An Ox, Red Cat</strong></p>
+                </div>
+                <div class="card">
+                    <h4>💧 Electrolyte Requirements</h4>
+                    <p>Must contain free-moving ions:</p>
+                    <ul>
+                        <li>Molten ionic compounds</li>
+                        <li>Aqueous ionic solutions</li>
+                        <li>Allows ion migration and current flow</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Copper Purification - Detailed Chemistry</h3>
+            <div class="simulation-container">
+                <h4>Chemical Equations</h4>
+                <div class="info-card">
+                    <p><strong>At the Cathode (Reduction):</strong></p>
+                    <p style="font-size: 1.2em; text-align: center; margin: 15px 0;">
+                        Cu²⁺(aq) + 2e⁻ → Cu(s)
+                    </p>
+                    <p>Copper ions in solution gain electrons and deposit as pure solid copper.</p>
+                </div>
+
+                <div class="info-card">
+                    <p><strong>At the Anode (Oxidation):</strong></p>
+                    <p style="font-size: 1.2em; text-align: center; margin: 15px 0;">
+                        Cu(s) → Cu²⁺(aq) + 2e⁻
+                    </p>
+                    <p>Impure copper metal loses electrons and dissolves as ions into the solution.</p>
+                </div>
+
+                <div class="info-card">
+                    <p><strong>Overall Process:</strong></p>
+                    <p>Mass transfers from impure anode to pure cathode while maintaining constant Cu²⁺ concentration in electrolyte (ideally).</p>
+                </div>
+            </div>
+
+            <h3>Impurity Management</h3>
+            <div class="info-grid">
+                <div class="card">
+                    <h4>Less Reactive Metals (Au, Ag, Pt)</h4>
+                    <p><strong>Behavior:</strong> Do NOT oxidize/dissolve</p>
+                    <p><strong>Result:</strong> Fall to bottom as anode sludge</p>
+                    <p><strong>Economic Value:</strong> Recovered and refined for profit</p>
+                </div>
+                <div class="card">
+                    <h4>More Reactive Metals (Zn, Fe, Ni)</h4>
+                    <p><strong>Behavior:</strong> Oxidize and dissolve into electrolyte</p>
+                    <p><strong>Problem:</strong> Contaminate the solution</p>
+                    <p><strong>Solution:</strong> Periodic electrolyte replacement or purification</p>
+                </div>
+                <div class="card">
+                    <h4>Copper Selectivity</h4>
+                    <p><strong>Key Principle:</strong> Only Cu²⁺ ions are preferentially reduced at the cathode under controlled conditions</p>
+                    <p><strong>Result:</strong> 99.99% pure copper cathode</p>
+                </div>
+            </div>
+
+            <h3>Faraday's Laws of Electrolysis</h3>
+            <div class="simulation-container">
+                <div class="card">
+                    <h4>First Law</h4>
+                    <p>The mass of substance deposited at an electrode is directly proportional to the quantity of electricity passed through the electrolyte.</p>
+                    <p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+                        m ∝ Q &nbsp;&nbsp; or &nbsp;&nbsp; m = ZQ
+                    </p>
+                    <p>Where: m = mass, Q = charge, Z = electrochemical equivalent</p>
+                </div>
+
+                <div class="card">
+                    <h4>Second Law</h4>
+                    <p>When the same quantity of electricity is passed through different electrolytes, the masses deposited are proportional to their equivalent weights.</p>
+                    <p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+                        m₁/m₂ = E₁/E₂
+                    </p>
+                    <p>Where: E = equivalent weight (atomic mass / valency)</p>
+                </div>
+
+                <div class="card">
+                    <h4>Practical Calculation</h4>
+                    <p><strong>Mass deposited formula:</strong></p>
+                    <p style="text-align: center; font-size: 1.1em; margin: 15px 0;">
+                        m = (I × t × M) / (n × F)
+                    </p>
+                    <p>I = current (A), t = time (s), M = molar mass, n = electrons transferred, F = Faraday constant (96,500 C/mol)</p>
+                </div>
+            </div>
+
+            <h3>Industrial Applications</h3>
+            <div class="info-grid">
+                <div class="card">
+                    <h4>Metal Purification</h4>
+                    <ul>
+                        <li>Copper refining (99.99% purity)</li>
+                        <li>Aluminum production (Hall-Héroult process)</li>
+                        <li>Zinc purification</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Metal Coating</h4>
+                    <ul>
+                        <li>Corrosion protection (galvanization)</li>
+                        <li>Decorative finishes (jewelry)</li>
+                        <li>Industrial applications (automotive, aerospace)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Chemical Production</h4>
+                    <ul>
+                        <li>Chlorine and caustic soda (chlor-alkali)</li>
+                        <li>Hydrogen production</li>
+                        <li>Metal extraction from ores</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quiz" class="tab-content">
+            <h2>🎯 Test Your Knowledge</h2>
+
+            <div class="quiz-container">
+                <h3>Question 1: Copper Purification</h3>
+                <p>Why is electrolysis necessary for copper purification after smelting?</p>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    A) To make copper cheaper
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    B) Smelted copper is not pure enough for electrical conductivity
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    C) To change copper's color
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    D) To make copper harder
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <h3>Question 2: Electrode Reactions</h3>
+                <p>What happens at the cathode during copper purification?</p>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    A) Copper metal dissolves
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    B) Cu²⁺ ions gain electrons and deposit as pure copper
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    C) Impurities fall to the bottom
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    D) Water decomposes
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <h3>Question 3: Anode Sludge</h3>
+                <p>What happens to less reactive impurities like gold and silver during copper purification?</p>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    A) They dissolve in the electrolyte
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    B) They deposit on the cathode
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    C) They fall to the bottom as anode sludge
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    D) They evaporate
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <h3>Question 4: Electroplating Purpose</h3>
+                <p>Which of the following is NOT a primary reason for electroplating?</p>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    A) Aesthetics - improving appearance
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    B) Protection - preventing corrosion
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    C) Increasing the weight of objects
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    D) Enhancing durability
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <h3>Question 5: Current and Plating Speed</h3>
+                <p>How does current strength affect electroplating?</p>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    A) No relationship exists
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    B) Plating speed is directly proportional to current strength
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    C) Higher current always produces better quality
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    D) Lower current produces thicker coatings
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <h3>Question 6: Electrolyte State</h3>
+                <p>For electrolysis to occur, the electrolyte must be:</p>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    A) In solid state only
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    B) Either molten or dissolved in solution
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    C) In gaseous state
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    D) Frozen
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <h3>Question 7: Reactive Contaminants</h3>
+                <p>What happens to metals more reactive than copper (like zinc) during purification?</p>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    A) They form anode sludge
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    B) They dissolve into the electrolyte and may require solution replacement
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    C) They deposit on the cathode
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    D) They remain unchanged
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <h3>Question 8: Multi-layer Plating</h3>
+                <p>Why might multiple plating layers be required?</p>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    A) To waste materials
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    B) To increase weight
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    C) Not all metals form alloys, e.g., steel needs copper before silver
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    D) To make the process slower
+                </div>
+            </div>
+
+            <div class="stats-display" style="margin-top: 30px;">
+                <div class="stat-item">
+                    <div class="stat-value" id="quizScore">0</div>
+                    <div class="stat-label">Correct Answers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="quizTotal">8</div>
+                    <div class="stat-label">Total Questions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="quizPercent">0%</div>
+                    <div class="stat-label">Score</div>
+                </div>
+            </div>
+
+            <button onclick="resetQuiz()" style="margin-top: 20px; width: 100%;">🔄 Reset Quiz</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <img src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png" alt="Clairo Logo" style="max-width: 100px; margin-bottom: 10px;">
+        <p><strong>Clairo Interactive Learning Platform</strong></p>
+        <p>Advancing education through interactive simulations and engaging content</p>
+        <p style="margin-top: 10px; color: #666;">© 2026 Clairo Educational Technologies. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function openTab(tabName) {
+            const contents = document.getElementsByClassName('tab-content');
+            const buttons = document.getElementsByClassName('tab-btn');
+            
+            for (let content of contents) {
+                content.classList.remove('active');
+            }
+            
+            for (let button of buttons) {
+                button.classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Copper Purification Simulation
+        const copperCanvas = document.getElementById('copperCanvas');
+        const copperCtx = copperCanvas.getContext('2d');
+        let copperRunning = false;
+        let copperAnimationId;
+
+        // Simulation variables
+        let anodeSize = 100;
+        let cathodeSize = 50;
+        let sludgeAmount = 0;
+        let copperIons = [];
+        let impurityIons = [];
+        let time = 0;
+
+        function drawCopperSetup() {
+            copperCtx.clearRect(0, 0, copperCanvas.width, copperCanvas.height);
+            
+            // Draw electrolyte solution background
+            copperCtx.fillStyle = '#87CEEB40';
+            copperCtx.fillRect(50, 100, 700, 300);
+            
+            // Draw battery/power source
+            copperCtx.fillStyle = '#333';
+            copperCtx.fillRect(350, 20, 100, 40);
+            copperCtx.fillStyle = '#E74C3C';
+            copperCtx.fillRect(460, 30, 20, 20);
+            copperCtx.fillStyle = '#3498DB';
+            copperCtx.fillRect(320, 30, 20, 20);
+            
+            // Draw wires
+            copperCtx.strokeStyle = '#333';
+            copperCtx.lineWidth = 3;
+            copperCtx.beginPath();
+            copperCtx.moveTo(340, 40);
+            copperCtx.lineTo(200, 40);
+            copperCtx.lineTo(200, 100);
+            copperCtx.stroke();
+            
+            copperCtx.beginPath();
+            copperCtx.moveTo(450, 40);
+            copperCtx.lineTo(600, 40);
+            copperCtx.lineTo(600, 100);
+            copperCtx.stroke();
+            
+            // Draw Anode (Impure Copper) - left
+            const anodeHeight = 200 * (anodeSize / 100);
+            copperCtx.fillStyle = '#FF6B6B';
+            copperCtx.fillRect(150, 100, 100, anodeHeight);
+            copperCtx.strokeStyle = '#C0392B';
+            copperCtx.lineWidth = 2;
+            copperCtx.strokeRect(150, 100, 100, anodeHeight);
+            
+            // Draw impurities in anode
+            for (let i = 0; i < 15; i++) {
+                copperCtx.fillStyle = i % 2 === 0 ? '#FFD700' : '#95E1D3';
+                copperCtx.beginPath();
+                copperCtx.arc(160 + Math.random() * 80, 110 + Math.random() * (anodeHeight - 20), 3, 0, Math.PI * 2);
+                copperCtx.fill();
+            }
+            
+            // Anode label
+            copperCtx.fillStyle = '#333';
+            copperCtx.font = 'bold 14px Arial';
+            copperCtx.fillText('ANODE (-)', 160, 90);
+            copperCtx.fillText('Impure Cu', 160, 450);
+            
+            // Draw Cathode (Pure Copper) - right
+            const cathodeHeight = 200 * (cathodeSize / 100);
+            copperCtx.fillStyle = '#FF8C42';
+            copperCtx.fillRect(550, 300 - cathodeHeight, 100, cathodeHeight);
+            copperCtx.strokeStyle = '#D35400';
+            copperCtx.lineWidth = 2;
+            copperCtx.strokeRect(550, 300 - cathodeHeight, 100, cathodeHeight);
+            
+            // Cathode label
+            copperCtx.fillStyle = '#333';
+            copperCtx.font = 'bold 14px Arial';
+            copperCtx.fillText('CATHODE (+)', 550, 90);
+            copperCtx.fillText('Pure Cu', 565, 450);
+            
+            // Draw anode sludge
+            if (sludgeAmount > 0) {
+                copperCtx.fillStyle = '#FFD700';
+                copperCtx.fillRect(150, 400, 100, sludgeAmount * 2);
+                copperCtx.fillStyle = '#333';
+                copperCtx.font = '12px Arial';
+                copperCtx.fillText('Anode Sludge', 145, 470);
+                copperCtx.fillText('(Au, Ag)', 165, 485);
+            }
+            
+            // Draw copper ions
+            copperIons.forEach(ion => {
+                copperCtx.fillStyle = '#4ECDC4';
+                copperCtx.beginPath();
+                copperCtx.arc(ion.x, ion.y, 5, 0, Math.PI * 2);
+                copperCtx.fill();
+                copperCtx.fillStyle = '#fff';
+                copperCtx.font = 'bold 8px Arial';
+                copperCtx.fillText('Cu²⁺', ion.x - 8, ion.y + 3);
+            });
+            
+            // Draw impurity ions
+            impurityIons.forEach(ion => {
+                copperCtx.fillStyle = '#95E1D3';
+                copperCtx.beginPath();
+                copperCtx.arc(ion.x, ion.y, 4, 0, Math.PI * 2);
+                copperCtx.fill();
+                copperCtx.fillStyle = '#333';
+                copperCtx.font = 'bold 7px Arial';
+                copperCtx.fillText('Zn²⁺', ion.x - 7, ion.y + 2);
+            });
+            
+            // Draw electron flow arrows if running
+            if (copperRunning && Math.floor(time) % 2 === 0) {
+                copperCtx.fillStyle = '#E74C3C';
+                // From cathode to anode (external circuit)
+                for (let i = 0; i < 3; i++) {
+                    const x = 450 - i * 80;
+                    copperCtx.beginPath();
+                    copperCtx.moveTo(x, 35);
+                    copperCtx.lineTo(x - 10, 30);
+                    copperCtx.lineTo(x - 10, 40);
+                    copperCtx.fill();
+                }
+            }
+        }
+
+        function updateCopperSimulation() {
+            if (!copperRunning) return;
+            
+            const current = parseFloat(document.getElementById('currentStrength').value);
+            const impurityLevel = parseFloat(document.getElementById('impurityLevel').value);
+            
+            time += 0.1;
+            
+            // Generate new copper ions from anode
+            if (Math.random() < 0.3 && anodeSize > 10) {
+                copperIons.push({
+                    x: 250,
+                    y: 150 + Math.random() * 100,
+                    vx: current * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5
+                });
+            }
+            
+            // Generate impurity ions occasionally
+            if (Math.random() < impurityLevel / 100 && anodeSize > 10) {
+                impurityIons.push({
+                    x: 250,
+                    y: 150 + Math.random() * 100,
+                    vx: current * 0.3,
+                    vy: (Math.random() - 0.5) * 0.8
+                });
+            }
+            
+            // Update copper ion positions
+            copperIons = copperIons.filter(ion => {
+                ion.x += ion.vx;
+                ion.y += ion.vy;
+                
+                // Deposit on cathode
+                if (ion.x > 550) {
+                    cathodeSize += 0.5;
+                    return false;
+                }
+                return ion.x < 700;
+            });
+            
+            // Update impurity ion positions (stay in solution)
+            impurityIons.forEach(ion => {
+                ion.x += ion.vx * 0.5;
+                ion.y += ion.vy;
+                
+                // Bounce off edges
+                if (ion.x > 730 || ion.x < 60) ion.vx *= -1;
+                if (ion.y > 390 || ion.y < 110) ion.vy *= -1;
+            });
+            
+            // Decrease anode size
+            if (anodeSize > 10) {
+                anodeSize -= current * 0.05;
+            }
+            
+            // Collect anode sludge (noble metals)
+            if (Math.random() < impurityLevel / 200) {
+                sludgeAmount += 0.1;
+            }
+            
+            // Update display values
+            document.getElementById('anodeSize').textContent = Math.max(0, anodeSize).toFixed(1);
+            document.getElementById('cathodeSize').textContent = cathodeSize.toFixed(1);
+            document.getElementById('sludgeAmount').textContent = sludgeAmount.toFixed(1);
+            document.getElementById('purityLevel').textContent = (100 - impurityIons.length * 0.1).toFixed(1);
+            
+            drawCopperSetup();
+            copperAnimationId = requestAnimationFrame(updateCopperSimulation);
+        }
+
+        function toggleCopperSimulation() {
+            copperRunning = !copperRunning;
+            const btn = document.getElementById('startCopperBtn');
+            
+            if (copperRunning) {
+                btn.textContent = '⏸ Pause';
+                updateCopperSimulation();
+            } else {
+                btn.textContent = '▶ Start Electrolysis';
+                cancelAnimationFrame(copperAnimationId);
+            }
+        }
+
+        function resetCopperSimulation() {
+            copperRunning = false;
+            cancelAnimationFrame(copperAnimationId);
+            
+            anodeSize = 100;
+            cathodeSize = 50;
+            sludgeAmount = 0;
+            copperIons = [];
+            impurityIons = [];
+            time = 0;
+            
+            document.getElementById('anodeSize').textContent = '100';
+            document.getElementById('cathodeSize').textContent = '50';
+            document.getElementById('sludgeAmount').textContent = '0';
+            document.getElementById('purityLevel').textContent = '100';
+            document.getElementById('startCopperBtn').textContent = '▶ Start Electrolysis';
+            
+            drawCopperSetup();
+        }
+
+        // Update current value display
+        document.getElementById('currentStrength').addEventListener('input', function() {
+            document.getElementById('currentValue').textContent = this.value;
+        });
+
+        document.getElementById('impurityLevel').addEventListener('input', function() {
+            document.getElementById('impurityValue').textContent = this.value;
+        });
+
+        // Electroplating Simulation
+        const platingCanvas = document.getElementById('platingCanvas');
+        const platingCtx = platingCanvas.getContext('2d');
+        let platingRunning = false;
+        let platingAnimationId;
+
+        let platingThickness = 0;
+        let platingTime = 0;
+        let platingAnodeMass = 200;
+        let platingIons = [];
+        let electrons = [];
+
+        const metalColors = {
+            gold: '#FFD700',
+            silver: '#C0C0C0',
+            chrome: '#AAB7C4',
+            nickel: '#B8B8B8',
+            copper: '#FF8C42'
+        };
+
+        function drawPlatingSetup() {
+            platingCtx.clearRect(0, 0, platingCanvas.width, platingCanvas.height);
+            
+            const selectedMetal = document.getElementById('platingMetal').value;
+            const metalColor = metalColors[selectedMetal];
+            
+            // Draw electrolyte solution
+            platingCtx.fillStyle = '#87CEEB30';
+            platingCtx.fillRect(50, 100, 700, 300);
+            
+            // Draw power source
+            platingCtx.fillStyle = '#333';
+            platingCtx.fillRect(350, 20, 100, 40);
+            platingCtx.fillStyle = '#E74C3C';
+            platingCtx.fillRect(460, 30, 20, 20);
+            platingCtx.fillStyle = '#3498DB';
+            platingCtx.fillRect(320, 30, 20, 20);
+            
+            // Draw wires
+            platingCtx.strokeStyle = '#333';
+            platingCtx.lineWidth = 3;
+            platingCtx.beginPath();
+            platingCtx.moveTo(340, 40);
+            platingCtx.lineTo(200, 40);
+            platingCtx.lineTo(200, 100);
+            platingCtx.stroke();
+            
+            platingCtx.beginPath();
+            platingCtx.moveTo(450, 40);
+            platingCtx.lineTo(600, 40);
+            platingCtx.lineTo(600, 100);
+            platingCtx.stroke();
+            
+            // Draw Anode (plating metal)
+            platingCtx.fillStyle = metalColor;
+            platingCtx.fillRect(550, 100, 100, 250);
+            platingCtx.strokeStyle = '#333';
+            platingCtx.lineWidth = 2;
+            platingCtx.strokeRect(550, 100, 100, 250);
+            
+            platingCtx.fillStyle = '#333';
+            platingCtx.font = 'bold 14px Arial';
+            platingCtx.fillText('ANODE (+)', 560, 90);
+            platingCtx.fillText(selectedMetal.charAt(0).toUpperCase() + selectedMetal.slice(1), 570, 450);
+            
+            // Draw Cathode (object being plated)
+            platingCtx.fillStyle = '#8B8B8B';
+            platingCtx.fillRect(150, 100, 100, 250);
+            
+            // Draw plating layer
+            if (platingThickness > 0) {
+                platingCtx.fillStyle = metalColor;
+                const thickness = Math.min(platingThickness / 5, 15);
+                platingCtx.fillRect(150 - thickness, 100 - thickness, 100 + thickness * 2, 250 + thickness * 2);
+            }
+            
+            platingCtx.strokeStyle = '#333';
+            platingCtx.lineWidth = 2;
+            platingCtx.strokeRect(150, 100, 100, 250);
+            
+            platingCtx.fillStyle = '#333';
+            platingCtx.font = 'bold 14px Arial';
+            platingCtx.fillText('CATHODE (-)', 150, 90);
+            platingCtx.fillText('Object', 175, 450);
+            
+            // Draw metal ions
+            platingIons.forEach(ion => {
+                platingCtx.fillStyle = metalColor;
+                platingCtx.beginPath();
+                platingCtx.arc(ion.x, ion.y, 6, 0, Math.PI * 2);
+                platingCtx.fill();
+                platingCtx.fillStyle = '#333';
+                platingCtx.font = 'bold 10px Arial';
+                platingCtx.fillText('+', ion.x - 3, ion.y + 4);
+            });
+            
+            // Draw electrons in wire
+            electrons.forEach(e => {
+                platingCtx.fillStyle = '#E74C3C';
+                platingCtx.beginPath();
+                platingCtx.arc(e.x, e.y, 4, 0, Math.PI * 2);
+                platingCtx.fill();
+                platingCtx.fillStyle = '#fff';
+                platingCtx.font = 'bold 8px Arial';
+                platingCtx.fillText('e⁻', e.x - 4, e.y + 3);
+            });
+        }
+
+        function updatePlatingSimulation() {
+            if (!platingRunning) return;
+            
+            const current = parseFloat(document.getElementById('platingCurrent').value);
+            
+            platingTime += 0.1;
+            
+            // Generate ions from anode
+            if (Math.random() < 0.4 && platingAnodeMass > 10) {
+                platingIons.push({
+                    x: 550,
+                    y: 150 + Math.random() * 150,
+                    vx: -current * 0.8,
+                    vy: (Math.random() - 0.5) * 0.5
+                });
+            }
+            
+            // Generate electrons in wire
+            if (Math.random() < 0.5) {
+                electrons.push({
+                    x: 590,
+                    y: 40,
+                    vx: -2
+                });
+            }
+            
+            // Update ion positions
+            platingIons = platingIons.filter(ion => {
+                ion.x += ion.vx;
+                ion.y += ion.vy;
+                
+                // Deposit on cathode
+                if (ion.x < 250) {
+                    platingThickness += 0.3;
+                    return false;
+                }
+                return ion.x > 100;
+            });
+            
+            // Update electron positions
+            electrons = electrons.filter(e => {
+                e.x += e.vx;
+                return e.x > 210;
+            });
+            
+            // Decrease anode mass
+            if (platingAnodeMass > 10) {
+                platingAnodeMass -= current * 0.03;
+            }
+            
+            // Update displays
+            document.getElementById('platingThickness').textContent = platingThickness.toFixed(1);
+            document.getElementById('platingTime').textContent = (platingTime / 10).toFixed(1);
+            document.getElementById('anodeMass').textContent = platingAnodeMass.toFixed(1);
+            document.getElementById('coverage').textContent = Math.min(100, (platingThickness / 2).toFixed(1));
+            
+            drawPlatingSetup();
+            platingAnimationId = requestAnimationFrame(updatePlatingSimulation);
+        }
+
+        function togglePlatingSimulation() {
+            platingRunning = !platingRunning;
+            const btn = document.getElementById('startPlatingBtn');
+            
+            if (platingRunning) {
+                btn.textContent = '⏸ Pause';
+                updatePlatingSimulation();
+            } else {
+                btn.textContent = '▶ Start Plating';
+                cancelAnimationFrame(platingAnimationId);
+            }
+        }
+
+        function resetPlatingSimulation() {
+            platingRunning = false;
+            cancelAnimationFrame(platingAnimationId);
+            
+            platingThickness = 0;
+            platingTime = 0;
+            platingAnodeMass = 200;
+            platingIons = [];
+            electrons = [];
+            
+            document.getElementById('platingThickness').textContent = '0';
+            document.getElementById('platingTime').textContent = '0';
+            document.getElementById('anodeMass').textContent = '200';
+            document.getElementById('coverage').textContent = '0';
+            document.getElementById('startPlatingBtn').textContent = '▶ Start Plating';
+            
+            drawPlatingSetup();
+        }
+
+        // Update plating current display
+        document.getElementById('platingCurrent').addEventListener('input', function() {
+            document.getElementById('platingCurrentValue').textContent = this.value;
+        });
+
+        // Redraw when metal selection changes
+        document.getElementById('platingMetal').addEventListener('change', function() {
+            drawPlatingSetup();
+        });
+
+        // Quiz functionality
+        let quizScore = 0;
+        let answeredQuestions = new Set();
+
+        function checkAnswer(element, isCorrect) {
+            const questionContainer = element.parentElement;
+            const options = questionContainer.getElementsByClassName('quiz-option');
+            
+            // Prevent re-answering
+            if (answeredQuestions.has(questionContainer)) return;
+            answeredQuestions.add(questionContainer);
+            
+            // Disable all options in this question
+            for (let option of options) {
+                option.style.pointerEvents = 'none';
+            }
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                quizScore++;
+            } else {
+                element.classList.add('incorrect');
+                // Highlight the correct answer
+                for (let option of options) {
+                    if (option.onclick.toString().includes('true')) {
+                        option.classList.add('correct');
+                    }
+                }
+            }
+            
+            updateQuizScore();
+        }
+
+        function updateQuizScore() {
+            document.getElementById('quizScore').textContent = quizScore;
+            const percentage = (quizScore / 8 * 100).toFixed(0);
+            document.getElementById('quizPercent').textContent = percentage + '%';
+        }
+
+        function resetQuiz() {
+            quizScore = 0;
+            answeredQuestions.clear();
+            
+            const allOptions = document.getElementsByClassName('quiz-option');
+            for (let option of allOptions) {
+                option.classList.remove('correct', 'incorrect');
+                option.style.pointerEvents = 'auto';
+            }
+            
+            updateQuizScore();
+        }
+
+        // Initialize simulations
+        drawCopperSetup();
+        drawPlatingSetup();
+    </script>
+</body>
+</html>

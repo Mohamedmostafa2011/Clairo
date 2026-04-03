@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polyatomic Ions | Glass Theme</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            --text-color: #ffffff;
+            --highlight-color: #ffd700; /* Gold for Important */
+            --accent-blue: #00f2fe;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(45deg, #000428, #004e92); /* Deep Ocean */
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Ambient Background blobs */
+        .blob {
+            position: fixed;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #4facfe; border-radius: 50%; }
+        .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #00f2fe; border-radius: 50%; }
+
+        header {
+            text-align: center;
+            padding: 4rem 1rem 2rem 1rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #a5f3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        p.subtitle {
+            font-weight: 300;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        /* Grid Layout */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 90%;
+            max-width: 1200px;
+            padding-bottom: 5rem;
+        }
+
+        /* Glass Card Styling */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--glass-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px 0 rgba(0, 0, 0, 0.4);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* Typography inside cards */
+        .ion-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .ion-formula {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin: 1rem 0;
+            font-family: 'Times New Roman', serif; /* Serif looks more chemical */
+        }
+
+        .ion-charge {
+            background: rgba(255,255,255,0.15);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* IMPORTANT HIGHLIGHT STYLES */
+        .card.important {
+            border: 1px solid rgba(255, 215, 0, 0.4); /* Gold border */
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255, 215, 0, 0.05) 100%);
+            box-shadow: 0 8px 32px 0 rgba(255, 215, 0, 0.1);
+        }
+
+        .card.important:hover {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .imp-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: var(--highlight-color);
+            font-size: 1.2rem;
+            filter: drop-shadow(0 0 5px rgba(255,215,0,0.5));
+        }
+
+        .imp-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--highlight-color);
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        /* Superscript/Subscript adjustment for readability */
+        sup { font-size: 0.6em; top: -0.8em; }
+        sub { font-size: 0.6em; bottom: -0.3em; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Blobs for Watery Effect -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <header>
+        <h1>Polyatomic Ions</h1>
+        <p class="subtitle">Essential Chemistry Formulae</p>
+    </header>
+
+    <div class="container">
+
+        <!-- 1. Ammonium (IMP) -->
+        <div class="card important">
+            <div class="imp-badge">★</div>
+            <div class="imp-label">Key Ion</div>
+            <div class="ion-name">Ammonium</div>
+            <div class="ion-formula">NH<sub>4</sub><sup>+</sup></div>
+            <div class="ion-charge">+1 Charge</div>
+        </div>
+
+        <!-- 2. Hydroxide (IMP) -->
+        <div class="card important">
+            <div class="imp-badge">★</div>
+            <div class="imp-label">Key Ion</div>
+            <div class="ion-name">Hydroxide</div>
+            <div class="ion-formula">OH<sup>-</sup></div>
+            <div class="ion-charge">-1 Charge</div>
+        </div>
+
+        <!-- 3. Nitrate (IMP) -->
+        <div class="card important">
+            <div class="imp-badge">★</div>
+            <div class="imp-label">Key Ion</div>
+            <div class="ion-name">Nitrate</div>
+            <div class="ion-formula">NO<sub>3</sub><sup>-</sup></div>
+            <div class="ion-charge">-1 Charge</div>
+        </div>
+
+        <!-- 4. Nitrite -->
+        <div class="card">
+            <div class="ion-name">Nitrite</div>
+            <div class="ion-formula">NO<sub>2</sub><sup>-</sup></div>
+            <div class="ion-charge">-1 Charge</div>
+        </div>
+
+        <!-- 5. Carbonate (IMP) -->
+        <div class="card important">
+            <div class="imp-badge">★</div>
+            <div class="imp-label">Key Ion</div>
+            <div class="ion-name">Carbonate</div>
+            <div class="ion-formula">CO<sub>3</sub><sup>2-</sup></div>
+            <div class="ion-charge">-2 Charge</div>
+        </div>
+
+        <!-- 6. Sulfate (IMP) -->
+        <div class="card important">
+            <div class="imp-badge">★</div>
+            <div class="imp-label">Key Ion</div>
+            <div class="ion-name">Sulfate</div>
+            <div class="ion-formula">SO<sub>4</sub><sup>2-</sup></div>
+            <div class="ion-charge">-2 Charge</div>
+        </div>
+
+        <!-- 7. Sulfite -->
+        <div class="card">
+            <div class="ion-name">Sulfite</div>
+            <div class="ion-formula">SO<sub>3</sub><sup>2-</sup></div>
+            <div class="ion-charge">-2 Charge</div>
+        </div>
+
+        <!-- 8. Phosphate -->
+        <div class="card">
+            <div class="ion-name">Phosphate</div>
+            <div class="ion-formula">PO<sub>4</sub><sup>3-</sup></div>
+            <div class="ion-charge">-3 Charge</div>
+        </div>
+
+    </div>
+
+</body>
+</html>

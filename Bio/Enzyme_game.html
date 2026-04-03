@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ENZYME RUSH: EASY MODE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff00dd;
+            --secondary: #00ffff;
+            --yellow: #ffe600;
+            --danger: #ff2a2a;
+            --bg: #1a0b2e;
+            --green: #39ff14;
+        }
+
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0; padding: 0; overflow: hidden;
+            background: var(--bg);
+            font-family: 'Fredoka One', cursive;
+            height: 100vh; width: 100vw;
+            display: flex; flex-direction: column;
+            touch-action: none;
+            transition: background 1s;
+        }
+
+        /* CANVAS FOR PARTICLES */
+        #fx-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 5;
+        }
+
+        /* RED FLASH ON DAMAGE */
+        #damage-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: red; opacity: 0; pointer-events: none; z-index: 6;
+            transition: opacity 0.1s;
+        }
+
+        /* UI LAYER */
+        #ui {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10; pointer-events: none;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+        }
+
+        /* TOP BARS */
+        .top-section { width: 100%; max-width: 500px; margin: 0 auto; }
+
+        .bar-container { margin-bottom: 15px; }
+        .bar-label { color: white; font-size: 1rem; display: flex; justify-content: space-between; margin-bottom: 4px; text-shadow: 1px 1px 0 #000; letter-spacing: 1px; }
+        .bar-bg { width: 100%; height: 30px; background: rgba(0,0,0,0.6); border-radius: 15px; overflow: hidden; border: 3px solid rgba(255,255,255,0.4); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        
+        /* Health Bar */
+        #hp-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff4d4d, #ff0000); transition: width 0.2s; }
+        /* Progress Bar */
+        #prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--yellow), orange); transition: width 0.2s; }
+
+        .level-indicator {
+            text-align: center; color: white; font-size: 2.5rem; 
+            text-shadow: 0 0 15px var(--primary); margin-bottom: 15px;
+            font-family: 'Black Ops One', cursive;
+        }
+
+        /* PLAY AREA */
+        #play-area {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2; overflow: hidden;
+        }
+
+        .target {
+            position: absolute; width: 100px; height: 100px; /* BIGGER TARGETS */
+            display: flex; align-items: center; justify-content: center;
+            font-size: 4rem; cursor: pointer;
+            z-index: 3;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+            transition: transform 0.1s;
+        }
+        .target:active { transform: scale(0.9); }
+
+        /* CONTROLS */
+        .controls {
+            pointer-events: auto;
+            display: flex; justify-content: center; gap: 15px;
+            padding-bottom: 30px; z-index: 20;
+        }
+        
+        .enz-btn {
+            width: 90px; height: 90px;
+            background: rgba(255,255,255,0.1);
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: white; cursor: pointer;
+            transition: 0.1s; position: relative;
+            backdrop-filter: blur(5px);
+        }
+        .enz-btn.locked { opacity: 0.2; filter: grayscale(100%); pointer-events: none; }
+        .enz-btn i { font-size: 2.5rem; margin-bottom: 5px; }
+        .enz-btn span { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; }
+
+        .enz-btn.active {
+            background: white; transform: translateY(-15px) scale(1.1);
+            border-color: white; color: black;
+            box-shadow: 0 0 25px rgba(255,255,255,0.6);
+        }
+        /* Color coding the buttons when active */
+        .enz-btn.active#btn-0 { color: var(--secondary); border-color: var(--secondary); box-shadow: 0 0 25px var(--secondary); }
+        .enz-btn.active#btn-1 { color: var(--primary); border-color: var(--primary); box-shadow: 0 0 25px var(--primary); }
+        .enz-btn.active#btn-2 { color: var(--yellow); border-color: var(--yellow); box-shadow: 0 0 25px var(--yellow); }
+        
+        /* OVERLAYS */
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; backdrop-filter: blur(8px);
+        }
+        
+        h1 { font-size: 3rem; color: var(--green); margin: 0 0 10px 0; text-shadow: 0 0 20px var(--green); line-height: 1; }
+        p { color: #ccc; font-size: 1.3rem; margin-bottom: 30px; max-width: 80%; font-family: sans-serif; line-height: 1.4; }
+        
+        .big-btn {
+            background: var(--green); color: black; border: none;
+            padding: 20px 60px; font-size: 1.8rem; font-family: 'Black Ops One';
+            cursor: pointer; border-radius: 50px;
+            box-shadow: 0 0 30px var(--green); animation: pulse 1.5s infinite;
+        }
+        .big-btn:hover { transform: scale(1.1); }
+        
+        .float-text {
+            position: absolute; font-weight: bold; pointer-events: none;
+            animation: floatUp 1s forwards; z-index: 20; text-shadow: 2px 2px 0 #000;
+        }
+
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-80px); opacity: 0; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+    </style>
+</head>
+<body>
+
+    <div id="fx-canvas"></div>
+    <div id="damage-overlay"></div>
+
+    <div id="ui">
+        <div class="top-section">
+            <div class="level-indicator" id="level-txt">LEVEL 1</div>
+            
+            <div class="bar-container">
+                <div class="bar-label"><span>HEALTH (REGENERATING...)</span> <span id="hp-txt">100%</span></div>
+                <div class="bar-bg"><div id="hp-fill"></div></div>
+            </div>
+
+            <div class="bar-container">
+                <div class="bar-label"><span>DIGESTION</span> <span id="prog-txt">0%</span></div>
+                <div class="bar-bg"><div id="prog-fill"></div></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="enz-btn active" id="btn-0" onclick="switchEnzyme(0)">
+                <div style="font-size:2rem">🍞</div>
+                <span>AMYLASE</span>
+            </div>
+            <div class="enz-btn locked" id="btn-1" onclick="switchEnzyme(1)">
+                <div style="font-size:2rem">🥩</div>
+                <span>PROTEASE</span>
+            </div>
+            <div class="enz-btn locked" id="btn-2" onclick="switchEnzyme(2)">
+                <div style="font-size:2rem">🍟</div>
+                <span>LIPASE</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="play-area"></div>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="overlay">
+        <h1>EASY MODE</h1>
+        <p>Health regenerates.<br>Food falls slowly.<br>Targets are huge.</p>
+        <button class="big-btn" onclick="startLevel(1)">START</button>
+    </div>
+
+    <!-- LEVEL COMPLETE SCREEN -->
+    <div id="level-screen" class="overlay" style="display:none;">
+        <h1 style="color:var(--yellow)">CLEARED!</h1>
+        <p id="level-msg">Good job. Next level.</p>
+        <button class="big-btn" onclick="nextLevel()">CONTINUE</button>
+    </div>
+
+    <!-- GAME OVER SCREEN -->
+    <div id="game-over-screen" class="overlay" style="display:none;">
+        <h1 style="color:red">GAME OVER</h1>
+        <p>Don't worry, try again.</p>
+        <button class="big-btn" onclick="location.reload()">RETRY</button>
+    </div>
+
+    <script>
+        // --- REBALANCED CONFIGURATION ---
+        // spawnRate: Higher number = Slower spawning
+        // speed: [min, max] (Pixels per frame) -> Lower = Slower
+        const LEVELS = [
+            { id: 1, name: "THE MOUTH", bg: "radial-gradient(circle, #4a2c2c 0%, #000 100%)", types: [0], spawnRate: 90, speed: [1, 2.5], msg: "Easy, right? Moving down..." },
+            { id: 2, name: "THE STOMACH", bg: "radial-gradient(circle, #1e3d1e 0%, #000 100%)", types: [0, 1], spawnRate: 70, speed: [2, 4], msg: "Adding Fats now. Stay cool." },
+            { id: 3, name: "INTESTINE", bg: "radial-gradient(circle, #3d1e35 0%, #000 100%)", types: [0, 1, 2], spawnRate: 60, speed: [3, 5], msg: "Bloodstream ahead." },
+            { id: 4, name: "BLOODSTREAM", bg: "radial-gradient(circle, #4a0000 0%, #000 100%)", types: [0, 1, 2], spawnRate: 50, speed: [4, 6], msg: "Final Stage. You got this." },
+            { id: 5, name: "THE BRAIN", bg: "radial-gradient(circle, #00004a 0%, #000 100%)", types: [0, 1, 2], spawnRate: 40, speed: [5, 7], msg: "VICTORY!" }
+        ];
+
+        const TYPES = [
+            { name: 'Carb', icon: '🍞', color: '#00ffff' },
+            { name: 'Protein', icon: '🥩', color: '#ff00dd' },
+            { name: 'Fat', icon: '🍟', color: '#ffe600' }
+        ];
+
+        // --- STATE ---
+        let currentLevelIdx = 0;
+        let hp = 100;
+        let progress = 0; // 0 to 100
+        let activeEnzyme = 0;
+        let isPlaying = false;
+        let frame = 0;
+        
+        // --- AUDIO ---
+        const Audio = {
+            ctx: null,
+            init: function() {
+                window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioContext();
+            },
+            playTone: function(freq, type, vol=0.1) {
+                if(!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.1);
+            },
+            hit: function() { this.playTone(400, 'triangle', 0.1); },
+            damage: function() { this.playTone(100, 'sawtooth', 0.2); },
+            win: function() { this.playTone(600, 'sine', 0.2); }
+        };
+
+        // --- FUNCTIONS ---
+
+        function switchEnzyme(idx) {
+            const levelData = LEVELS[currentLevelIdx];
+            if(!levelData.types.includes(idx)) return;
+
+            activeEnzyme = idx;
+            document.querySelectorAll('.enz-btn').forEach((b, i) => {
+                if(i === idx) b.classList.add('active');
+                else b.classList.remove('active');
+            });
+            Audio.playTone(800, 'sine', 0.05);
+        }
+
+        function updateButtons() {
+            const levelData = LEVELS[currentLevelIdx];
+            document.querySelectorAll('.enz-btn').forEach((b, i) => {
+                if(levelData.types.includes(i)) {
+                    b.classList.remove('locked');
+                } else {
+                    b.classList.add('locked');
+                }
+            });
+            switchEnzyme(levelData.types[0]); 
+        }
+
+        function startLevel(lvlNum) {
+            Audio.init();
+            currentLevelIdx = lvlNum - 1;
+            const levelData = LEVELS[currentLevelIdx];
+            
+            document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none');
+            document.body.style.backgroundImage = levelData.bg;
+            document.getElementById('level-txt').innerText = `LEVEL ${lvlNum}: ${levelData.name}`;
+            
+            hp = 100; 
+            progress = 0;
+            updateUI();
+            updateButtons();
+            document.getElementById('play-area').innerHTML = '';
+            
+            isPlaying = true;
+            gameLoop();
+        }
+
+        function nextLevel() {
+            if(currentLevelIdx >= LEVELS.length - 1) {
+                alert("YOU WON!");
+                location.reload();
+                return;
+            }
+            startLevel(currentLevelIdx + 2);
+        }
+
+        function takeDamage(amount) {
+            hp -= amount;
+            if(hp < 0) hp = 0;
+            
+            const overlay = document.getElementById('damage-overlay');
+            overlay.style.opacity = 0.5;
+            setTimeout(() => overlay.style.opacity = 0, 100);
+            Audio.damage();
+
+            if(hp <= 0) gameOver();
+            updateUI();
+        }
+
+        function gainProgress() {
+            progress += 10; // Generous progress
+            if(progress >= 100) {
+                progress = 100;
+                levelComplete();
+            }
+            Audio.hit();
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('hp-fill').style.width = hp + "%";
+            document.getElementById('hp-txt').innerText = Math.floor(hp) + "%";
+            document.getElementById('prog-fill').style.width = progress + "%";
+            document.getElementById('prog-txt').innerText = Math.floor(progress) + "%";
+        }
+
+        function gameLoop() {
+            if(!isPlaying) return;
+            frame++;
+
+            const levelData = LEVELS[currentLevelIdx];
+
+            // Spawning
+            if(frame % levelData.spawnRate === 0) {
+                spawnTarget();
+            }
+
+            // HEALTH REGENERATION
+            if(frame % 10 === 0 && hp < 100 && hp > 0) {
+                hp += 0.5; // Regenerate 0.5% every 10 frames
+                updateUI();
+            }
+
+            // Movement
+            document.querySelectorAll('.target').forEach(t => {
+                let y = parseFloat(t.dataset.y);
+                let speed = parseFloat(t.dataset.speed);
+                y += speed;
+                t.style.top = y + 'px';
+                t.dataset.y = y;
+
+                if(y > window.innerHeight) {
+                    t.remove();
+                    // VERY LOW DAMAGE for missing (5%)
+                    createFloatingText(t.style.left, (window.innerHeight-50)+'px', "Missed!", "white");
+                    takeDamage(5);
+                }
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function spawnTarget() {
+            const levelData = LEVELS[currentLevelIdx];
+            const typeIdx = levelData.types[Math.floor(Math.random() * levelData.types.length)];
+            const data = TYPES[typeIdx];
+
+            const t = document.createElement('div');
+            t.className = 'target';
+            t.innerHTML = data.icon;
+            t.dataset.type = typeIdx;
+            t.dataset.y = -100;
+            t.dataset.speed = Math.random() * (levelData.speed[1] - levelData.speed[0]) + levelData.speed[0];
+            t.style.left = Math.random() * (window.innerWidth - 110) + 'px'; // Adjusted for larger width
+            t.style.color = data.color;
+            t.style.textShadow = `0 0 20px ${data.color}`;
+
+            t.onpointerdown = (e) => {
+                e.stopPropagation();
+                checkHit(t, e.clientX, e.clientY);
+            };
+
+            document.getElementById('play-area').appendChild(t);
+        }
+
+        function checkHit(target, x, y) {
+            const type = parseInt(target.dataset.type);
+            
+            if(type === activeEnzyme) {
+                createParticles(x, y, TYPES[type].color);
+                createFloatingText(x, y, "YUM!", "#39ff14");
+                target.remove();
+                gainProgress();
+            } else {
+                // Wrong button press damage
+                createFloatingText(x, y, "Oops!", "red");
+                target.style.opacity = 0.5;
+                takeDamage(10);
+            }
+        }
+
+        function levelComplete() {
+            isPlaying = false;
+            Audio.win();
+            const screen = document.getElementById('level-screen');
+            document.getElementById('level-msg').innerText = LEVELS[currentLevelIdx].msg;
+            screen.style.display = 'flex';
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            document.getElementById('game-over-screen').style.display = 'flex';
+        }
+
+        function createFloatingText(x, y, txt, color) {
+            const el = document.createElement('div');
+            el.className = 'float-text';
+            el.innerText = txt;
+            
+            // Handle string 'px' or number
+            let leftVal = (parseFloat(x) || 0);
+            if(typeof x === 'number') leftVal = x - 30;
+            
+            el.style.left = leftVal + 'px';
+            el.style.top = y + 'px';
+            el.style.color = color;
+            el.style.fontSize = "2rem";
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        // Particles
+        const cvs = document.createElement('canvas');
+        const ctx = document.getElementById('fx-canvas').appendChild(cvs).getContext('2d');
+        let particles = [];
+        function resize() { cvs.width = window.innerWidth; cvs.height = window.innerHeight; }
+        window.onresize = resize; resize();
+
+        function createParticles(x, y, color) {
+            for(let i=0; i<10; i++) {
+                particles.push({ x, y, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, life: 1, color });
+            }
+        }
+
+        function renderParticles() {
+            ctx.clearRect(0, 0, cvs.width, cvs.height);
+            for(let i=particles.length-1; i>=0; i--) {
+                let p = particles[i];
+                p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.life -= 0.05;
+                ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+                ctx.beginPath(); ctx.arc(p.x, p.y, 8, 0, Math.PI*2); ctx.fill();
+                if(p.life <= 0) particles.splice(i, 1);
+            }
+            requestAnimationFrame(renderParticles);
+        }
+        renderParticles();
+
+        window.addEventListener('keydown', (e) => {
+            if(e.key === '1') switchEnzyme(0);
+            if(e.key === '2') switchEnzyme(1);
+            if(e.key === '3') switchEnzyme(2);
+        });
+
+    </script>
+</body>
+</html>

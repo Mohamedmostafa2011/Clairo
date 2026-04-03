@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IG-Chem | Chemical Bonding</title>
+
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&amp;family=Crimson+Pro:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- PDF Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+    :root {
+        /* Theme: Violet & Indigo */
+        --primary: #6366f1; /* Indigo 500 */
+        --primary-dark: #312e81; /* Indigo 900 */
+        --accent: #ec4899; /* Pink Accent */
+        --bg: #f5f3ff; /* Very light violet */
+        --text: #1e1b4b;
+        --sidebar-w: 280px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
+        transition: opacity ease-in 0.2s;
+    }
+
+    /* --- NAVIGATION BUTTON --- */
+    .menu-toggle {
+        display: none;
+        position: fixed; top: 20px; left: 20px; z-index: 3000;
+        background: var(--primary); color: white; border: none;
+        width: 50px; height: 50px; border-radius: 50%;
+        font-size: 1.4rem; cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        align-items: center; justify-content: center;
+        transition: transform 0.2s;
+    }
+    .menu-toggle:active { transform: scale(0.9); }
+
+    /* --- MOBILE OVERLAY --- */
+    .overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 1999;
+        opacity: 0; visibility: hidden; transition: 0.3s;
+        backdrop-filter: blur(2px);
+    }
+    .overlay.active { opacity: 1; visibility: visible; }
+
+    /* --- SIDEBAR --- */
+    aside {
+        width: var(--sidebar-w);
+        background: #1e1b4b;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        padding: 30px 20px;
+        flex-shrink: 0;
+        z-index: 2000;
+        border-right: 1px solid #312e81;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .brand {
+        font-size: 1.5rem; font-weight: 800; color: #a5b4fc; margin-bottom: 40px;
+        display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+    }
+
+    .nav-item {
+        padding: 16px; margin-bottom: 8px; border-radius: 8px;
+        cursor: pointer; color: #94a3b8; font-weight: 600;
+        display: flex; align-items: center; gap: 15px; transition: 0.2s;
+        border: 1px solid transparent;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
+
+    /* --- MAIN CONTENT --- */
+    main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+    .view-panel {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        overflow-y: auto; padding: 0; display: none; opacity: 0;
+        transition: opacity 0.4s;
+    }
+    .view-panel.active { display: block; opacity: 1; }
+
+    /* --- TEXTBOOK STYLING --- */
+    .paper {
+        max-width: 950px; margin: 0 auto; background: white;
+        padding: 80px; min-height: 100vh;
+        box-shadow: 0 0 40px rgba(0,0,0,0.05);
+    }
+
+    h1 { font-family: 'Inter', sans-serif; font-size: 3rem; color: var(--primary-dark); margin-bottom: 10px; letter-spacing: -1px; }
+    .meta { color: #6366f1; text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+    
+    h2 { 
+        font-family: 'Inter', sans-serif; font-size: 1.8rem; color: #1e1b4b; 
+        margin-top: 60px; margin-bottom: 25px; padding-bottom: 15px; 
+        border-bottom: 2px solid #e0e7ff; display: flex; align-items: center; gap: 10px;
+    }
+    
+    h3 { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--primary); margin-top: 35px; margin-bottom: 15px; }
+
+    p {
+        font-family: 'Crimson Pro', serif; font-size: 1.2rem; line-height: 1.8;
+        color: #334155; margin-bottom: 20px;
+    }
+    li { font-family: 'Crimson Pro', serif; font-size: 1.15rem; line-height: 1.7; margin-bottom: 8px; }
+    
+    /* Concept Boxes */
+    .concept-box {
+        background: #eef2ff; border-left: 5px solid var(--primary);
+        padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;
+    }
+    .concept-box strong { color: var(--primary-dark); font-family: 'Inter', sans-serif; }
+
+    .exam-tip {
+        background: #fdf2f8; border: 1px solid #f472b6; border-radius: 8px;
+        padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+    }
+    .exam-tip i { color: var(--accent); font-size: 1.5rem; margin-top: 3px; }
+
+    /* Tables */
+    .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #e2e8f0; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    th { background: #eef2ff; color: var(--primary-dark); padding: 16px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; border-bottom: 2px solid #c7d2fe; }
+    td { padding: 16px; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-family: 'Crimson Pro', serif; font-size: 1.1rem; }
+    tr:last-child td { border-bottom: none; }
+
+    /* --- MIND MAP --- */
+    .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #f1f5f9; }
+    .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+    .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+    .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #94a3b8; width: 50%; height: 20px; }
+    .tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+    .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+    .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+    .tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+    .tree li:first-child::after { border-radius: 5px 0 0 0; }
+    .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #94a3b8; width: 0; height: 20px; }
+
+    .node {
+        background: white; border: 1px solid #cbd5e1; padding: 12px 18px; border-radius: 8px;
+        display: inline-block; min-width: 140px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary-dark);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; z-index: 2;
+    }
+    .root-node { background: var(--primary-dark); color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+    /* --- QUIZ --- */
+    .quiz-area { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+    .q-card { background: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; }
+    .q-opt {
+        display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e2e8f0;
+        margin-top: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+    }
+    .q-opt:hover { background: #eef2ff; border-color: #a5b4fc; }
+    .q-let { font-weight: 900; color: #94a3b8; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    
+    .q-opt.correct { background: #dcfce7; border-color: #16a34a; }
+    .q-opt.correct .q-let { background: #16a34a; color: white; }
+    .q-opt.wrong { background: #fee2e2; border-color: #dc2626; }
+    .q-opt.wrong .q-let { background: #dc2626; color: white; }
+
+    /* --- MOBILE --- */
+    @media (max-width: 768px) {
+        .menu-toggle { display: flex; }
+        aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        aside.active { left: 0; }
+        .paper { padding: 30px 20px; }
+        h1 { font-size: 2.2rem; }
+        .mm-wrapper { justify-content: flex-start; padding: 40px; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-flask"></i> IG-CHEM MASTER</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Textbook Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-sitemap"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-list-check"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #312e81;">
+             <div class="nav-item" onclick="genPDF()" style="color:#818cf8; border-color:#312e81;">
+                 <i class="fa-solid fa-download"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. DETAILED NOTES -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Chemistry 0620 • Topic 3</span>
+                <h1>Chemical Bonding</h1>
+                <p>Atoms combine to form compounds in order to gain a full outer shell of electrons (Noble Gas configuration). This makes them stable. The way they bond depends on whether they are metals or non-metals.</p>
+
+                <h2>1. Ionic Bonding</h2>
+                <p>Ionic bonding occurs between a <strong>Metal</strong> and a <strong>Non-Metal</strong>.</p>
+                <ul>
+                    <li><strong>Mechanism:</strong> The metal atom <strong>loses</strong> electrons to form a positive ion (Cation). The non-metal atom <strong>gains</strong> electrons to form a negative ion (Anion).</li>
+                    <li><strong>Definition:</strong> An ionic bond is the strong <strong>electrostatic attraction</strong> between oppositely charged ions.</li>
+                    <li><strong>Structure:</strong> They form a giant <strong>Lattice Structure</strong> (a regular arrangement of alternating positive and negative ions).</li>
+                </ul>
+                
+                <div class="concept-box">
+                    <strong>Dot-and-Cross Diagrams (Ionic)</strong><br>
+                    When drawing these:
+                    1. Use dots for electrons of one atom, crosses for the other.
+                    2. Put brackets [] around the final ions.
+                    3. Write the charge outside the bracket (e.g., Na<sup>+</sup>, Cl<sup>-</sup>).
+                </div>
+
+                <h3>Properties of Ionic Compounds</h3>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Property</th><th>Observation</th><th>Explanation</th></tr>
+                        <tr><td><strong>Melting/Boiling Point</strong></td><td>High</td><td>Strong electrostatic forces between ions require lots of energy to break.</td></tr>
+                        <tr><td><strong>Volatility</strong></td><td>Non-volatile</td><td>They do not evaporate easily due to strong bonds.</td></tr>
+                        <tr><td><strong>Conductivity (Solid)</strong></td><td>Does not conduct</td><td>Ions are fixed in the lattice and cannot move.</td></tr>
+                        <tr><td><strong>Conductivity (Liquid/Aq)</strong></td><td>Conducts</td><td>Ions are free to move and carry charge.</td></tr>
+                    </table>
+                </div>
+
+                <h2>2. Covalent Bonding</h2>
+                <p>Covalent bonding occurs between a <strong>Non-Metal</strong> and a <strong>Non-Metal</strong>.</p>
+                <ul>
+                    <li><strong>Mechanism:</strong> Atoms <strong>share</strong> pairs of electrons to achieve a full outer shell.</li>
+                    <li><strong>Definition:</strong> The electrostatic attraction between the positive nuclei of the atoms and the shared pair of electrons.</li>
+                </ul>
+
+                <h3>Simple Molecular Structures</h3>
+                <p>Substances like Water (H<sub>2</sub>O), Carbon Dioxide (CO<sub>2</sub>), and Methane (CH<sub>4</sub>) form simple molecules.</p>
+                <div class="exam-tip">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <div>
+                        <strong>Exam Tip: Intermolecular Forces</strong><br>
+                        Covalent bonds <em>within</em> the molecule are strong. However, forces <em>between</em> molecules (Intermolecular forces) are weak. When boiling water, you break the weak intermolecular forces, not the strong covalent bonds.
+                    </div>
+                </div>
+                <ul>
+                    <li><strong>Low MP/BP:</strong> Because weak intermolecular forces are easily overcome.</li>
+                    <li><strong>Conductivity:</strong> They do <strong>not</strong> conduct electricity (no free ions or electrons).</li>
+                </ul>
+
+                <h2>3. Giant Covalent Structures</h2>
+                <p>Some covalent substances form giant lattices (Macromolecules). All atoms are linked by strong covalent bonds. Examples: Diamond, Graphite, Silicon(IV) Oxide.</p>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Substance</th><th>Structure</th><th>Properties & Uses</th></tr>
+                        <tr><td><strong>Diamond (C)</strong></td><td>Each Carbon bonded to <strong>4</strong> others (Tetrahedral).</td><td><strong>Hard:</strong> Cutting tools.<br><strong>Insulator:</strong> No free electrons.</td></tr>
+                        <tr><td><strong>Graphite (C)</strong></td><td>Each Carbon bonded to <strong>3</strong> others. Forms layers.</td><td><strong>Soft/Slippery:</strong> Layers slide (Lubricant).<br><strong>Conductor:</strong> 4th electron is delocalized.</td></tr>
+                        <tr><td><strong>Silicon(IV) Oxide (SiO<sub>2</sub>)</strong></td><td>Similar structure to Diamond.</td><td>Hard, high melting point. Used in sandpaper/glass.</td></tr>
+                    </table>
+                </div>
+
+                <h2>4. Metallic Bonding</h2>
+                <p>Metallic bonding occurs in <strong>Metals</strong>.</p>
+                <ul>
+                    <li><strong>Structure:</strong> A lattice of positive metal ions in a "sea of delocalized electrons".</li>
+                    <li><strong>Definition:</strong> The electrostatic attraction between the positive metal ions and the delocalized electrons.</li>
+                </ul>
+                
+                <div class="concept-box">
+                    <strong>Why are metals malleable?</strong><br>
+                    The layers of positive ions can slide over each other without breaking the bond because the delocalized electrons move with them.
+                </div>
+                
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">BONDING</div>
+                            <ul>
+                                <li>
+                                    <div class="node">Ionic</div>
+                                    <ul>
+                                        <li><div class="node">Metal + Non-Metal</div></li>
+                                        <li><div class="node">Transfer e-</div></li>
+                                        <li><div class="node">Lattice</div></li>
+                                        <li><div class="node">High MP</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Covalent</div>
+                                    <ul>
+                                        <li><div class="node">Non-Metal + Non-Metal</div></li>
+                                        <li><div class="node">Shared Pairs</div></li>
+                                        <li>
+                                            <div class="node" style="border-color:var(--primary);">Types</div>
+                                            <ul>
+                                                <li><div class="node">Simple<br><small>Low MP, Volatile</small></div></li>
+                                                <li><div class="node">Giant<br><small>Diamond, Graphite</small></div></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Metallic</div>
+                                    <ul>
+                                        <li><div class="node">Sea of e-</div></li>
+                                        <li><div class="node">Conducts</div></li>
+                                        <li><div class="node">Malleable</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container">
+                <!-- Questions generated by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI LOGIC ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Chem_Topic3_Bonding.pdf');
+            });
+        }
+
+        // --- 50 CHEMICAL BONDING QUESTIONS ---
+        const qData = [
+            {q:"Ionic bonding forms between?", o:["Metal & Non-metal", "Two Non-metals", "Two Metals", "Gases only"], a:0},
+            {q:"Covalent bonding forms between?", o:["Two Non-metals", "Metal & Non-metal", "Two Metals", "Ions"], a:0},
+            {q:"Metallic bonding involves?", o:["Sea of delocalized electrons", "Shared pairs", "Transfer of electrons", "Proton exchange"], a:0},
+            {q:"In ionic bonding, electrons are?", o:["Transferred", "Shared", "Delocalized", "Destroyed"], a:0},
+            {q:"In covalent bonding, electrons are?", o:["Shared", "Transferred", "Lost", "Gained"], a:0},
+            {q:"A positive ion is called a?", o:["Cation", "Anion", "Positron", "Nucleon"], a:0},
+            {q:"A negative ion is called a?", o:["Anion", "Cation", "Electron", "Neutron"], a:0},
+            {q:"Group I metals form ions with charge?", o:["+1", "-1", "+2", "+7"], a:0},
+            {q:"Group VII non-metals form ions with charge?", o:["-1", "+1", "-7", "+7"], a:0},
+            {q:"Ionic compounds usually have?", o:["High melting points", "Low melting points", "Low density", "High volatility"], a:0},
+            {q:"Why do ionic compounds have high MP?", o:["Strong electrostatic forces", "Weak forces", "Shared electrons", "Metallic lattice"], a:0},
+            {q:"Ionic compounds conduct electricity when?", o:["Molten or dissolved", "Solid", "Gas", "Never"], a:0},
+            {q:"Why don't solid ionic compounds conduct?", o:["Ions are fixed", "Electrons are shared", "No ions present", "They are cold"], a:0},
+            {q:"Simple molecular substances have?", o:["Low melting points", "High melting points", "Giant lattices", "Conductivity"], a:0},
+            {q:"Force broken when boiling water?", o:["Intermolecular forces", "Covalent bonds", "Ionic bonds", "Metallic bonds"], a:0},
+            {q:"Force holding Hydrogen to Oxygen in water?", o:["Covalent bond", "Ionic bond", "Gravity", "Magnetic"], a:0},
+            {q:"How many electrons shared in a single bond?", o:["2 (1 pair)", "1", "4", "6"], a:0},
+            {q:"Structure of Diamond?", o:["Giant Covalent", "Simple Molecular", "Ionic Lattice", "Metallic"], a:0},
+            {q:"Structure of Graphite?", o:["Giant Covalent", "Ionic", "Simple Molecular", "Metallic"], a:0},
+            {q:"In Diamond, each Carbon bonds to?", o:["4 Carbons", "3 Carbons", "2 Carbons", "6 Carbons"], a:0},
+            {q:"In Graphite, each Carbon bonds to?", o:["3 Carbons", "4 Carbons", "2 Carbons", "5 Carbons"], a:0},
+            {q:"Why does Graphite conduct electricity?", o:["Delocalized electrons", "Ions move", "It is a metal", "Protons move"], a:0},
+            {q:"Why is Diamond hard?", o:["Rigid tetrahedral lattice", "Layers slide", "Ionic bonds", "Sea of electrons"], a:0},
+            {q:"Why is Graphite soft/slippery?", o:["Layers slide over each other", "Weak covalent bonds", "It is liquid", "It melts easily"], a:0},
+            {q:"Use of Graphite?", o:["Lubricant / Electrode", "Cutting tools", "Fuel", "Jewelry"], a:0},
+            {q:"Use of Diamond?", o:["Cutting tools", "Lubricant", "Conductor", "Fuel"], a:0},
+            {q:"Silicon(IV) Oxide structure is similar to?", o:["Diamond", "Graphite", "Salt", "Water"], a:0},
+            {q:"Metals are malleable because?", o:["Layers of ions slide", "Bonds break", "They are soft", "Electrons stop moving"], a:0},
+            {q:"Metals conduct electricity due to?", o:["Mobile delocalized electrons", "Moving ions", "Vibrating atoms", "Magnetic field"], a:0},
+            {q:"An alloy is?", o:["Mixture of a metal with other elements", "Compound of metals", "Pure metal", "Non-metal mixture"], a:0},
+            {q:"Why are alloys harder than pure metals?", o:["Disrupted layers cannot slide", "Stronger bonds", "More electrons", "Heavier atoms"], a:0},
+            {q:"Nitrogen gas (N2) has what bond?", o:["Triple Covalent", "Double Covalent", "Single Covalent", "Ionic"], a:0},
+            {q:"Carbon Dioxide (CO2) bonds are?", o:["Double Covalent", "Single Covalent", "Ionic", "Metallic"], a:0},
+            {q:"Formula for Magnesium Chloride?", o:["MgCl2", "MgCl", "Mg2Cl", "Mg2Cl2"], a:0},
+            {q:"Charge of an Oxide ion?", o:["2-", "1-", "2+", "1+"], a:0},
+            {q:"Charge of an Aluminum ion?", o:["3+", "2+", "1+", "3-"], a:0},
+            {q:"Volatile means?", o:["Evaporates easily", "Explosive", "Hard to melt", "Conducts"], a:0},
+            {q:"Are ionic compounds soluble in water?", o:["Usually yes", "Never", "Only if hot", "No"], a:0},
+            {q:"Are covalent compounds soluble in water?", o:["Usually no", "Always", "Yes", "Depends on mass"], a:0},
+            {q:"Ammonia (NH3) bonding type?", o:["Covalent", "Ionic", "Metallic", "Giant"], a:0},
+            {q:"Methane (CH4) shape?", o:["Tetrahedral", "Linear", "Flat", "Circular"], a:0},
+            {q:"Which element exists as giant covalent?", o:["Silicon", "Sodium", "Sulfur", "Helium"], a:0},
+            {q:"Bonding in Brass?", o:["Metallic", "Ionic", "Covalent", "None"], a:0},
+            {q:"Noble gases do not bond because?", o:["Full outer shell", "Too heavy", "Too light", "No protons"], a:0},
+            {q:"Hydrogen Chloride (HCl) bond?", o:["Covalent", "Ionic", "Metallic", "Hydrogen"], a:0},
+            {q:"Dot and cross diagram for NaCl involves?", o:["Brackets and charges", "Overlapping circles", "Sea of electrons", "Lines"], a:0},
+            {q:"Dot and cross for Chlorine (Cl2) involves?", o:["Overlapping circles (Shared pair)", "Brackets", "Transfer", "Lattice"], a:0},
+            {q:"State of ionic compounds at room temp?", o:["Solid", "Liquid", "Gas", "Plasma"], a:0},
+            {q:"Ethane (C2H6) is?", o:["Simple molecular", "Giant covalent", "Ionic", "Metallic"], a:0},
+            {q:"Force between ions in lattice?", o:["Electrostatic", "Magnetic", "Gravitational", "Friction"], a:0}
+        ];
+
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const text = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerText.includes(text)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

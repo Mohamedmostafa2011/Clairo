@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCSE Chemistry: Rates of Reaction</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            text-align: center;
+            padding: 40px 0;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        .btn-youtube {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #ef4444;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-youtube:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Section Styles */
+        section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        ul {
+            list-style-position: inside;
+            margin-left: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Hero/Theory Section */
+        .theory-highlight {
+            background: linear-gradient(135deg, #e0e7ff 0%, #fae8ff 100%);
+            border-left: 5px solid var(--primary);
+        }
+
+        .key-concept {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .concept-card {
+            flex: 1;
+            min-width: 250px;
+            background: rgba(255,255,255,0.6);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Grid for Factors */
+        .factors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .factor-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #f1f5f9;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .factor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+            border-color: var(--primary);
+        }
+
+        .factor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .factor-temp::before { background-color: #ef4444; } /* Red */
+        .factor-conc::before { background-color: #3b82f6; } /* Blue */
+        .factor-surf::before { background-color: #10b981; } /* Green */
+        .factor-cat::before { background-color: #f59e0b; } /* Orange */
+
+        .factor-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding-bottom: 40px;
+        }
+        
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header>
+            <h1>Rate of Chemical Reaction</h1>
+            <p class="subtitle">GCSE Chemistry Detailed Summary</p>
+            <a href="https://youtu.be/JK7yPzO9POU?si=P5fC5WvMwZCqbTQB" target="_blank" class="btn-youtube">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="white" stroke="none"></polygon></svg>
+                Watch Original Video
+            </a>
+        </header>
+
+        <!-- Aim & Theory -->
+        <section class="theory-highlight">
+            <h2>🧪 Core Foundation: Collision Theory</h2>
+            <p>Before understanding the factors that affect rate, you must understand <strong>Collision Theory</strong>. For a reaction to happen, two conditions must be met:</p>
+            
+            <div class="key-concept">
+                <div class="concept-card">
+                    <h3>1. Activation Energy</h3>
+                    <p>Particles must collide with a minimum amount of energy. If they have less than this <strong>activation energy</strong>, they simply bounce apart.</p>
+                </div>
+                <div class="concept-card">
+                    <h3>2. Frequency</h3>
+                    <p>The rate depends on the <strong>frequency of collisions</strong> (how often particles hit each other).</p>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; font-style: italic; color: var(--text-muted);">
+                Exam Tip: Whenever explaining a factor, always link it back to changes in the <strong>energy of particles</strong> or the <strong>frequency of collisions</strong>.
+            </p>
+        </section>
+
+        <!-- The Factors Grid -->
+        <div class="factors-grid">
+            
+            <!-- Temperature -->
+            <div class="factor-card factor-temp">
+                <span class="factor-icon">🔥</span>
+                <h3>Temperature</h3>
+                <p>When temperature increases, particles gain more <strong>kinetic energy</strong> and move faster.</p>
+                <ul>
+                    <li>Collisions happen more <strong>frequently</strong>.</li>
+                    <li>Collisions happen with <strong>more energy</strong>.</li>
+                </ul>
+                <p style="margin-top:10px;"><strong>Result:</strong> A higher proportion of collisions exceed the activation energy, leading to more successful collisions per second.</p>
+            </div>
+
+            <!-- Concentration & Pressure -->
+            <div class="factor-card factor-conc">
+                <span class="factor-icon">💧</span>
+                <h3>Concentration & Pressure</h3>
+                <p>These refer to how many particles exist <strong>per unit volume</strong>.</p>
+                <ul>
+                    <li><strong>Concentration:</strong> For solutions.</li>
+                    <li><strong>Pressure:</strong> For gases.</li>
+                </ul>
+                <p style="margin-top:10px;"><strong>Result:</strong> More particles in the same space means they are closer together, causing the <strong>frequency of collisions</strong> to increase.</p>
+            </div>
+
+            <!-- Surface Area -->
+            <div class="factor-card factor-surf">
+                <span class="factor-icon">🪨</span>
+                <h3>Surface Area</h3>
+                <p>Applies to solids. Using powder instead of a block increases the <strong>surface area to volume ratio</strong>.</p>
+                <ul>
+                    <li>More solid particles are exposed to the reactant.</li>
+                    <li>More points of contact are available.</li>
+                </ul>
+                <p style="margin-top:10px;"><strong>Result:</strong> The <strong>frequency of collisions</strong> increases significantly.</p>
+            </div>
+
+            <!-- Catalysts -->
+            <div class="factor-card factor-cat">
+                <span class="factor-icon">⚡</span>
+                <h3>Catalysts</h3>
+                <p>A substance that speeds up a reaction but is <strong>not used up</strong>.</p>
+                <ul>
+                    <li>Provides an <strong>alternative reaction pathway</strong>.</li>
+                    <li>This pathway has a <strong>lower activation energy</strong>.</li>
+                </ul>
+                <p style="margin-top:10px;"><strong>Result:</strong> A greater proportion of particles now have enough energy to react, increasing the rate of successful collisions.</p>
+            </div>
+
+        </div>
+
+        <!-- Additional Notes Section -->
+        <section style="margin-top: 30px;">
+            <h2>📝 Reaction Profiles & Examples</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h3>Common Catalysts</h3>
+                    <ul>
+                        <li><strong>Transition metals:</strong> Cobalt, Nickel.</li>
+                        <li><strong>Enzymes:</strong> Biological catalysts in living organisms.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Reaction Profile</h3>
+                    <p>On an energy level diagram, a catalyst is shown as a curve with a <strong>lower peak</strong> than the uncatalysed reaction, representing the reduced activation energy.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Summary based on <a href="https://cognitoedu.org" target="_blank">Cognito</a> educational content.</p>
+            <p>&copy; Study Notes | <a href="https://youtu.be/JK7yPzO9POU?si=P5fC5WvMwZCqbTQB">View Source Video</a></p>
+        </footer>
+
+    </div>
+
+</body>
+</html>

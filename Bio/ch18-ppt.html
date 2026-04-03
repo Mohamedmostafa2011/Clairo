@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaGlass PPTX Viewer</title>
+    <style>
+        :root {
+            /* Theme Variables */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            --neon-blue: #00f2ff;
+            --deep-water: #004e92;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to bottom, #000428, #004e92);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        /* --- Background Animation --- */
+        .water-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bubble {
+            position: absolute;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            border-radius: 50%;
+            filter: blur(4px);
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(120vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
+        }
+
+        /* --- Main Player Frame --- */
+        .glass-frame {
+            position: relative;
+            z-index: 10;
+            width: 85vw;
+            height: 85vh;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Header / Title Bar --- */
+        .glass-header {
+            height: 50px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.02);
+        }
+        .ppt-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            fill: #e04f2e; /* PPT color */
+        }
+
+        /* --- Iframe Container --- */
+        .ppt-container {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9); /* PPT needs light bg */
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* --- Loading Overlay --- */
+        .loader {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            transition: opacity 0.5s;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--neon-blue);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Toolbar --- */
+        .glass-toolbar {
+            height: 60px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: var(--neon-blue);
+            color: black;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+        .btn svg { width: 16px; height: 16px; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background -->
+    <div class="water-bg" id="bg-effects"></div>
+
+    <!-- Main Glass Viewer -->
+    <div class="glass-frame">
+        
+        <!-- Header -->
+        <div class="glass-header">
+            <svg class="ppt-icon" viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m3 4v10h2v-4h2.5c1.93 0 3.5-1.57 3.5-3.5S14.43 7 12.5 7H8m2 2h2.5c.83 0 1.5.67 1.5 1.5S13.33 12 12.5 12H10V9z"/></svg>
+            <span id="file-name">Presentation.pptx</span>
+        </div>
+
+        <!-- Viewer Area -->
+        <div class="ppt-container">
+            <div class="loader" id="loading-screen">
+                <div class="spinner"></div>
+                <div style="letter-spacing: 2px; font-size: 0.8rem;">LOADING SLIDES</div>
+            </div>
+            <!-- Microsoft Office Embed Iframe -->
+            <iframe id="ppt-frame" allowfullscreen="true"></iframe>
+        </div>
+
+        <!-- Footer / Controls -->
+        <div class="glass-toolbar">
+            <div class="status">Powered by Office Embed</div>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="btn" id="btn-fullscreen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                    Fullscreen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ------------------------------------------------------------------
+         * ADMIN CONFIGURATION
+         * 1. Upload your .pptx file to a public server (DropBox, Google Drive, or your own site).
+         * 2. Paste the direct URL below.
+         * NOTE: This will NOT work with a local file (file://) due to Microsoft security.
+         * ------------------------------------------------------------------
+         */
+        
+        // Example public PPTX for testing
+        const PPT_URL = "https://huggingface.co/datasets/MidoSTM11/Ig-Bio/resolve/main/The_Ecosystem_Engine.pptx";
+        
+        // --- Logic ---
+
+        const iframe = document.getElementById('ppt-frame');
+        const loader = document.getElementById('loading-screen');
+        const bg = document.getElementById('bg-effects');
+
+        // 1. Construct the Microsoft Embed URL
+        // 'wdAr=1.33' forces aspect ratio, 'action=embedview' gives a clean player
+        const embedSrc = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(PPT_URL)}&wdAr=1.77&wdEaa=1`;
+
+        iframe.src = embedSrc;
+
+        // 2. Hide loader when iframe loads
+        iframe.onload = function() {
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
+            }, 1000); // Small delay to ensure render
+        };
+
+        // 3. Background Bubbles
+        for(let i=0; i<15; i++){
+            let b = document.createElement('div');
+            b.className = 'bubble';
+            let size = Math.random() * 60 + 20;
+            b.style.width = size + 'px';
+            b.style.height = size + 'px';
+            b.style.left = Math.random() * 100 + '%';
+            b.style.animationDuration = (Math.random() * 10 + 5) + 's';
+            b.style.animationDelay = (Math.random() * 5) + 's';
+            bg.appendChild(b);
+        }
+
+        // 4. Fullscreen Logic
+        document.getElementById('btn-fullscreen').addEventListener('click', () => {
+            const el = document.querySelector('.glass-frame');
+            if (!document.fullscreenElement) {
+                el.requestFullscreen().catch(err => console.log(err));
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+    </script>
+</body>
+</html>

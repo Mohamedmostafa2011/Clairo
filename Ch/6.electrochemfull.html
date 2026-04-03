@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IG-Chem | Electrochemistry</title>
+
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- PDF Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+    :root {
+        /* Electric Theme: Blue, Neon Yellow, Dark Slate */
+        --primary: #2563eb; /* Electric Blue */
+        --primary-dark: #1e3a8a; /* Deep Blue */
+        --secondary: #0f172a; /* Dark Slate */
+        --accent: #facc15; /* Volt Yellow */
+        --bg: #f8fafc; /* Very Light Blue-Grey */
+        --text: #1e293b;
+        --sidebar-w: 280px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Space Grotesk', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
+    }
+
+    /* --- NAVIGATION --- */
+    .menu-toggle {
+        display: none;
+        position: fixed; top: 20px; left: 20px; z-index: 3000;
+        background: var(--secondary); color: white; border: none;
+        width: 50px; height: 50px; border-radius: 12px;
+        font-size: 1.4rem; cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        align-items: center; justify-content: center;
+        transition: 0.2s;
+    }
+    .menu-toggle:active { transform: scale(0.95); }
+
+    .overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); z-index: 1999;
+        opacity: 0; visibility: hidden; transition: 0.3s;
+        backdrop-filter: blur(3px);
+    }
+    .overlay.active { opacity: 1; visibility: visible; }
+
+    aside {
+        width: var(--sidebar-w);
+        background: var(--secondary);
+        color: #e2e8f0;
+        display: flex; flex-direction: column;
+        padding: 30px 20px;
+        flex-shrink: 0; z-index: 2000;
+        border-right: 4px solid var(--primary);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .brand {
+        font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 40px;
+        display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px;
+    }
+    .brand i { color: var(--accent); text-shadow: 0 0 10px rgba(250, 204, 21, 0.5); }
+
+    .nav-item {
+        padding: 16px; margin-bottom: 8px; border-radius: 8px;
+        cursor: pointer; color: #94a3b8; font-weight: 600;
+        display: flex; align-items: center; gap: 15px; transition: 0.2s;
+        border: 1px solid transparent;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .nav-item.active { 
+        background: var(--primary); color: white; 
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); 
+    }
+
+    /* --- CONTENT AREA --- */
+    main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+    .view-panel {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        overflow-y: auto; padding: 0; display: none; opacity: 0;
+        transition: opacity 0.4s;
+    }
+    .view-panel.active { display: block; opacity: 1; }
+
+    /* --- NOTES STYLING --- */
+    .paper {
+        max-width: 950px; margin: 0 auto; background: white;
+        padding: 80px; min-height: 100vh;
+        box-shadow: 0 0 50px rgba(0,0,0,0.08);
+    }
+
+    h1 { font-size: 2.8rem; color: var(--secondary); margin-bottom: 10px; letter-spacing: -1.5px; line-height: 1.1; }
+    .meta { color: var(--primary); text-transform: uppercase; font-weight: bold; font-size: 0.85rem; letter-spacing: 2px; }
+    
+    h2 { 
+        font-family: 'Space Grotesk', sans-serif; font-size: 1.7rem; color: var(--secondary); 
+        margin-top: 60px; margin-bottom: 25px; padding-bottom: 10px; 
+        border-bottom: 4px solid var(--accent); display: inline-block;
+    }
+    
+    h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; color: var(--primary-dark); margin-top: 35px; margin-bottom: 15px; }
+
+    p {
+        font-family: 'Lora', serif; font-size: 1.15rem; line-height: 1.8;
+        color: #475569; margin-bottom: 20px;
+    }
+    li { font-family: 'Lora', serif; font-size: 1.1rem; line-height: 1.7; margin-bottom: 8px; margin-left: 20px; color: #475569; }
+    
+    /* Concept Box */
+    .concept-box {
+        background: #eff6ff; border: 2px solid var(--primary);
+        padding: 25px; margin: 30px 0; border-radius: 12px;
+        position: relative;
+    }
+    .concept-box::before {
+        content: 'KEY CONCEPT'; position: absolute; top: -12px; left: 20px;
+        background: var(--primary); color: white; padding: 2px 10px;
+        font-size: 0.8rem; font-weight: bold; border-radius: 4px;
+    }
+
+    .mnemonic {
+        background: #fefce8; border-left: 5px solid var(--accent);
+        padding: 20px; margin: 20px 0; font-family: 'Space Grotesk', sans-serif;
+        color: #854d0e; font-weight: bold; font-size: 1.2rem;
+        display: flex; align-items: center; gap: 15px;
+    }
+
+    /* Tables */
+    .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #cbd5e1; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th { background: var(--secondary); color: white; padding: 16px; text-align: left; font-family: 'Space Grotesk', sans-serif; }
+    td { padding: 16px; border-bottom: 1px solid #e2e8f0; font-family: 'Lora', serif; }
+    tr:nth-child(even) { background: #f8fafc; }
+
+    /* Chemical Equations */
+    .chem-eq {
+        font-family: 'Space Grotesk', monospace; background: #1e293b; color: #bef264;
+        padding: 15px; border-radius: 8px; text-align: center; font-size: 1.2rem;
+        margin: 20px 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        border: 1px solid #334155; overflow-x: auto;
+    }
+
+    /* --- MIND MAP --- */
+    .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #cbd5e1; min-height: 100%; }
+    .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+    .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+    .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #64748b; width: 50%; height: 20px; }
+    .tree li::after { right: auto; left: 50%; border-left: 2px solid #64748b; }
+    .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+    .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+    .tree li:last-child::before { border-right: 2px solid #64748b; border-radius: 0 5px 0 0; }
+    .tree li:first-child::after { border-radius: 5px 0 0 0; }
+    .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #64748b; width: 0; height: 20px; }
+
+    .node {
+        background: white; border: 2px solid #94a3b8; padding: 12px 18px; border-radius: 6px;
+        display: inline-block; min-width: 130px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--secondary);
+        box-shadow: 0 4px 0px #cbd5e1; position: relative; z-index: 2; transition: 0.2s;
+    }
+    .node:hover { transform: translateY(-3px); box-shadow: 0 7px 0 #94a3b8; }
+    .root-node { background: var(--secondary); color: var(--accent); border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    .sub-node { border-color: var(--primary); color: var(--primary); }
+
+    /* --- QUIZ --- */
+    .quiz-area { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    .q-card { background: white; padding: 30px; margin-bottom: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    .q-opt {
+        display: flex; align-items: center; gap: 15px; padding: 15px; border: 2px solid #f1f5f9;
+        margin-top: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-family: 'Space Grotesk', sans-serif;
+    }
+    .q-opt:hover { background: #eff6ff; border-color: var(--primary); }
+    .q-let { 
+        font-weight: 800; color: #64748b; background: #e2e8f0; 
+        width: 35px; height: 35px; border-radius: 8px; 
+        display: flex; align-items: center; justify-content: center; 
+    }
+    
+    .q-opt.correct { background: #dcfce7; border-color: #22c55e; }
+    .q-opt.correct .q-let { background: #22c55e; color: white; }
+    .q-opt.wrong { background: #fee2e2; border-color: #ef4444; }
+    .q-opt.wrong .q-let { background: #ef4444; color: white; }
+
+    /* --- MOBILE --- */
+    @media (max-width: 768px) {
+        .menu-toggle { display: flex; }
+        aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        aside.active { left: 0; }
+        .paper { padding: 30px 20px; }
+        h1 { font-size: 2rem; }
+        .mm-wrapper { justify-content: flex-start; padding: 40px; transform: scale(0.6); transform-origin: top left; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-bolt"></i> IG-CHEM ELECTRO</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Study Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-project-diagram"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-flask"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #334155;">
+             <div class="nav-item" onclick="genPDF()" style="color:var(--accent); border-color:#334155;">
+                 <i class="fa-solid fa-file-pdf"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. NOTES PANEL -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Chemistry 0620 • Chapter 6</span>
+                <h1>Electrochemistry</h1>
+                <p>Electrochemistry is the study of the production of electricity from chemical reactions or the use of electricity to cause chemical changes (Electrolysis).</p>
+
+                <h2>1. Key Definitions & Principles</h2>
+                
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Term</th><th>Definition</th></tr>
+                        <tr><td><strong>Electrolysis</strong></td><td>The breakdown of an ionic compound, molten or in aqueous solution, by the passage of electricity.</td></tr>
+                        <tr><td><strong>Electrolyte</strong></td><td>The compound that conducts electricity when molten or dissolved (contains free-moving ions).</td></tr>
+                        <tr><td><strong>Electrode</strong></td><td>Rod (usually Graphite or Platinum) that carries current into the liquid.</td></tr>
+                    </table>
+                </div>
+
+                <div class="mnemonic">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    PANIC: Positive Anode, Negative Is Cathode
+                </div>
+
+                <div class="concept-box">
+                    <strong>Electron Flow & Redox</strong><br>
+                    <strong>Anode (+):</strong> Negative ions (Anions) are attracted here. They lose electrons (Oxidation).<br>
+                    <strong>Cathode (-):</strong> Positive ions (Cations) are attracted here. They gain electrons (Reduction).
+                    <br><br>
+                    <strong>OIL RIG:</strong> Oxidation Is Loss, Reduction Is Gain (of electrons).
+                </div>
+
+                <h2>2. Electrolysis of Molten Compounds</h2>
+                <p>In molten compounds, there are only two types of ions. It is simple: the metal goes to the cathode, and the non-metal goes to the anode.</p>
+                
+                <h3>Example: Molten Lead(II) Bromide (PbBr<sub>2</sub>)</h3>
+                <ul>
+                    <li><strong>Ions Present:</strong> Pb<sup>2+</sup> and Br<sup>&minus;</sup></li>
+                    <li><strong>Cathode (-):</strong> Pb<sup>2+</sup> gains electrons to become Lead metal (Grey bead).
+                        <div class="chem-eq">Pb<sup>2+</sup> + 2e<sup>&minus;</sup> &rarr; Pb</div>
+                    </li>
+                    <li><strong>Anode (+):</strong> Br<sup>&minus;</sup> loses electrons to become Bromine gas (Red-brown gas).
+                        <div class="chem-eq">2Br<sup>&minus;</sup> &rarr; Br<sub>2</sub> + 2e<sup>&minus;</sup></div>
+                    </li>
+                </ul>
+
+                <h2>3. Electrolysis of Aqueous Solutions</h2>
+                <p>Aqueous solutions contain the ions from the salt PLUS ions from water: <strong>H<sup>+</sup></strong> and <strong>OH<sup>&minus;</sup></strong>. We must follow the rules of selective discharge.</p>
+
+                <div class="concept-box">
+                    <strong>The Rules of Discharge</strong><br>
+                    <br>
+                    <strong>At the Cathode (-):</strong><br>
+                    Usually, the less reactive element is discharged.
+                    <ul>
+                        <li>If metal is <strong>more reactive than Hydrogen</strong> (e.g., Na, K, Ca, Mg), Hydrogen gas is produced (2H<sup>+</sup> + 2e<sup>&minus;</sup> &rarr; H<sub>2</sub>).</li>
+                        <li>If metal is <strong>less reactive than Hydrogen</strong> (e.g., Cu, Ag), the Metal is produced.</li>
+                    </ul>
+                    <br>
+                    <strong>At the Anode (+):</strong><br>
+                    <ul>
+                        <li>If Halide ions are present (Cl<sup>&minus;</sup>, Br<sup>&minus;</sup>, I<sup>&minus;</sup>) in concentration, the <strong>Halogen</strong> is produced.</li>
+                        <li>If no Halide (e.g., Sulfates, Nitrates), <strong>Oxygen</strong> is produced from Hydroxide ions.
+                        <div class="chem-eq">4OH<sup>&minus;</sup> &rarr; O<sub>2</sub> + 2H<sub>2</sub>O + 4e<sup>&minus;</sup></div>
+                        </li>
+                    </ul>
+                </div>
+
+                <h3>Example 1: Concentrated Aqueous NaCl (Brine)</h3>
+                <ul>
+                    <li><strong>Ions:</strong> Na<sup>+</sup>, Cl<sup>&minus;</sup>, H<sup>+</sup>, OH<sup>&minus;</sup></li>
+                    <li><strong>Cathode:</strong> H<sup>+</sup> discharged (Na is too reactive). Product: <strong>Hydrogen Gas</strong>.</li>
+                    <li><strong>Anode:</strong> Cl<sup>&minus;</sup> discharged (Halide rule). Product: <strong>Chlorine Gas</strong>.</li>
+                    <li><strong>Remaining Solution:</strong> Na<sup>+</sup> and OH<sup>&minus;</sup> remain &rarr; <strong>Sodium Hydroxide (NaOH)</strong>.</li>
+                </ul>
+
+                <h3>Example 2: Dilute Sulfuric Acid (H<sub>2</sub>SO<sub>4</sub>)</h3>
+                <ul>
+                    <li><strong>Cathode:</strong> H<sup>+</sup> &rarr; Hydrogen gas.</li>
+                    <li><strong>Anode:</strong> OH<sup>&minus;</sup> &rarr; Oxygen gas (Sulfate SO<sub>4</sub><sup>2-</sup> never discharges).</li>
+                </ul>
+
+                <h2>4. Electroplating & Purification</h2>
+                <p>Used to coat objects with metals (protection/appearance) or purify Copper.</p>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Component</th><th>Purification of Copper</th><th>Electroplating (Silver on Spoon)</th></tr>
+                        <tr><td><strong>Anode (+)</strong></td><td>Impure Copper</td><td>Pure Silver</td></tr>
+                        <tr><td><strong>Cathode (-)</strong></td><td>Pure Copper Strip</td><td>The Spoon (Object)</td></tr>
+                        <tr><td><strong>Electrolyte</strong></td><td>Copper(II) Sulfate</td><td>Silver Nitrate</td></tr>
+                        <tr><td><strong>Process</strong></td><td>Anode dissolves, Cathode gets bigger.</td><td>Ag<sup>+</sup> moves from Anode to Spoon.</td></tr>
+                    </table>
+                </div>
+
+                <h2>5. Chemical Cells & Fuel Cells</h2>
+                <p><strong>Simple Cell:</strong> Two metals of different reactivity in an electrolyte create a voltage. The further apart in the reactivity series, the higher the voltage.</p>
+                <p>Electron flow: From More Reactive Metal &rarr; Less Reactive Metal.</p>
+
+                <h3>Hydrogen Fuel Cells</h3>
+                <p>Combines Hydrogen and Oxygen to produce electricity without combustion.</p>
+                <ul>
+                    <li><strong>Fuel:</strong> Hydrogen (H<sub>2</sub>) and Oxygen (O<sub>2</sub>).</li>
+                    <li><strong>Product:</strong> Only Water (H<sub>2</sub>O). Non-polluting.</li>
+                    <li><strong>Overall Equation:</strong>
+                        <div class="chem-eq">2H<sub>2</sub> + O<sub>2</sub> &rarr; 2H<sub>2</sub>O</div>
+                    </li>
+                </ul>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">ELECTROLYSIS</div>
+                            <ul>
+                                <li>
+                                    <div class="node sub-node">Molten</div>
+                                    <ul>
+                                        <li>
+                                            <div class="node">Simple Split</div>
+                                            <ul>
+                                                <li><div class="node"><small>Metal &rarr; Cathode</small></div></li>
+                                                <li><div class="node"><small>Non-Metal &rarr; Anode</small></div></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node sub-node">Aqueous</div>
+                                    <ul>
+                                        <li>
+                                            <div class="node">Cathode Rules</div>
+                                            <ul>
+                                                <li><div class="node"><small>Reactive > H<br>&rarr; H<sub>2</sub> gas</small></div></li>
+                                                <li><div class="node"><small>Reactive < H<br>&rarr; Metal</small></div></li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <div class="node">Anode Rules</div>
+                                            <ul>
+                                                <li><div class="node"><small>Halides &rarr; Halogen</small></div></li>
+                                                <li><div class="node"><small>Sulfates/Nitrates<br>&rarr; Oxygen</small></div></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node sub-node">Uses</div>
+                                    <ul>
+                                        <li>
+                                            <div class="node">Electroplating<br><small>Obj at Cathode</small></div>
+                                        </li>
+                                        <li>
+                                            <div class="node">Refining Cu<br><small>Impure at Anode</small></div>
+                                        </li>
+                                        <li>
+                                            <div class="node">Extraction<br><small>Aluminum</small></div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container">
+                <!-- Javascript will load questions here -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI FUNCTIONS ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Close menu on mobile
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            
+            // Force desktop width for PDF rendering
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth; // Restore
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Chem_Electrochemistry.pdf');
+            });
+        }
+
+        // --- QUIZ DATA (50 Questions on Electrochemistry) ---
+        const qData = [
+            {q:"What is the charge of the Anode?", o:["Positive", "Negative", "Neutral", "Variable"], a:0},
+            {q:"PANIC stands for?", o:["Positive Anode Negative Is Cathode", "Positive Anode Neutral Is Cathode", "Positive Atom Negative Ion Charge", "Positive Anode Negative Is Cation"], a:0},
+            {q:"Oxidation occurs at the...?", o:["Anode", "Cathode", "Electrolyte", "Wire"], a:0},
+            {q:"Reduction is the...?", o:["Gain of electrons", "Loss of electrons", "Loss of oxygen", "Gain of hydrogen ions"], a:0},
+            {q:"What forms at the cathode during electrolysis of molten PbBr<sub>2</sub>?", o:["Lead", "Bromine", "Hydrogen", "Oxygen"], a:0},
+            {q:"What forms at the anode during electrolysis of molten PbBr<sub>2</sub>?", o:["Bromine gas", "Lead", "Oxygen", "Hydrogen"], a:0},
+            {q:"Product at cathode in conc. aqueous NaCl?", o:["Hydrogen", "Sodium", "Chlorine", "Oxygen"], a:0},
+            {q:"Product at anode in conc. aqueous NaCl?", o:["Chlorine", "Oxygen", "Sodium", "Hydrogen"], a:0},
+            {q:"Why is Hydrogen produced instead of Sodium in aq. NaCl?", o:["Sodium is more reactive than Hydrogen", "Sodium is less reactive than Hydrogen", "Sodium ions are not present", "Hydrogen is a halogen"], a:0},
+            {q:"Solution remaining after electrolysis of conc. NaCl?", o:["Sodium Hydroxide", "Hydrochloric Acid", "Water", "Sodium Chloride"], a:0},
+            {q:"Product at anode in dilute Sulfuric Acid?", o:["Oxygen", "Sulfur Dioxide", "Hydrogen", "Sulfate"], a:0},
+            {q:"Which ions discharge first at the Anode?", o:["Halides (Cl, Br, I)", "Sulfates", "Nitrates", "Carbonates"], a:0},
+            {q:"In electroplating a spoon with silver, the anode is?", o:["Pure Silver", "The Spoon", "Carbon", "Platinum"], a:0},
+            {q:"In electroplating a spoon with silver, the electrolyte is?", o:["Silver Nitrate", "Copper Sulfate", "Sulfuric Acid", "Sodium Chloride"], a:0},
+            {q:"What happens to the mass of the copper anode during purification?", o:["Decreases", "Increases", "Stays same", "Becomes zero instantly"], a:0},
+            {q:"Equation for reaction at Anode in purification of Copper?", o:["Cu &rarr; Cu<sup>2+</sup> + 2e<sup>-</sup>", "Cu<sup>2+</sup> + 2e<sup>-</sup> &rarr; Cu", "Cu + 2e<sup>-</sup> &rarr; Cu<sup>2-</sup>", "Cu &rarr; Cu<sup>+</sup> + e<sup>-</sup>"], a:0},
+            {q:"Material commonly used for inert electrodes?", o:["Graphite or Platinum", "Iron", "Zinc", "Copper"], a:0},
+            {q:"What is an Electrolyte?", o:["Molten/Dissolved ionic compound", "A solid metal", "A gas", "A plastic"], a:0},
+            {q:"Why don't covalent compounds conduct electricity?", o:["No free ions/electrons", "They are too hard", "They have high melting points", "They are soluble"], a:0},
+            {q:"Product of Hydrogen Fuel Cell?", o:["Water", "Carbon Dioxide", "Carbon Monoxide", "Methane"], a:0},
+            {q:"Equation for formation of Oxygen from Hydroxide ions?", o:["4OH<sup>-</sup> &rarr; O<sub>2</sub> + 2H<sub>2</sub>O + 4e<sup>-</sup>", "2OH<sup>-</sup> &rarr; O<sub>2</sub> + H<sub>2</sub>", "OH<sup>-</sup> &rarr; O + H", "4OH &rarr; 2O<sub>2</sub> + 2H<sub>2</sub>"], a:0},
+            {q:"Color of Bromine gas?", o:["Red-Brown", "Green-Yellow", "Purple", "Colorless"], a:0},
+            {q:"Color of Chlorine gas?", o:["Green-Yellow", "Red-Brown", "Purple", "Colorless"], a:0},
+            {q:"In a simple cell, electrons flow from...?", o:["More reactive to less reactive metal", "Less reactive to more reactive", "Anode to cathode through liquid", "Positive to Negative"], a:0},
+            {q:"Which pair gives highest voltage in a cell?", o:["Magnesium and Copper", "Zinc and Iron", "Iron and Copper", "Copper and Silver"], a:0},
+            {q:"What is Galvanizing?", o:["Coating iron with Zinc", "Coating copper with Gold", "Electrolysis of water", "Making steel"], a:0},
+            {q:"Why is Cryolite used in Aluminum extraction?", o:["Lowers melting point of Alumina", "Acts as catalyst", "Increases yield", "Prevents anode burning"], a:0},
+            {q:"Main ore of Aluminum?", o:["Bauxite", "Hematite", "Cryolite", "Limestone"], a:0},
+            {q:"Anode reaction in Aluminum extraction produces?", o:["Oxygen (and CO<sub>2</sub>)", "Aluminum", "Fluorine", "Sodium"], a:0},
+            {q:"In aqueous Copper(II) Sulfate, product at Cathode?", o:["Copper", "Hydrogen", "Oxygen", "Sulfur"], a:0},
+            {q:"In aqueous Copper(II) Sulfate with carbon electrodes, product at Anode?", o:["Oxygen", "Sulfur Dioxide", "Copper", "Hydrogen"], a:0},
+            {q:"If using Copper electrodes in Copper Sulfate electrolysis, what happens to Anode?", o:["It dissolves", "Bubbles of Oxygen", "Nothing", "Gets bigger"], a:0},
+            {q:"Conductor of electricity in a metal wire?", o:["Electrons", "Ions", "Atoms", "Protons"], a:0},
+            {q:"Conductor of electricity in an electrolyte?", o:["Ions", "Electrons", "Atoms", "Neutrons"], a:0},
+            {q:"Which statement is true for Exothermic reactions?", o:["Chemical energy &rarr; Heat energy", "Heat &rarr; Chemical", "Takes in heat", "Temp decreases"], a:0},
+            {q:"Fuel cells are efficient because?", o:["Directly convert chemical to electrical energy", "Burn fuel at high temp", "Use cheap oil", "Have moving parts"], a:0},
+            {q:"Disadvantage of Hydrogen Fuel Cells?", o:["Storage/Transport of Hydrogen is hard", "Produces CO<sub>2</sub>", "Low energy density", "Uses lots of water"], a:0},
+            {q:"Ionic half-equation for Hydrogen discharge?", o:["2H<sup>+</sup> + 2e<sup>-</sup> &rarr; H<sub>2</sub>", "H<sup>+</sup> + e<sup>-</sup> &rarr; H", "2H &rarr; H<sub>2</sub>", "H<sub>2</sub> &rarr; 2H<sup>+</sup> + 2e<sup>-</sup>"], a:0},
+            {q:"Observation at cathode when Copper forms?", o:["Pink/Brown solid deposits", "Fizzing", "Green gas", "White precipitate"], a:0},
+            {q:"Observation at anode when Oxygen forms?", o:["Bubbles of colorless gas", "Bubbles of green gas", "Red-brown gas", "Electrode dissolves"], a:0},
+            {q:"Why is electroplating used on steel car bumpers?", o:["Prevent rust and look shiny", "Make them stronger", "Make them lighter", "Make them magnetic"], a:0},
+            {q:"Charge of a Cation?", o:["Positive", "Negative", "Neutral", "Double negative"], a:0},
+            {q:"Anions move towards?", o:["The Anode", "The Cathode", "The bottom", "The surface"], a:0},
+            {q:"Molten NaCl electrolysis products?", o:["Sodium and Chlorine", "Hydrogen and Chlorine", "Sodium and Oxygen", "Hydrogen and Oxygen"], a:0},
+            {q:"Which creates a current?", o:["Simple Cell", "Electrolytic Cell", "Beaker of water", "Piece of wood"], a:0},
+            {q:"Purpose of the membrane in some cells?", o:["Allow ions to pass but separate gases", "Stop electricity", "Filter solids", "Look cool"], a:0},
+            {q:"Oxidation state of Oxygen in O<sub>2</sub>?", o:["0", "-2", "+2", "-1"], a:0},
+            {q:"In Mg + ZnSO<sub>4</sub> reaction, which is oxidized?", o:["Mg", "Zn", "S", "O"], a:0},
+            {q:"Solid lead(II) bromide does not conduct because?", o:["Ions are fixed in lattice", "No ions present", "It is a metal", "It has no electrons"], a:0},
+            {q:"Why is Aluminum extraction expensive?", o:["Large amount of electricity needed", "Bauxite is rare", "Labor costs", "Machinery is cheap"], a:0}
+        ];
+
+        // --- RENDER QUIZ ---
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            // Shuffle options logic
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            // Use innerHTML to render subscripts/superscripts
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem; color:#334155;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                // Highlight correct answer
+                const correctTxt = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerHTML.includes(correctTxt)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

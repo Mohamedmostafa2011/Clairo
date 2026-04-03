@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIE IGCSE Biology 0610 Paper 6 Complete Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg: #0a0f1e;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.1);
+    --glass-hover: rgba(255,255,255,0.08);
+    --teal: #00d4c8;
+    --teal-dim: rgba(0,212,200,0.15);
+    --teal-glow: rgba(0,212,200,0.4);
+    --cyan: #38bdf8;
+    --violet: #a78bfa;
+    --violet-dim: rgba(167,139,250,0.15);
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-muted: #64748b;
+    --card-radius: 16px;
+    --nav-h: 64px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── BACKGROUND ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 10%, rgba(0,212,200,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 80%, rgba(167,139,250,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 50%, rgba(56,189,248,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: var(--nav-h);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(10,15,30,0.85);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+
+  .nav-brand {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-right: 1rem;
+  }
+
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+
+  nav a:hover {
+    color: var(--teal);
+    background: var(--teal-dim);
+    border-color: rgba(0,212,200,0.3);
+  }
+
+  /* ─── LAYOUT ─── */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    text-align: center;
+    padding: 5rem 1rem 3rem;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: var(--teal-dim);
+    border: 1px solid rgba(0,212,200,0.35);
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.4rem 1.2rem;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    background: linear-gradient(135deg, #fff 0%, var(--teal) 50%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-sub {
+    color: var(--text-dim);
+    font-size: 1.05rem;
+    max-width: 620px;
+    margin: 0 auto 2rem;
+  }
+
+  .hero-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+
+  .skill-pill {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    backdrop-filter: blur(8px);
+    transition: all 0.2s;
+  }
+
+  .skill-pill:hover {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--card-radius);
+    padding: 1.75rem 2rem;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    margin-bottom: 1.25rem;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: rgba(0,212,200,0.25); }
+
+  /* ─── SECTION ─── */
+  section {
+    margin-bottom: 3.5rem;
+    scroll-margin-top: calc(var(--nav-h) + 16px);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .section-num {
+    background: linear-gradient(135deg, var(--teal), var(--cyan));
+    color: var(--bg);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 0.75rem;
+    margin-top: 1.25rem;
+  }
+
+  h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--cyan);
+    margin-bottom: 0.5rem;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  p { margin-bottom: 0.75rem; color: var(--text); font-size: 0.93rem; }
+
+  ul, ol { margin: 0.5rem 0 0.75rem 1.2rem; }
+  li { margin-bottom: 0.35rem; font-size: 0.9rem; color: var(--text); }
+
+  strong { color: #fff; font-weight: 600; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; background: rgba(0,212,200,0.12); color: var(--teal); padding: 0.15rem 0.5rem; border-radius: 4px; }
+
+  /* ─── CALLOUT BOXES ─── */
+  .tip, .warn, .examiner, .fullmarks, .formula-box, .mistake-box {
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+    border-left: 3px solid;
+    backdrop-filter: blur(8px);
+  }
+
+  .tip {
+    background: rgba(52,211,153,0.08);
+    border-color: var(--green);
+    color: #a7f3d0;
+  }
+
+  .tip::before { content: '✅ Top Tip: '; font-weight: 700; color: var(--green); }
+
+  .warn {
+    background: rgba(248,113,113,0.08);
+    border-color: var(--red);
+    color: #fca5a5;
+  }
+
+  .warn::before { content: '⚠️ Common Mistake: '; font-weight: 700; color: var(--red); }
+
+  .examiner {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: #99f6e4;
+  }
+
+  .examiner::before { content: '🎯 Examiner Wants: '; font-weight: 700; color: var(--teal); }
+
+  .fullmarks {
+    background: rgba(167,139,250,0.1);
+    border-color: var(--violet);
+    color: #ddd6fe;
+  }
+
+  .fullmarks::before { content: '⭐ Full Marks Tip: '; font-weight: 700; color: var(--violet); }
+
+  .formula-box {
+    background: rgba(56,189,248,0.08);
+    border-color: var(--cyan);
+    color: #bae6fd;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+  }
+
+  .mistake-box {
+    background: rgba(251,191,36,0.07);
+    border-color: var(--amber);
+    color: #fde68a;
+  }
+
+  /* ─── TABLES ─── */
+  .table-wrap { overflow-x: auto; margin: 1rem 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  th {
+    background: rgba(0,212,200,0.15);
+    color: var(--teal);
+    font-weight: 700;
+    padding: 0.7rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid rgba(0,212,200,0.3);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ─── PAPER CARDS ─── */
+  .paper-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(16px);
+  }
+
+  .paper-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .paper-badge {
+    background: var(--teal-dim);
+    border: 1px solid rgba(0,212,200,0.3);
+    color: var(--teal);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .q-block {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 0.75rem 0;
+  }
+
+  .q-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+
+  /* ─── CHAPTER CARDS ─── */
+  .chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+
+  .chapter-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    backdrop-filter: blur(16px);
+    transition: all 0.2s;
+  }
+
+  .chapter-card:hover {
+    border-color: rgba(0,212,200,0.3);
+    transform: translateY(-1px);
+  }
+
+  .ch-num {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .ch-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ─── SKILL GRID ─── */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .skill-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    backdrop-filter: blur(12px);
+  }
+
+  .skill-name {
+    font-weight: 700;
+    color: var(--violet);
+    font-size: 0.88rem;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── COMMAND WORDS ─── */
+  .cmd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .cmd-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+  }
+
+  .cmd-word {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--amber);
+    background: rgba(251,191,36,0.1);
+    border: 1px solid rgba(251,191,36,0.3);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.6rem;
+  }
+
+  /* ─── REVISION SHEET ─── */
+  .rev-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1rem;
+  }
+
+  .rev-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+  }
+
+  .rev-title {
+    font-weight: 700;
+    color: var(--teal);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 0.5rem;
+  }
+
+  /* ─── CHECKLIST ─── */
+  .checklist li {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .checklist li::before {
+    content: '☐';
+    color: var(--teal);
+    flex-shrink: 0;
+    margin-top: 0.05rem;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--glass-border), transparent);
+    margin: 2.5rem 0;
+  }
+
+  /* ─── TAGS ─── */
+  .tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    margin: 0.15rem;
+  }
+
+  .tag-teal { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(0,212,200,0.3); }
+  .tag-violet { background: var(--violet-dim); color: var(--violet); border: 1px solid rgba(167,139,250,0.3); }
+  .tag-amber { background: rgba(251,191,36,0.1); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+  .tag-red { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+  .tag-green { background: rgba(52,211,153,0.1); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+
+  /* ─── CLOSING ─── */
+  .closing {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    backdrop-filter: blur(16px);
+  }
+
+  .closing h2 {
+    background: linear-gradient(135deg, var(--teal), var(--violet));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ─── PRINT ─── */
+  @media print {
+    body { background: white; color: black; }
+    nav { display: none; }
+    .card, .chapter-card, .skill-card { break-inside: avoid; }
+  }
+
+  @media (max-width: 768px) {
+    .chapter-grid, .skill-grid, .cmd-grid, .rev-grid { grid-template-columns: 1fr; }
+    h2 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <span class="nav-brand">Bio P6 Guide</span>
+  <a href="#what-tests">What P6 Tests</a>
+  <a href="#strategy">Strategy</a>
+  <a href="#analysis">Exam Analysis</a>
+  <a href="#chapters">Chapters</a>
+  <a href="#skills">Skills</a>
+  <a href="#experiments">Experiments</a>
+  <a href="#commands">Commands</a>
+  <a href="#markscheme">Mark Scheme</a>
+  <a href="#mistakes">Mistakes</a>
+  <a href="#revision">Revision</a>
+  <a href="#closing">Checklist</a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 1 — HERO / COVER
+═══════════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-badge">CIE IGCSE Biology 0610 • Paper 6 • Alternative to Practical</div>
+  <h1>The Complete<br>Paper 6 Guide</h1>
+  <p class="hero-sub">Experimental Skills, Exam Techniques, Chapter-Based Revision — Built from 6 Real 2025 Exam Papers and Mark Schemes</p>
+  <div class="hero-strip">
+    <span class="skill-pill">🔬 Observation</span>
+    <span class="skill-pill">📐 Measurement</span>
+    <span class="skill-pill">📊 Graphing</span>
+    <span class="skill-pill">🧮 Calculations</span>
+    <span class="skill-pill">📋 Planning</span>
+    <span class="skill-pill">🔎 Evaluation</span>
+    <span class="skill-pill">💡 Interpretation</span>
+    <span class="skill-pill">🖊 Drawing</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 2 — WHAT PAPER 6 TESTS
+═══════════════════════════════════════════════════════════════ -->
+<section id="what-tests">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>What Paper 6 Tests</h2>
+  </div>
+
+  <div class="card">
+    <p>Paper 6 (Alternative to Practical) tests <strong>practical skills without requiring actual lab work</strong>. You are given descriptions of experiments, results, graphs, and data — and you answer questions using these. <strong>Total: 40 marks. Time: 1 hour.</strong></p>
+    <p>Typically there are <strong>3 questions</strong>, each carrying about 12–15 marks. Questions are based on real experimental scenarios from Biology topics in the 0610 syllabus.</p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Skill Tested</th><th>What You Must Do</th><th>Mark Value (typical)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Table construction</strong></td><td>Draw a ruled table, correct headings with units in column heads only, no units repeated in cells</td><td>3–4 marks</td></tr>
+        <tr><td><strong>Graph plotting</strong></td><td>Label axes fully with units, choose suitable scale using >½ paper, plot as × or dots, join with ruler</td><td>4–6 marks</td></tr>
+        <tr><td><strong>Calculations</strong></td><td>Show all working, include units, correct rounding, percentage change/magnification/rate</td><td>1–3 marks</td></tr>
+        <tr><td><strong>Identifying variables</strong></td><td>State independent variable (what changes), dependent variable (what is measured), control variables (what stays the same — named specifically)</td><td>2–3 marks</td></tr>
+        <tr><td><strong>Observation/description</strong></td><td>Use data from the paper, state colour changes precisely, use comparative language with numbers</td><td>1–2 marks</td></tr>
+        <tr><td><strong>Conclusions</strong></td><td>Based only on evidence given, link IV to DV, use data in answer, no over-extension</td><td>1–2 marks</td></tr>
+        <tr><td><strong>Improvements</strong></td><td>Realistic, named, specific — e.g. "repeat each concentration three times and calculate a mean"</td><td>1–2 marks</td></tr>
+        <tr><td><strong>Hazards</strong></td><td>Name the hazard and state the risk — e.g. "hydrochloric acid is corrosive and could cause skin burns"</td><td>1 mark</td></tr>
+        <tr><td><strong>Planning</strong></td><td>Name IV, DV, controls, method outline, repeats</td><td>4–6 marks</td></tr>
+        <tr><td><strong>Anomalies</strong></td><td>Identify result that does not fit the pattern, explain what to do with it</td><td>1 mark</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>What Examiners Are Really Looking For</h3>
+  <div class="examiner">Specific biological vocabulary with correct units. Answers grounded in the data provided. Realistic, named improvements. Control variables stated by name — not just "same conditions".</div>
+
+  <div class="card">
+    <h4>Examiner Priority List</h4>
+    <ul>
+      <li><strong>Use data in every answer where possible</strong> — compare figures, quote measurements</li>
+      <li><strong>Name control variables explicitly</strong> — "same volume of solution", "same temperature", "same species of potato"</li>
+      <li><strong>Describe, don't explain</strong> unless the command word is "explain"</li>
+      <li><strong>Conclusions must follow from evidence only</strong> — don't go beyond what the results show</li>
+      <li><strong>Include units every time</strong> in calculations, table headings, and axis labels</li>
+      <li><strong>Graph: both axes fully labelled with units</strong> — no labels = no marks</li>
+      <li><strong>Improvements must be practical and named</strong> — "use a water bath to maintain a constant temperature of 40 °C"</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 3 — EXAM STRATEGY
+═══════════════════════════════════════════════════════════════ -->
+<section id="strategy">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>Paper 6 Exam Strategy</h2>
+  </div>
+
+  <div class="card">
+    <h3>How to Read a Paper 6 Question</h3>
+    <ol>
+      <li>Read the <strong>experiment description</strong> fully before looking at any question</li>
+      <li>Underline the <strong>command word</strong> in each sub-question</li>
+      <li>Check the <strong>mark allocation</strong> in brackets — it tells you how many points to make</li>
+      <li>Look at any <strong>figures, tables, or diagrams</strong> provided and understand them first</li>
+      <li>If a graph is given, read the axes carefully including units and scale</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Time Management</h3>
+    <p>Paper 6 = 40 marks in 60 minutes. That is <strong>1.5 minutes per mark</strong>. If a question is worth 4 marks, spend about 6 minutes on it. Do not spend more than 10 minutes on any single question part.</p>
+    <ul>
+      <li>Start with what you know — earn easy marks first</li>
+      <li>Tables and graphs take longer — budget 8–10 minutes for these</li>
+      <li>Planning questions need structured thinking — allocate 7–9 minutes for a 6-mark planning answer</li>
+    </ul>
+  </div>
+
+  <div class="formula-box">
+    <strong>Key Formulas</strong><br><br>
+    magnification = image size ÷ actual size<br>
+    actual size = image size ÷ magnification<br>
+    percentage change = (change ÷ original) × 100<br>
+    percentage = (part ÷ whole) × 100<br>
+    mean = total sum ÷ number of readings<br>
+    rate = quantity ÷ time
+  </div>
+
+  <div class="card">
+    <h3>Checklists for Each Question Type</h3>
+
+    <h4>Graph Questions ✔</h4>
+    <ul class="checklist">
+      <li>Both axes fully labelled with quantity AND units (e.g. "time / s")</li>
+      <li>Scale uses more than half the grid area — not too cramped</li>
+      <li>Scale goes up in even steps (1, 2, 5, 10 etc.)</li>
+      <li>All points plotted as neat small × or dot in the exact right position</li>
+      <li>Points joined by straight ruled lines between them (unless smooth curve is justified)</li>
+      <li>Anomalous points circled but NOT included in the line</li>
+      <li>Title not always required but add it if asked</li>
+    </ul>
+
+    <h4>Table Questions ✔</h4>
+    <ul class="checklist">
+      <li>All lines drawn with a ruler</li>
+      <li>Column headings include units in the heading (e.g. "Temperature / °C")</li>
+      <li>No units written in the data cells themselves</li>
+      <li>All values recorded to the same number of decimal places</li>
+      <li>Headings are clear and descriptive</li>
+    </ul>
+
+    <h4>Planning Questions ✔</h4>
+    <ul class="checklist">
+      <li>Independent variable named and how it will be varied (range + values)</li>
+      <li>Dependent variable named and how it will be measured (instrument + units)</li>
+      <li>At least two named control variables with how they will be kept constant</li>
+      <li>Method described step-by-step in logical order</li>
+      <li>Repeats mentioned: "repeat each value three times and calculate a mean"</li>
+      <li>Safety consideration included if hazards are present</li>
+    </ul>
+
+    <h4>Evaluation Questions ✔</h4>
+    <ul class="checklist">
+      <li>Identify a specific source of error (not just "human error")</li>
+      <li>Explain WHY it causes inaccuracy</li>
+      <li>Suggest a specific, realistic improvement that addresses it</li>
+      <li>Do not suggest changing the basic experiment design</li>
+    </ul>
+
+    <h4>Calculation Questions ✔</h4>
+    <ul class="checklist">
+      <li>Write the formula first</li>
+      <li>Substitute values clearly</li>
+      <li>Show all working steps</li>
+      <li>Include the correct unit in the answer</li>
+      <li>Round to an appropriate number of significant figures</li>
+    </ul>
+  </div>
+
+  <div class="tip">When comparing data, always quote actual numbers from the paper. Never say "results increased" — say "results increased from 23 s to 41 s".</div>
+  <div class="warn">Never say "keep everything the same" as a control variable. You must NAME what variable is kept the same.</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 4 — ANALYSIS OF 6 PAST PAPERS
+═══════════════════════════════════════════════════════════════ -->
+<section id="analysis">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>Analysis of the 6 Provided Examinations</h2>
+  </div>
+
+  <!-- PAPER 1: S25/61 -->
+  <div class="paper-card">
+    <div class="paper-title">
+      <span>Paper 1: 0610/61/M/J/2025 (May/June 2025)</span>
+      <span class="paper-badge">S25 Paper 61</span>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q1 — Diffusion Investigation (Agar Cubes + HCl)</div>
+      <p><strong>What tested:</strong> Effect of concentration on the rate of diffusion. Agar containing universal indicator (green → red) placed in different concentrations of HCl. Time recorded to change colour completely.</p>
+      <p><strong>Skills:</strong> Table construction (4 marks), conclusion (1 mark), identifying IV/DV (2 marks), two improvements (2 marks), two hazards (1 mark).</p>
+      <p><strong>What the mark scheme rewards for the table:</strong> Ruled lines, headings with units in column head (concentration / mol dm⁻³ and time / s), no units in data cells, all data in correct columns, values converted correctly from min:sec to seconds.</p>
+      <p><strong>Ideal conclusion:</strong> "As the concentration of HCl increases, the time taken for the agar to turn red decreases." — Always state direction and link IV to DV.</p>
+      <div class="warn">Students often write "time decreased" without saying "as concentration increased". The mark requires a comparative statement.</div>
+      <p><strong>Improvements expected:</strong> Repeat each concentration and calculate a mean; use a colorimeter to measure colour change instead of visual judgement; use agar pieces of identical size; control temperature using a water bath.</p>
+      <p><strong>Hazards:</strong> HCl is corrosive — causes skin burns / eye damage. Knife/scalpel is sharp — could cut skin.</p>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q1(b) — Planning: Effect of Temperature on Osmosis in Potato</div>
+      <p><strong>What tested:</strong> Full planning — IV, DV, controls, method, safety.</p>
+      <p><strong>IV:</strong> Temperature of water bath (e.g. 10, 20, 30, 40, 50 °C)</p>
+      <p><strong>DV:</strong> Change in length/mass of potato strips after a set time</p>
+      <p><strong>Controls:</strong> Same concentration of solution, same initial size of potato strips, same species of potato, same time in solution</p>
+      <div class="examiner">State at least 3 named control variables for full marks. Include how you will keep them constant.</div>
+    </div>
+    <div class="tip">This paper tested: table construction with unit conversion, conclusion writing, hazards, and a planning question. Classic Paper 6 structure.</div>
+  </div>
+
+  <!-- PAPER 2: S25/62 -->
+  <div class="paper-card">
+    <div class="paper-title">
+      <span>Paper 2: 0610/62/M/J/2025 (May/June 2025)</span>
+      <span class="paper-badge">S25 Paper 62</span>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q1 — Osmosis in Potato Discs with Salt Solutions</div>
+      <p><strong>What tested:</strong> Effect of salt solution concentration on osmosis in potato tissue. Potato discs placed in 0.0, 0.5, 1.0 mol dm⁻³ salt solutions. Change in total length measured.</p>
+      <p><strong>Skills:</strong> Calculating volumes for dilution (1 mark), table construction, percentage change calculation, graph plotting, conclusion, evaluation.</p>
+      <p><strong>Dilution calculation:</strong> To make 0.5 mol dm⁻³ from 1.0 mol dm⁻³ in 50 cm³ total — need 25 cm³ of 1.0 mol dm⁻³ + 25 cm³ distilled water.</p>
+      <div class="formula-box">Percentage change = (final length − initial length) ÷ initial length × 100</div>
+      <p><strong>Graph expectations:</strong> Line graph, concentration on x-axis, percentage change in length on y-axis. Full axis labels with units. Points joined with ruled lines. Anomalous point if present should be circled.</p>
+      <div class="examiner">The examiner gives marks for: scale using over half the grid, even scale intervals, fully labelled axes with units, all points plotted correctly as ×, ruled lines between points.</div>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q1 Continued — Conclusion and Evaluation</div>
+      <p><strong>Ideal conclusion:</strong> "As the concentration of salt solution increases, the percentage decrease in length of potato discs increases. This is because water moves out of the potato cells by osmosis down a water potential gradient into the more concentrated salt solution."</p>
+      <div class="warn">Do NOT say "the potato gained water" if the data shows it decreased in length. Always base conclusions on the given data.</div>
+    </div>
+  </div>
+
+  <!-- PAPER 3: S25/63 -->
+  <div class="paper-card">
+    <div class="paper-title">
+      <span>Paper 3: 0610/63/M/J/2025 (May/June 2025)</span>
+      <span class="paper-badge">S25 Paper 63</span>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q1 — Effect of Temperature on Catalase Activity</div>
+      <p><strong>What tested:</strong> Catalase (from potato extract) breaks down hydrogen peroxide → water + oxygen foam. Student measures height of foam at cold (C), room temperature (R), and hot (H).</p>
+      <p><strong>Skills:</strong> Table construction with measurements from diagram, conclusion, identifying anomalies, evaluation.</p>
+      <p><strong>Table requirements:</strong> Three rows (C, R, H), headings: "test-tube" and "height of foam / mm", drawn with ruler, units in heading only.</p>
+      <p><strong>Expected trend:</strong> Foam increases from cold to room temperature (enzyme more active), then decreases at very high temperature (enzyme denatures).</p>
+      <div class="examiner">For the conclusion — state the specific test-tube letters, refer to foam height values, and link to enzyme activity. "The height of foam was greatest in test-tube R (room temperature), showing catalase is most active at room temperature."</div>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q2 — Enzyme Invertase Investigation (Yeast)</div>
+      <p><strong>Context:</strong> Yeast invertase breaks down sucrose into reducing sugars. Two concentrations of invertase extract (10%, 100%) tested with Benedict's solution.</p>
+      <p><strong>Expected results:</strong> 100% invertase → brick-red (large amount of reducing sugar), 10% invertase → green/yellow (smaller amount), Control (water) → blue (no change).</p>
+      <p><strong>Table for W25/63:</strong> Three columns: test-tube (A, B, W), colour of liquid, conclusion (reducing sugars present/absent).</p>
+      <div class="tip">For Benedict's results: always state the exact colour seen — "brick-red" not just "red". "Blue" = negative, "green/yellow/orange/brick-red" = positive reducing sugar, intensity indicates relative amount.</div>
+    </div>
+  </div>
+
+  <!-- PAPER 4: W25/61 -->
+  <div class="paper-card">
+    <div class="paper-title">
+      <span>Paper 4: 0610/61/O/N/2025 (Oct/Nov 2025)</span>
+      <span class="paper-badge">W25 Paper 61</span>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q1 — Transpiration in Celery (Effect of Temperature)</div>
+      <p><strong>Context:</strong> Celery stalks placed in blue dye at cold (4 °C) and warm (40 °C) temperatures. Sections cut from stalk to measure how far dye has moved up the xylem.</p>
+      <p><strong>Skills:</strong> Temperature change calculation (1 mark), table construction (4 marks), conclusions, drawing labelled diagram of xylem, evaluation.</p>
+      <p><strong>Temperature calculation:</strong> Change = final temp − initial temp (include sign: positive if increased, negative if decreased).</p>
+      <p><strong>Table requirements:</strong> Headings: water-bath (C or W), number of 5 mm sections, total distance moved by blue dye / mm. Units in headings.</p>
+      <p><strong>Expected conclusion:</strong> Water (dye) moved further up the xylem at higher temperature — transpiration rate is greater at higher temperatures because water molecules have more kinetic energy.</p>
+      <div class="examiner">Drawing of xylem cross-section: use pencil, draw with clear continuous lines, NO shading, label xylem tissue clearly with a line that clearly points to the structure.</div>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q2 — Microscopy and Magnification</div>
+      <p><strong>What tested:</strong> Biological drawing from a microscope image + magnification calculation.</p>
+      <div class="formula-box">magnification = image size ÷ actual size<br>actual size = image size ÷ magnification</div>
+      <div class="warn">Always measure image size in mm first, then convert to µm if actual size is given in µm (1 mm = 1000 µm).</div>
+    </div>
+  </div>
+
+  <!-- PAPER 5: W25/62 -->
+  <div class="paper-card">
+    <div class="paper-title">
+      <span>Paper 5: 0610/62/O/N/2025 (Oct/Nov 2025)</span>
+      <span class="paper-badge">W25 Paper 62</span>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q1 — Yeast Respiration with Different Glucose Concentrations</div>
+      <p><strong>Context:</strong> Yeast ferments glucose solutions (1% and 4%). Carbon dioxide produced is collected in an inverted test-tube in water. Volume of gas measured over time.</p>
+      <p><strong>Skills:</strong> Understanding dilution (1% from 5% glucose), table + graph construction, rate calculation, conclusion, evaluation.</p>
+      <p><strong>Rate calculation:</strong> Rate = volume of gas produced ÷ time taken (cm³/min).</p>
+      <p><strong>Graph:</strong> Time (x-axis) vs volume of gas / cm³ (y-axis). Two lines on same axes — label each line.</p>
+      <p><strong>Conclusion:</strong> "As the concentration of glucose increases, the rate of CO₂ production increases, showing that yeast respires faster when more substrate (glucose) is available."</p>
+      <div class="examiner">When two lines are plotted, compare them using actual data values. State which is greater and by how much.</div>
+    </div>
+  </div>
+
+  <!-- PAPER 6: W25/63 -->
+  <div class="paper-card">
+    <div class="paper-title">
+      <span>Paper 6: 0610/63/O/N/2025 (Oct/Nov 2025)</span>
+      <span class="paper-badge">W25 Paper 63</span>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q1 — Invertase Enzyme Investigation</div>
+      <p><strong>Context:</strong> Invertase enzyme (from yeast) breaks sucrose into reducing sugars. Two concentrations (10%, 100%) + control (distilled water). Benedict's test used to detect reducing sugars.</p>
+      <p><strong>Table:</strong> Test-tube, colour of Benedict's solution, conclusion (reducing sugar present / absent / trace).</p>
+      <p><strong>Conclusion:</strong> "The higher the concentration of invertase, the more sucrose was broken down into reducing sugars, as shown by the more intense colour change in Benedict's solution."</p>
+    </div>
+    <div class="q-block">
+      <div class="q-title">Q2 — Planning and Evaluation Question</div>
+      <p><strong>Skills:</strong> Full planning with named variables, improvement suggestions, linking results to biological concepts (enzyme concentration → reaction rate → product formation).</p>
+    </div>
+    <div class="tip">This paper reinforced the pattern: enzyme investigation in Q1 (food test + table), planning or evaluation in Q2, and often a transport/ecology data question in Q3.</div>
+  </div>
+
+  <!-- CROSS-PAPER SYNTHESIS -->
+  <div class="card">
+    <h3>🔁 Cross-Paper Synthesis — Patterns Across All 6 Papers</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Pattern</th><th>Frequency Across 6 Papers</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Table construction (with headings + units)</td><td>✅ Present in ALL 6 papers</td></tr>
+          <tr><td>Writing a conclusion linked to IV and DV</td><td>✅ Present in ALL 6 papers</td></tr>
+          <tr><td>Identifying or naming variables</td><td>✅ 5 out of 6 papers</td></tr>
+          <tr><td>Calculating percentage change or rate</td><td>✅ 5 out of 6 papers</td></tr>
+          <tr><td>Suggesting improvements to method</td><td>✅ Present in ALL 6 papers</td></tr>
+          <tr><td>Osmosis experiments (potato/celery)</td><td>✅ 4 out of 6 papers</td></tr>
+          <tr><td>Enzyme activity (catalase, lipase, invertase)</td><td>✅ 4 out of 6 papers</td></tr>
+          <tr><td>Respiration investigations (yeast)</td><td>✅ 3 out of 6 papers</td></tr>
+          <tr><td>Graph plotting (line graph)</td><td>✅ 4 out of 6 papers</td></tr>
+          <tr><td>Planning an investigation</td><td>✅ 4 out of 6 papers</td></tr>
+          <tr><td>Identifying hazards</td><td>✅ 3 out of 6 papers</td></tr>
+          <tr><td>Food tests (Benedict's/biuret/iodine)</td><td>✅ 3 out of 6 papers</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="fullmarks">The three highest-value skills across all 6 papers are: (1) table construction, (2) conclusion writing, and (3) evaluation/improvements. Master these three and you secure the most marks.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 5 — CHAPTER-BY-CHAPTER GUIDE
+═══════════════════════════════════════════════════════════════ -->
+<section id="chapters">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>Chapter-by-Chapter Practical Skills Guide</h2>
+  </div>
+
+  <div class="chapter-grid">
+
+    <!-- CH 1 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 1</div>
+      <div class="ch-title">Characteristics of Living Organisms</div>
+      <p><strong>P6 link:</strong> Rarely directly tested as an experiment, but used in evaluation and observation questions. Identifying MRSGREN characteristics from data.</p>
+      <div class="tip">If asked to observe an organism, describe its characteristics using precise scientific language (nutrition, respiration, movement, growth, excretion, reproduction, sensitivity).</div>
+      <p><strong>Likely question:</strong> Describe what observations suggest the organism is alive (e.g. movement, gas exchange, growth).</p>
+    </div>
+
+    <!-- CH 2 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 2</div>
+      <div class="ch-title">Organisation of Organisms</div>
+      <p><strong>P6 link:</strong> Microscopy, biological drawing, measuring cells, magnification calculations.</p>
+      <p><strong>Skills:</strong> Drawing cells accurately, calculating magnification from scale bar or actual size, identifying organelles.</p>
+      <div class="formula-box">magnification = image size ÷ actual size</div>
+      <div class="warn">Never shade a biological drawing. Use clear, sharp, continuous pencil lines. No sketch lines.</div>
+    </div>
+
+    <!-- CH 3 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 3</div>
+      <div class="ch-title">Movement In & Out of Cells</div>
+      <p><strong>P6 link:</strong> <strong>Very heavily tested.</strong> Osmosis in potato/celery, diffusion in agar, effect of concentration on movement rate.</p>
+      <p><strong>Common experiments:</strong> Potato discs in salt/sugar solutions (mass or length change), agar cubes in HCl, dialysis tubing osmosis.</p>
+      <p><strong>IV:</strong> Concentration of solution. <strong>DV:</strong> Change in mass / length / time taken.</p>
+      <p><strong>Controls:</strong> Same initial mass/length, same temperature, same time, same species of potato, same volume of solution.</p>
+      <div class="examiner">Percentage change is almost always required: (final − initial) ÷ initial × 100. Always include the % sign.</div>
+    </div>
+
+    <!-- CH 4 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 4</div>
+      <div class="ch-title">Biological Molecules</div>
+      <p><strong>P6 link:</strong> Food tests — core, heavily tested.</p>
+      <div class="table-wrap" style="margin-top:0.5rem">
+        <table>
+          <thead><tr><th>Molecule</th><th>Test</th><th>Positive Result</th></tr></thead>
+          <tbody>
+            <tr><td>Starch</td><td>Iodine solution</td><td>Blue-black</td></tr>
+            <tr><td>Reducing sugar</td><td>Benedict's (heat)</td><td>Green → brick-red</td></tr>
+            <tr><td>Protein</td><td>Biuret (NaOH + CuSO₄)</td><td>Blue → violet/purple</td></tr>
+            <tr><td>Lipid</td><td>Ethanol emulsion</td><td>Cloudy white emulsion</td></tr>
+            <tr><td>Vitamin C</td><td>DCPIP</td><td>Purple → colourless</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn">Always state the actual colour seen — NOT "colour change" or "turns positive". Write "turns brick-red" not "positive result".</div>
+    </div>
+
+    <!-- CH 5 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 5</div>
+      <div class="ch-title">Enzymes</div>
+      <p><strong>P6 link:</strong> <strong>Very heavily tested.</strong> Enzyme activity investigations appear in multiple papers.</p>
+      <p><strong>Common experiments:</strong> Catalase + H₂O₂ (foam height), lipase + milk (colour change using thymolphthalein), invertase + sucrose (Benedict's test), amylase + starch (iodine test).</p>
+      <p><strong>IV options:</strong> Temperature, pH, enzyme concentration, substrate concentration.</p>
+      <p><strong>DV options:</strong> Time for colour to disappear, rate of reaction, foam height, volume of gas produced.</p>
+      <div class="tip">Graph of enzyme activity vs temperature: rises to optimum, then drops sharply. Enzyme is DENATURED at high temperatures (not "killed").</div>
+      <div class="warn">Never say the enzyme is "killed" by heat. Say it is "denatured" — the active site changes shape so substrate cannot bind.</div>
+    </div>
+
+    <!-- CH 6 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 6</div>
+      <div class="ch-title">Plant Nutrition</div>
+      <p><strong>P6 link:</strong> Photosynthesis investigations — light intensity, CO₂ concentration, temperature; starch testing; leaf structure drawings.</p>
+      <p><strong>Common experiments:</strong> Aquatic plant (Elodea) bubble counting at different light intensities; starch test on variegated/destarched leaves; hydrogencarbonate indicator colour changes.</p>
+      <p><strong>IV:</strong> Distance of lamp from plant (→ changes light intensity). <strong>DV:</strong> Number of bubbles per minute.</p>
+      <div class="examiner">Light intensity is proportional to 1/distance². But in P6 you use distance as the IV — do NOT say intensity was the IV unless the question states this.</div>
+      <div class="tip">For the starch test on a leaf — state colour of each region precisely: "green area turned blue-black (starch present), white area remained brown/yellow (no starch)".</div>
+    </div>
+
+    <!-- CH 7 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 7</div>
+      <div class="ch-title">Human Nutrition</div>
+      <p><strong>P6 link:</strong> Food test practicals, dietary analysis, identifying nutrients from experimental data.</p>
+      <p><strong>Likely P6 format:</strong> A table of food test results is given — interpret which nutrients are present. Or plan a method to test for a named nutrient.</p>
+      <div class="warn">When asked to interpret food test results, state what each result shows before giving a conclusion. Don't jump straight to "the food contains starch".</div>
+    </div>
+
+    <!-- CH 8 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 8</div>
+      <div class="ch-title">Transport in Plants</div>
+      <p><strong>P6 link:</strong> Transpiration (potometer), water movement in xylem (celery/dye), stomata observation, rate calculations.</p>
+      <p><strong>Key skills:</strong> Rate = distance moved by bubble ÷ time (mm/min) in potometer; drawing cross-section of stem; counting stomata per field of view.</p>
+      <p><strong>IV (potometer):</strong> Wind speed, temperature, humidity, light intensity. <strong>DV:</strong> Rate of movement of air bubble.</p>
+      <div class="tip">Rate in potometer = distance / time. If cross-sectional area of tube is given, volume = area × distance.</div>
+    </div>
+
+    <!-- CH 9 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 9</div>
+      <div class="ch-title">Transport in Animals</div>
+      <p><strong>P6 link:</strong> Heart rate investigation, effect of exercise on pulse rate, graph of heart rate vs time.</p>
+      <p><strong>Skills:</strong> Graph plotting (line graph, time vs heart rate/bpm), rate calculation, evaluation of method for measuring pulse rate.</p>
+      <p><strong>Typical question:</strong> Plot heart rate before, during, and after exercise. Describe the pattern with data. Suggest why heart rate increases during exercise.</p>
+      <div class="examiner">When describing a graph trend: state the starting value, direction of change, any peak, and the final value. Always include numbers.</div>
+    </div>
+
+    <!-- CH 10 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 10</div>
+      <div class="ch-title">Diseases and Immunity</div>
+      <p><strong>P6 link:</strong> Rarely a direct practical, but may appear as data interpretation — antibody levels over time, infection rates in populations, evaluating vaccine trial data.</p>
+      <p><strong>Likely question:</strong> Graph of antibody titre over time — describe the pattern, compare primary/secondary immune response using data.</p>
+      <div class="tip">When interpreting immunity graphs, describe the lag period, the peak, and the rate of decline using actual values from the graph.</div>
+    </div>
+
+    <!-- CH 11 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 11</div>
+      <div class="ch-title">Gas Exchange and Respiration</div>
+      <p><strong>P6 link:</strong> <strong>Frequently tested.</strong> Yeast respiration investigations, limewater experiments, breathing rate, hydrogencarbonate indicator colour changes.</p>
+      <p><strong>Common experiments:</strong> Yeast + glucose at different temperatures (bubble counting), limewater to compare CO₂ in inspired vs expired air, hydrogencarbonate indicator in light/dark.</p>
+      <p><strong>Graph:</strong> Rate of respiration (bubbles/min) vs temperature — bell-shaped curve with optimum.</p>
+      <div class="warn">Aerobic respiration: glucose + O₂ → CO₂ + water (+ energy). Anaerobic (yeast): glucose → ethanol + CO₂. Do not confuse the two when writing conclusions.</div>
+    </div>
+
+    <!-- CH 12 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 12</div>
+      <div class="ch-title">Coordination and Response</div>
+      <p><strong>P6 link:</strong> Reaction time investigations, sensory response experiments, tropism investigations.</p>
+      <p><strong>Typical practical:</strong> Ruler-drop reaction time test; measuring effect of stimulus intensity on response; geotropism or phototropism in seedlings.</p>
+      <p><strong>Skills:</strong> Table with repeat readings + mean, anomaly identification, graph of response vs stimulus strength.</p>
+    </div>
+
+    <!-- CH 13 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 13</div>
+      <div class="ch-title">Excretion and Homeostasis</div>
+      <p><strong>P6 link:</strong> Less commonly a direct practical; may appear as data interpretation of temperature regulation, urine concentration data, or blood glucose levels.</p>
+      <p><strong>Likely question:</strong> Graph of blood glucose over time — describe the pattern, identify the peak, explain the role of insulin.</p>
+      <div class="tip">When interpreting homeostasis data — always describe the mechanism (negative feedback) and name the hormone involved.</div>
+    </div>
+
+    <!-- CH 14 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 14</div>
+      <div class="ch-title">Reproduction in Plants</div>
+      <p><strong>P6 link:</strong> Germination investigations, pollen tube growth, effect of conditions on germination rate.</p>
+      <p><strong>Common experiment:</strong> Seeds in different conditions (temperature, light, water availability) — count % germination over time.</p>
+      <p><strong>IV:</strong> Temperature / light / water. <strong>DV:</strong> Percentage of seeds germinated.</p>
+    </div>
+
+    <!-- CH 15 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 15</div>
+      <div class="ch-title">Reproduction in Humans</div>
+      <p><strong>P6 link:</strong> Interpreting graphs of hormone levels during menstrual cycle, fertility data, pregnancy development data.</p>
+      <p><strong>Likely question:</strong> Line graph of oestrogen/progesterone over 28 days — describe patterns, identify ovulation, compare hormone levels using data.</p>
+    </div>
+
+    <!-- CH 16 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 16</div>
+      <div class="ch-title">Chromosomes, Genes and Proteins</div>
+      <p><strong>P6 link:</strong> Rarely a direct practical. May appear as analysis of genetic variation data or gel electrophoresis interpretation.</p>
+      <p><strong>Likely question:</strong> Interpreting band patterns in gel electrophoresis, drawing conclusions about genetic relationships.</p>
+    </div>
+
+    <!-- CH 17 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 17</div>
+      <div class="ch-title">Variation and Selection</div>
+      <p><strong>P6 link:</strong> Measuring continuous variation in a population, plotting histograms, calculating mean and range.</p>
+      <p><strong>Common experiment (ES 17.1):</strong> Measuring finger length in a class — record in a frequency table, construct a histogram.</p>
+      <p><strong>Skills:</strong> Frequency table, histogram (bars touching), mean calculation, mode identification.</p>
+      <div class="warn">Histograms have BARS THAT TOUCH — this shows continuous data. Bar charts have gaps between bars for discrete data.</div>
+    </div>
+
+    <!-- CH 18 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 18</div>
+      <div class="ch-title">Organisms and Their Environment</div>
+      <p><strong>P6 link:</strong> <strong>Very frequently tested.</strong> Quadrat sampling, transects, population data analysis, food webs, ecological investigations.</p>
+      <p><strong>Skills:</strong> Calculating population density from quadrat data, percentage cover, interpreting transect diagrams, bar charts of species abundance.</p>
+      <p><strong>Formula:</strong> Population estimate = (number in sample ÷ area of quadrat) × total area.</p>
+      <div class="tip">For quadrat questions — always state how many quadrats were used and how the area was randomly selected to reduce sampling bias.</div>
+    </div>
+
+    <!-- CH 19 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 19</div>
+      <div class="ch-title">Human Influences on Ecosystems</div>
+      <p><strong>P6 link:</strong> Interpreting pollution data, biodiversity indices, deforestation impact data, eutrophication graphs.</p>
+      <p><strong>Likely question:</strong> Graph of species diversity vs pollution level — describe the pattern, explain the trend, evaluate the investigation method.</p>
+    </div>
+
+    <!-- CH 20 -->
+    <div class="chapter-card">
+      <div class="ch-num">Chapter 20</div>
+      <div class="ch-title">Biotechnology & Genetic Modification</div>
+      <p><strong>P6 link:</strong> Biological washing powder investigation (Exp. Skills 20.1), fermentation data analysis, enzyme function in industrial context.</p>
+      <p><strong>Planning skills:</strong> Planning how to compare biological vs non-biological washing powders — stain removal, temperature, IV/DV/controls.</p>
+      <div class="tip">For biotechnology planning: IV = type/concentration of enzyme preparation. DV = degree of stain removal (measured by eye or colorimeter). Controls = same fabric, same stain, same temperature, same time.</div>
+    </div>
+
+  </div><!-- end chapter-grid -->
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 6 — COMPLETE EXPERIMENTAL SKILLS
+═══════════════════════════════════════════════════════════════ -->
+<section id="skills">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>Complete Experimental Skills Master Guide</h2>
+  </div>
+
+  <div class="skill-grid">
+
+    <div class="skill-card">
+      <div class="skill-name">Observation & Identification</div>
+      <p>Describe what you see using precise scientific language. State exact colours, sizes, shapes. Never use vague terms like "it changed".</p>
+      <div class="tip">Always state: what changed, in which direction, and by how much (if measurable).</div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Measuring with Apparatus</div>
+      <p>Use a ruler to measure in mm/cm. Use a measuring cylinder or syringe for volumes (cm³). Use a thermometer for temperature (°C). Record to the precision of the instrument.</p>
+      <div class="warn">Read volume from the bottom of the meniscus. Eye must be level with the meniscus.</div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Recording in Tables</div>
+      <ul>
+        <li>Draw all lines with a ruler</li>
+        <li>Units in column headings only — use "/" notation: "Temperature / °C"</li>
+        <li>No units repeated in data cells</li>
+        <li>All values to consistent decimal places in same column</li>
+        <li>IV in first column, DV in subsequent columns</li>
+      </ul>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Graphing</div>
+      <ul>
+        <li>IV → x-axis; DV → y-axis</li>
+        <li>Both axes labelled with quantity and unit</li>
+        <li>Scale: even intervals, uses >½ of paper</li>
+        <li>Plot as neat × or dot</li>
+        <li>Join points with straight ruled lines (unless told otherwise)</li>
+        <li>Anomalous points: circle them, do not include in line</li>
+      </ul>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Calculations</div>
+      <ul>
+        <li>Write formula first</li>
+        <li>Substitute values with units</li>
+        <li>Show all working</li>
+        <li>Include unit in final answer</li>
+        <li>Round appropriately (same decimal places as data)</li>
+      </ul>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Microscopy & Biological Drawing</div>
+      <ul>
+        <li>Use sharp pencil</li>
+        <li>Single continuous lines — no sketch marks</li>
+        <li>No shading</li>
+        <li>Labels drawn with horizontal lines (not diagonal)</li>
+        <li>Drawing fills the space provided</li>
+        <li>Title and magnification stated</li>
+      </ul>
+      <div class="formula-box">magnification = image size ÷ actual size</div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Identifying Variables</div>
+      <p><strong>Independent (IV):</strong> The variable you change. State what it is and the range of values you will use.</p>
+      <p><strong>Dependent (DV):</strong> The variable you measure. State what it is and how you will measure it.</p>
+      <p><strong>Control variables:</strong> Name at least 2–3 specific variables that could affect the DV and explain how you will keep each constant.</p>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Planning Investigations</div>
+      <ol>
+        <li>State the aim</li>
+        <li>Name IV and range of values</li>
+        <li>Name DV and how measured</li>
+        <li>Name and explain control variables</li>
+        <li>Write clear, logical method steps</li>
+        <li>State number of repeats</li>
+        <li>Note safety considerations</li>
+        <li>Draw results table outline</li>
+      </ol>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Reliability, Accuracy & Precision</div>
+      <p><strong>Reliability:</strong> Results you can trust — achieved by repeating and taking means.</p>
+      <p><strong>Accuracy:</strong> How close to the true value — improved by using calibrated instruments, removing systematic errors.</p>
+      <p><strong>Precision:</strong> How repeatable — more decimal places, smaller scale divisions.</p>
+      <div class="warn">These three terms mean different things. Using one when you mean another loses marks.</div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Evaluation & Improvements</div>
+      <p>Identify a specific source of error → explain the problem it causes → suggest a named improvement that would reduce it.</p>
+      <p><strong>Example:</strong> "The temperature of the water bath may have fluctuated during the experiment, affecting enzyme activity. Using an electronic water bath that maintains a constant temperature would improve accuracy."</p>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Identifying Anomalies</div>
+      <p>An anomalous result does not fit the general trend of the data. On a graph, circle the anomalous point and do not include it in the line of best fit. State that the result was excluded and why.</p>
+      <div class="tip">To decide if a result is anomalous: compare it to the trend of all other results. If it is significantly different from the trend, it is anomalous.</div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-name">Drawing Conclusions</div>
+      <p>A conclusion must: state the relationship between IV and DV; include specific data values; not go beyond what the evidence shows; use appropriate biological vocabulary.</p>
+      <p><strong>Structure:</strong> "As [IV] increases/decreases, [DV] increases/decreases. For example, when [IV] was [value], [DV] was [value], compared to [value] when [IV] was [value]."</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 7 — COMMON EXPERIMENTS & HOW TO ANSWER THEM
+═══════════════════════════════════════════════════════════════ -->
+<section id="experiments">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>Common Paper 6 Experiments: How to Answer Them</h2>
+  </div>
+
+  <!-- FOOD TESTS -->
+  <div class="card">
+    <h3>🧪 Food Tests</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Test</th><th>Reagent</th><th>Positive Colour</th><th>Negative Colour</th><th>P6 Tip</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Starch (Iodine)</td><td>Iodine solution</td><td>Blue-black</td><td>Brown/orange</td><td>State exact colour — "brown" not "no change"</td></tr>
+          <tr><td>Reducing Sugar (Benedict's)</td><td>Benedict's + heat in water bath</td><td>Brick-red (→ orange → yellow → green)</td><td>Blue</td><td>Colour intensity indicates amount. Describe the colour you see, not just "positive"</td></tr>
+          <tr><td>Protein (Biuret)</td><td>NaOH + CuSO₄</td><td>Violet/purple</td><td>Blue</td><td>Add NaOH first, then CuSO₄ — do not mix order</td></tr>
+          <tr><td>Lipid (Ethanol emulsion)</td><td>Ethanol, then add water</td><td>Cloudy white emulsion</td><td>Clear solution</td><td>The milky cloudiness is the lipid forming an emulsion</td></tr>
+          <tr><td>Vitamin C (DCPIP)</td><td>DCPIP solution</td><td>Purple → colourless</td><td>Purple (unchanged)</td><td>Count drops needed to decolourise — more drops = lower Vitamin C concentration</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- OSMOSIS -->
+  <div class="card">
+    <h3>💧 Osmosis Investigation (Potato/Plant Tissue)</h3>
+    <ul>
+      <li><strong>Aim:</strong> Investigate effect of solution concentration on osmosis in potato tissue</li>
+      <li><strong>IV:</strong> Concentration of salt/sugar solution (e.g. 0.0, 0.25, 0.5, 0.75, 1.0 mol dm⁻³)</li>
+      <li><strong>DV:</strong> Change in mass or length of potato strip/disc (%)</li>
+      <li><strong>Controls:</strong> Same initial mass/length, same potato species, same temperature, same time in solution, same surface area of potato, same volume of solution</li>
+      <li><strong>Graph:</strong> Line graph. Concentration (x-axis) vs percentage change in mass (y-axis). The line should cross zero at the point where water potential of solution = water potential of potato cells (isotonic point)</li>
+    </ul>
+    <div class="tip">Calculate percentage change: (final − initial) ÷ initial × 100. Use + for gain, − for loss. Plot % change, not absolute change, to allow fair comparison.</div>
+    <div class="examiner">Conclusion must use the word "osmosis" and explain direction of water movement. "Water moved out of potato cells by osmosis into the more concentrated salt solution, causing the potato to decrease in mass."</div>
+  </div>
+
+  <!-- ENZYME ACTIVITY -->
+  <div class="card">
+    <h3>⚗️ Enzyme Activity Investigations</h3>
+    <ul>
+      <li><strong>Catalase + H₂O₂:</strong> Foam height indicates activity. Higher temperature → more activity (to optimum), then drops (denaturation).</li>
+      <li><strong>Lipase + milk:</strong> Thymolphthalein indicator (blue → colourless when fatty acids produced). Time for colour to disappear = DV.</li>
+      <li><strong>Invertase + sucrose:</strong> Benedict's test detects reducing sugars produced. Brick-red = high enzyme activity.</li>
+      <li><strong>Amylase + starch:</strong> Iodine test at intervals. Starch breaks down → iodine stays yellow/brown.</li>
+    </ul>
+    <div class="tip">For rate calculations: rate = 1 ÷ time (if DV is time taken). Or rate = amount of product ÷ time.</div>
+    <div class="warn">Always explain denaturation correctly: "at high temperatures, the bonds holding the enzyme's tertiary structure break, changing the shape of the active site, so the substrate can no longer bind."</div>
+  </div>
+
+  <!-- PHOTOSYNTHESIS -->
+  <div class="card">
+    <h3>🌿 Photosynthesis Investigations</h3>
+    <ul>
+      <li><strong>Light intensity (Elodea):</strong> IV = distance from lamp (cm). DV = bubbles per minute / volume of O₂ per minute. Closer lamp → more bubbles.</li>
+      <li><strong>Controls:</strong> Same plant, same temperature (heat shield!), same CO₂ concentration, same time interval for counting.</li>
+      <li><strong>Starch test (variegated leaf):</strong> Green areas → blue-black (starch present). White areas → brown (no chlorophyll, no starch).</li>
+      <li><strong>CO₂ need (destarched plant):</strong> Leaf with CO₂ → starch present. Leaf without CO₂ (KOH absorbs CO₂) → no starch.</li>
+    </ul>
+    <div class="examiner">The heat shield in light intensity experiments controls temperature — an essential control variable. If omitted, you cannot conclude that light intensity is the only variable affecting rate.</div>
+  </div>
+
+  <!-- RESPIRATION -->
+  <div class="card">
+    <h3>🫁 Respiration Investigations</h3>
+    <ul>
+      <li><strong>Yeast + glucose (temperature effect):</strong> IV = temperature. DV = bubbles/min (CO₂ produced). Use at least 5 temperatures. Graph = bell curve.</li>
+      <li><strong>Inspired vs expired air (limewater):</strong> Breathe in → through limewater → breathe out → through second limewater. Compare cloudiness of limewater. Expired air = more cloudy = more CO₂.</li>
+      <li><strong>Aquatic plant (hydrogencarbonate indicator):</strong> In light → photosynthesis > respiration → CO₂ absorbed → indicator turns purple. In dark → only respiration → CO₂ released → indicator turns yellow.</li>
+    </ul>
+    <div class="tip">Hydrogencarbonate indicator colours: purple (CO₂ removed), red (normal CO₂ level), yellow (CO₂ increased). Always describe exact colour seen.</div>
+  </div>
+
+  <!-- TRANSPIRATION -->
+  <div class="card">
+    <h3>🌱 Transpiration (Potometer)</h3>
+    <ul>
+      <li><strong>Aim:</strong> Measure rate of water uptake (∝ transpiration rate) under different conditions</li>
+      <li><strong>IV:</strong> Wind speed (fan), temperature, humidity, light intensity</li>
+      <li><strong>DV:</strong> Distance moved by air bubble in capillary tube per unit time (mm/min)</li>
+      <li><strong>Controls:</strong> Same plant species, same leaf area, same length of capillary tube, same starting position of bubble</li>
+      <li><strong>Rate formula:</strong> Rate = distance ÷ time (mm/min)</li>
+    </ul>
+    <div class="warn">The potometer measures water UPTAKE, not directly water LOSS (transpiration). They are nearly equal because water lost = water taken up. State this distinction if asked.</div>
+  </div>
+
+  <!-- GERMINATION -->
+  <div class="card">
+    <h3>🌰 Germination Investigation</h3>
+    <ul>
+      <li><strong>Conditions tested:</strong> Temperature (warm vs cold), light (light vs dark), water (moist vs dry), oxygen (air vs no air)</li>
+      <li><strong>DV:</strong> Percentage of seeds that germinate</li>
+      <li><strong>Result:</strong> Seeds need warmth, water, and oxygen to germinate. Light is not essential for most seeds.</li>
+    </ul>
+    <div class="tip">Always use percentage germination (not raw count) to allow fair comparison across groups with different total seed numbers.</div>
+  </div>
+
+  <!-- ECOLOGICAL SAMPLING -->
+  <div class="card">
+    <h3>🌍 Ecological Sampling</h3>
+    <ul>
+      <li><strong>Quadrats:</strong> Randomly placed square frames used to estimate percentage cover or population density.</li>
+      <li><strong>Transects:</strong> A line along which quadrats or observations are made — used to study how species change along an environmental gradient.</li>
+      <li><strong>Population estimate:</strong> (mean number per quadrat × total area) ÷ quadrat area</li>
+      <li><strong>Random sampling:</strong> Use random coordinates (e.g. from random number tables) to place quadrats — reduces bias.</li>
+    </ul>
+    <div class="examiner">For evaluation of sampling: state that more quadrats should be used to improve reliability; or that quadrats should be placed more randomly to reduce bias.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 8 — COMMAND WORDS
+═══════════════════════════════════════════════════════════════ -->
+<section id="commands">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <h2>Command Words</h2>
+  </div>
+
+  <div class="cmd-grid">
+
+    <div class="cmd-card">
+      <div class="cmd-word">state / name / identify</div>
+      <p><strong>What examiner wants:</strong> A single clear answer. No explanation needed.</p>
+      <p><strong>Common mistake:</strong> Adding unnecessary explanation — you won't gain extra marks and may contradict yourself.</p>
+      <p><strong>Example:</strong> "State the independent variable." → "The concentration of hydrochloric acid."</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">describe</div>
+      <p><strong>What examiner wants:</strong> What you observe or what happens — with data. Not WHY it happens.</p>
+      <p><strong>Common mistake:</strong> Explaining the biology when the question only asks to describe. Loses time.</p>
+      <p><strong>Example:</strong> "Describe the results." → "As concentration increased from 0.4 to 1.0 mol dm⁻³, the time decreased from 145 s to 62 s."</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">explain</div>
+      <p><strong>What examiner wants:</strong> The biological reason WHY something happens. Use because / so that / therefore.</p>
+      <p><strong>Common mistake:</strong> Just re-describing the results without giving the mechanism.</p>
+      <p><strong>Example:</strong> "Explain why the potato decreased in length." → "Water moved out of potato cells by osmosis because the salt solution had a lower water potential than the cell contents."</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">compare</div>
+      <p><strong>What examiner wants:</strong> State the similarity AND/OR difference. Must refer to BOTH items being compared, with data.</p>
+      <p><strong>Common mistake:</strong> Describing each separately instead of making a direct comparison.</p>
+      <p><strong>Example:</strong> "Test-tube A showed a brick-red colour whereas test-tube B remained blue, showing that A contained reducing sugar but B did not."</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">suggest</div>
+      <p><strong>What examiner wants:</strong> A reasonable scientific explanation that may not be directly in the data. Your thinking is being tested.</p>
+      <p><strong>Common mistake:</strong> Writing a fact from memory that doesn't relate to the context given.</p>
+      <p><strong>Example:</strong> "Suggest why the time taken at 0 °C was very long." → "At low temperatures, enzyme molecules have less kinetic energy, so the frequency of enzyme-substrate collisions is reduced, slowing the reaction rate."</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">predict</div>
+      <p><strong>What examiner wants:</strong> What you expect the result to be, with a brief scientific justification.</p>
+      <p><strong>Example:</strong> "Predict the result for 2.0 mol dm⁻³." → "The time would be shorter than at 1.0 mol dm⁻³ because higher concentration increases diffusion rate."</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">calculate</div>
+      <p><strong>What examiner wants:</strong> Show formula → substitute values → give numerical answer with unit.</p>
+      <p><strong>Common mistake:</strong> No unit in the answer, or no working shown.</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">determine</div>
+      <p><strong>What examiner wants:</strong> Find a value from a graph or data (often by reading the graph or performing a calculation from it).</p>
+      <p><strong>Example:</strong> "Determine the rate of reaction at 30 °C from your graph." → Read value from y-axis at x = 30.</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">draw / plot</div>
+      <p><strong>Draw:</strong> Make a biological drawing or sketch diagram.<br><strong>Plot:</strong> Mark data points on a graph and connect them.</p>
+      <p><strong>Common mistake for plot:</strong> Not labelling axes, using wrong scale, not joining points with ruler.</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">construct</div>
+      <p><strong>What examiner wants:</strong> Build a table or draw a results chart from scratch. All lines with ruler, correct headings with units.</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">conclude</div>
+      <p><strong>What examiner wants:</strong> A statement of what the results show — must be based only on the evidence. Link IV to DV. Do not go beyond the data.</p>
+      <p><strong>Common mistake:</strong> Drawing a conclusion that goes further than the evidence (e.g. claiming to prove a hypothesis from one experiment).</p>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-word">evaluate</div>
+      <p><strong>What examiner wants:</strong> Assess the quality of the method/experiment. Identify weaknesses. Suggest improvements. Assess reliability of results.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 9 — HOW TO READ MARK SCHEMES
+═══════════════════════════════════════════════════════════════ -->
+<section id="markscheme">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <h2>How to Read Mark Schemes</h2>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Mark Scheme Term</th><th>What It Means</th><th>Student Implication</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>accept</code></td><td>An alternative answer the examiner will give credit for</td><td>Your phrasing doesn't have to be identical to the mark scheme</td></tr>
+          <tr><td><code>ignore</code></td><td>This information is irrelevant — mark is not given for it</td><td>Don't waste time writing this; it won't help or hurt</td></tr>
+          <tr><td><code>allow</code></td><td>A broader or less precise version of the answer that will be credited</td><td>You can use simplified language as long as meaning is clear</td></tr>
+          <tr><td><code>ecf</code> (error carried forward)</td><td>Even if a previous answer was wrong, if the student correctly uses THAT wrong answer in a later step, they still get the mark</td><td>Always attempt later parts even if you got an earlier part wrong</td></tr>
+          <tr><td><code>ora</code> (or reverse argument)</td><td>The mark is available for the opposite/reverse statement</td><td>Means both directions of the relationship are acceptable</td></tr>
+          <tr><td><code>any two from</code></td><td>The examiner will accept any two of the listed points</td><td>Write as many as you can — but be careful of contradictions</td></tr>
+          <tr><td><code>max 2</code></td><td>Maximum 2 marks even if more correct answers given</td><td>Focus on quality not quantity; contradictory answers cancel marks</td></tr>
+          <tr><td><code>named example required</code></td><td>A specific, named example must be given for the mark</td><td>You must name the organism, substance, organ etc. — general answers not credited</td></tr>
+          <tr><td><code>comparative statement needed</code></td><td>A comparison must be made between two values or conditions</td><td>Must mention BOTH items being compared</td></tr>
+          <tr><td><code>from data only</code></td><td>Answer must come from the given results — not general knowledge</td><td>Use the numbers/observations given in the paper, not textbook theory</td></tr>
+          <tr><td><code>unit required</code></td><td>The answer will only be accepted if the unit is included</td><td>ALWAYS include units in calculations and measurements</td></tr>
+          <tr><td><code>do not accept vague answers</code></td><td>General answers ("it increased") will not be credited</td><td>Always be specific — use data, name things, give values</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="tip">Mark schemes for Paper 6 always use "ecf" generously. If you made an error in part (a), your answer in part (b) that correctly uses your wrong answer from (a) will still get credit. Never leave a part blank because you think you got the previous part wrong.</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 10 — REPEATED STUDENT MISTAKES
+═══════════════════════════════════════════════════════════════ -->
+<section id="mistakes">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <h2>The Most Common Paper 6 Mistakes</h2>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Mistake</th><th>Correct Approach</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Missing units in calculations or table headings</td><td>Every measurement needs a unit. In tables: "Time / s" not "Time". In answers: "4.5 mm" not "4.5".</td></tr>
+          <tr><td>2</td><td>Wrong graph type — bar chart instead of line graph</td><td>Use LINE graph when IV is continuous (temperature, concentration, time). Use bar chart when IV is categoric (species, type of food).</td></tr>
+          <tr><td>3</td><td>Axes not labelled or units missing from axes</td><td>Both axes must have: quantity name + "/" + unit. E.g. "concentration / mol dm⁻³"</td></tr>
+          <tr><td>4</td><td>Graph not drawn with a ruler (freehand lines)</td><td>All straight lines between data points MUST be drawn with a ruler.</td></tr>
+          <tr><td>5</td><td>Vague control variable: "same conditions"</td><td>Name the specific variable: "same temperature maintained at 25 °C using a water bath"</td></tr>
+          <tr><td>6</td><td>Comparing without numbers</td><td>Never say "the results were higher". Say "the rate increased from 12 to 34 bubbles/min".</td></tr>
+          <tr><td>7</td><td>Explaining instead of describing</td><td>If the command word is "describe", state what happened. If "explain", then give the reason.</td></tr>
+          <tr><td>8</td><td>Not showing working in calculations</td><td>Always write formula first, then substitute, then calculate. Even if final answer is wrong, you can get method marks.</td></tr>
+          <tr><td>9</td><td>Wrong rounding or significant figures</td><td>Round to the same number of decimal places as the data provided. Check significant figures match the precision of the measurement.</td></tr>
+          <tr><td>10</td><td>Misreading scales on graphs/measuring cylinders</td><td>Always read from the bottom of the meniscus. For graph scales, check the value of each small division before reading.</td></tr>
+          <tr><td>11</td><td>Shading in biological drawings</td><td>NEVER shade. Use single, clean lines. Shading = zero marks for drawing quality.</td></tr>
+          <tr><td>12</td><td>Unrealistic improvements (e.g. "use a better thermometer")</td><td>Improvements must be specific and practical: "use an electronically controlled water bath to maintain temperature at ±0.1 °C"</td></tr>
+          <tr><td>13</td><td>Conclusion goes beyond data</td><td>Conclude only from the evidence in the paper. Don't assume results would extend beyond the range tested.</td></tr>
+          <tr><td>14</td><td>Confusing accuracy, precision, reliability</td><td>Reliability = repeatable. Accuracy = close to true value. Precision = many decimal places / small intervals.</td></tr>
+          <tr><td>15</td><td>Describing food test as "positive" without stating colour</td><td>Always state the actual colour: "turned brick-red" not "positive result"</td></tr>
+          <tr><td>16</td><td>Scale not using more than half the graph paper</td><td>Choose a scale so that all your data points use at least 50% (ideally 75%) of the available grid.</td></tr>
+          <tr><td>17</td><td>Identifying "human error" as a source of error</td><td>Be specific: "difficulty judging when the colour had completely changed by eye" is better than "human error".</td></tr>
+          <tr><td>18</td><td>Planning with only 1 control variable</td><td>Always name at least 2–3 control variables with specific methods for keeping them constant.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 11 — QUICK REVISION SUMMARY SHEETS
+═══════════════════════════════════════════════════════════════ -->
+<section id="revision">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <h2>Quick Revision Summary Sheets</h2>
+  </div>
+
+  <div class="rev-grid">
+
+    <div class="rev-card">
+      <div class="rev-title">📐 Graph Rules</div>
+      <ul class="checklist">
+        <li>IV on x-axis, DV on y-axis</li>
+        <li>Both axes labelled: "quantity / unit"</li>
+        <li>Even scale, uses >½ grid</li>
+        <li>Points plotted as neat ×</li>
+        <li>Straight ruled lines between points</li>
+        <li>Anomalies circled, excluded from line</li>
+        <li>Title if asked</li>
+      </ul>
+    </div>
+
+    <div class="rev-card">
+      <div class="rev-title">📋 Table Rules</div>
+      <ul class="checklist">
+        <li>All lines drawn with ruler</li>
+        <li>Headings with units (e.g. "Time / s")</li>
+        <li>No units in data cells</li>
+        <li>Consistent decimal places per column</li>
+        <li>IV in first column</li>
+        <li>Include a mean column if repeats present</li>
+      </ul>
+    </div>
+
+    <div class="rev-card">
+      <div class="rev-title">🔢 Formula Sheet</div>
+      <ul>
+        <li><code>magnification = image ÷ actual</code></li>
+        <li><code>actual = image ÷ magnification</code></li>
+        <li><code>% change = (change ÷ original) × 100</code></li>
+        <li><code>% = (part ÷ whole) × 100</code></li>
+        <li><code>mean = total ÷ n</code></li>
+        <li><code>rate = quantity ÷ time</code></li>
+        <li><code>rate = 1 ÷ time</code></li>
+      </ul>
+    </div>
+
+    <div class="rev-card">
+      <div class="rev-title">📝 Planning Template</div>
+      <ol>
+        <li><strong>Aim:</strong> To investigate the effect of [IV] on [DV]</li>
+        <li><strong>IV:</strong> [name], varied by [method], values: [list]</li>
+        <li><strong>DV:</strong> [name], measured by [instrument] in [unit]</li>
+        <li><strong>Controls:</strong> [name 3, say how kept constant]</li>
+        <li><strong>Method:</strong> Set up → do experiment → measure → repeat</li>
+        <li><strong>Repeats:</strong> Repeat 3 times, calculate mean</li>
+        <li><strong>Safety:</strong> [name hazard and precaution]</li>
+      </ol>
+    </div>
+
+    <div class="rev-card">
+      <div class="rev-title">⚗️ Food Tests Quick Ref</div>
+      <ul>
+        <li><strong>Starch:</strong> Iodine → blue-black</li>
+        <li><strong>Reducing sugar:</strong> Benedict's + heat → brick-red</li>
+        <li><strong>Protein:</strong> Biuret → violet</li>
+        <li><strong>Lipid:</strong> Ethanol emulsion → cloudy white</li>
+        <li><strong>Vitamin C:</strong> DCPIP → colourless</li>
+      </ul>
+    </div>
+
+    <div class="rev-card">
+      <div class="rev-title">✏️ Biological Drawing Rules</div>
+      <ul class="checklist">
+        <li>Use sharp pencil only</li>
+        <li>Single, continuous lines</li>
+        <li>No shading</li>
+        <li>Horizontal label lines with ruler</li>
+        <li>Drawing fills the space</li>
+        <li>Title + magnification stated</li>
+      </ul>
+    </div>
+
+    <div class="rev-card">
+      <div class="rev-title">💬 Sentence Starters</div>
+      <p><strong>Conclusion:</strong> "As [IV] increases, [DV] increases/decreases. For example…"</p>
+      <p><strong>Comparison:</strong> "[A] was greater than [B] — [value A] compared to [value B]"</p>
+      <p><strong>Description:</strong> "The results show that as [IV] changed from [v1] to [v2], [DV] changed from [v1] to [v2]."</p>
+      <p><strong>Improvement:</strong> "[Problem identified] — this could be improved by [specific named method]."</p>
+    </div>
+
+    <div class="rev-card">
+      <div class="rev-title">🔑 Key Vocabulary Bank</div>
+      <p><span class="tag tag-teal">osmosis</span> <span class="tag tag-teal">diffusion</span> <span class="tag tag-teal">active transport</span> <span class="tag tag-teal">denaturation</span> <span class="tag tag-teal">active site</span> <span class="tag tag-teal">substrate</span> <span class="tag tag-teal">optimum</span> <span class="tag tag-violet">water potential</span> <span class="tag tag-violet">partially permeable</span> <span class="tag tag-violet">transpiration</span> <span class="tag tag-violet">xylem</span> <span class="tag tag-amber">magnification</span> <span class="tag tag-amber">independent variable</span> <span class="tag tag-amber">dependent variable</span> <span class="tag tag-amber">control variable</span> <span class="tag tag-green">reliability</span> <span class="tag tag-green">accuracy</span> <span class="tag tag-green">precision</span> <span class="tag tag-red">anomalous</span> <span class="tag tag-red">percentage change</span></p>
+    </div>
+
+  </div>
+
+  <div class="card" style="margin-top:1.5rem">
+    <h3>⚡ 10 Last-Minute Reminders Before the Exam</h3>
+    <ol>
+      <li><strong>Read the experiment description fully</strong> before answering any question</li>
+      <li><strong>Underline the command word</strong> in every question</li>
+      <li><strong>Use data values</strong> in every conclusion, comparison, and description</li>
+      <li><strong>Never forget units</strong> — in tables, calculations, and axis labels</li>
+      <li><strong>Label BOTH axes</strong> of every graph with quantity and unit</li>
+      <li><strong>Use a ruler</strong> for table lines AND graph lines</li>
+      <li><strong>Name control variables specifically</strong> — never "keep everything the same"</li>
+      <li><strong>Improvements must be realistic and specific</strong> — not "use better equipment"</li>
+      <li><strong>Conclude from evidence only</strong> — don't go beyond the data given</li>
+      <li><strong>Show all working</strong> in calculations — even wrong answers can earn method marks</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 12 — CLOSING / FINAL CHECKLIST
+═══════════════════════════════════════════════════════════════ -->
+<section id="closing">
+  <div class="closing">
+    <h2>You Can Score High on Paper 6</h2>
+    <p style="color:var(--text-dim);max-width:560px;margin:0 auto 2rem;">Paper 6 marks are <strong>not about intelligence</strong> — they are about technique. Every mark here is trainable. Read carefully, answer precisely, use data, and follow the rules. You have everything you need.</p>
+
+    <div style="text-align:left;max-width:480px;margin:0 auto;">
+      <h3 style="color:var(--teal);text-align:center;margin-bottom:1rem">Final Exam Checklist</h3>
+      <ul class="checklist">
+        <li>Read the command word and answer exactly what it asks</li>
+        <li>Use data from the paper in every descriptive answer</li>
+        <li>Include correct units in all measurements and calculations</li>
+        <li>Label both axes of every graph with quantity and unit</li>
+        <li>Name all variables — IV, DV, and at least 2 controls</li>
+        <li>Suggest realistic, specific improvements (not generic ones)</li>
+        <li>Conclude from evidence only — do not over-extend</li>
+        <li>Show all working for calculations</li>
+        <li>Draw table lines and graph lines with a ruler</li>
+        <li>State exact colours in food test results</li>
+        <li>Use precise biological vocabulary throughout</li>
+        <li>Check all answers against mark allocation — enough points made?</li>
+      </ul>
+    </div>
+
+    <p style="color:var(--text-muted);font-size:0.8rem;margin-top:2rem">CIE IGCSE Biology 0610 Paper 6 Complete Guide • Based on May/June 2025 and Oct/Nov 2025 Examinations • For educational use only</p>
+  </div>
+</section>
+
+</main>
+</body>
+</html>

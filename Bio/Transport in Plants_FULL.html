@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IG-Bio | Ch 8: Transport in Plants</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* Theme: Cyan / Blue for Water Transport */
+            --primary: #0891b2; /* Cyan 600 */
+            --primary-dark: #164e63; /* Cyan 900 */
+            --accent: #eab308; /* Yellow (Sun/Evaporation) */
+            --bg: #ecfeff; /* Very light cyan tint */
+            --text: #334155;
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- NAVIGATION BUTTON (Fixed Circular) --- */
+        .menu-toggle {
+            display: none; /* Hidden on desktop */
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: var(--primary); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.4rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.9); }
+
+        /* --- MOBILE OVERLAY --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1999;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: var(--sidebar-w);
+            background: #0e3b43; /* Deep Cyan/Dark */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            z-index: 2000;
+            border-right: 1px solid #155e75;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand {
+            font-size: 1.5rem; font-weight: 800; color: #22d3ee; margin-bottom: 40px;
+            display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            padding: 16px; margin-bottom: 8px; border-radius: 8px;
+            cursor: pointer; color: #cffafe; font-weight: 600;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(8, 145, 178, 0.4); }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+        .view-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; padding: 0; display: none; opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .view-panel.active { display: block; opacity: 1; }
+
+        /* --- TEXTBOOK STYLING --- */
+        .paper {
+            max-width: 950px; margin: 0 auto; background: white;
+            padding: 80px; min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-family: 'Inter', sans-serif; font-size: 3rem; color: var(--primary-dark); margin-bottom: 10px; letter-spacing: -1px; }
+        .meta { color: #0e7490; text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        h2 { 
+            font-family: 'Inter', sans-serif; font-size: 1.8rem; color: #164e63; 
+            margin-top: 60px; margin-bottom: 25px; padding-bottom: 15px; 
+            border-bottom: 2px solid #cffafe; display: flex; align-items: center; gap: 10px;
+        }
+        
+        h3 { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--primary); margin-top: 35px; margin-bottom: 15px; }
+
+        p {
+            font-family: 'Crimson Pro', serif; font-size: 1.2rem; line-height: 1.8;
+            color: #334155; margin-bottom: 20px;
+        }
+        li { font-family: 'Crimson Pro', serif; font-size: 1.15rem; line-height: 1.7; margin-bottom: 8px; margin-left: 20px; }
+        
+        /* Concept Boxes */
+        .concept-box {
+            background: #ccfbf1; border-left: 5px solid var(--primary);
+            padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;
+        }
+        .concept-box strong { color: var(--primary-dark); font-family: 'Inter', sans-serif; }
+
+        .exam-tip {
+            background: #fffbe6; border: 1px solid #fde047; border-radius: 8px;
+            padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+        }
+        .exam-tip i { color: var(--accent); font-size: 1.5rem; margin-top: 3px; }
+        .exam-tip strong { color: #854d0e; }
+
+        /* Tables */
+        .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #a5f3fc; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #ecfeff; color: var(--primary-dark); padding: 16px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; border-bottom: 2px solid #67e8f9; }
+        td { padding: 16px; border-bottom: 1px solid #cffafe; vertical-align: top; font-family: 'Crimson Pro', serif; font-size: 1.1rem; }
+        tr:last-child td { border-bottom: none; }
+
+        /* --- MIND MAP --- */
+        .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #f0f9ff; }
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #94a3b8; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #94a3b8; width: 0; height: 20px; }
+
+        .node {
+            background: white; border: 1px solid #67e8f9; padding: 12px 18px; border-radius: 8px;
+            display: inline-block; min-width: 140px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; z-index: 2;
+        }
+        .root-node { background: var(--primary); color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: none; }
+
+        /* --- QUIZ --- */
+        .quiz-area { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .q-card { background: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #cffafe; }
+        .q-opt {
+            display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e2e8f0;
+            margin-top: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .q-opt:hover { background: #ecfeff; border-color: #22d3ee; }
+        .q-let { font-weight: 900; color: #94a3b8; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .q-opt.correct { background: #ccfbf1; border-color: var(--primary); }
+        .q-opt.correct .q-let { background: var(--primary); color: white; }
+        .q-opt.wrong { background: #ffe4e6; border-color: #f43f5e; }
+        .q-opt.wrong .q-let { background: #f43f5e; color: white; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
+            aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.active { left: 0; }
+            .paper { padding: 30px 20px; }
+            h1 { font-size: 2.2rem; }
+            .mm-wrapper { justify-content: flex-start; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-droplet"></i> IG-BIO TRANSPORT</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Full Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-sitemap"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-list-check"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #155e75;">
+             <div class="nav-item" onclick="genPDF()" style="color:#22d3ee; border-color:#155e75;">
+                 <i class="fa-solid fa-file-pdf"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. DETAILED NOTES -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Biology 0610 • Chapter 8</span>
+                <h1>Transport in Plants</h1>
+                <p>Plants need a transport system to move water from roots to leaves and sugars from leaves to the rest of the plant. This chapter covers Xylem, Phloem, Water Uptake, and Transpiration.</p>
+
+                <h2>1. Vascular Tissues: Xylem & Phloem</h2>
+                <p>Plants have a system of vessels called vascular bundles that run from the roots, up the stem, and into the leaves.</p>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Tissue</th><th>Structure</th><th>Substance Transported</th><th>Direction</th><th>Process</th></tr>
+                        <tr><td><strong>Xylem</strong></td><td>Dead, hollow cells strengthened with <strong>Lignin</strong>. No end walls (continuous tube).</td><td>Water & Mineral Ions</td><td><strong>Upwards Only</strong> (Root to Leaf)</td><td>Transpiration Stream</td></tr>
+                        <tr><td><strong>Phloem</strong></td><td>Living cells with sieve plates and companion cells.</td><td>Sucrose & Amino Acids</td><td><strong>Up & Down</strong> (Source to Sink)</td><td>Translocation</td></tr>
+                    </table>
+                </div>
+
+                <div class="concept-box">
+                    <strong>Position of Vascular Bundles:</strong><br>
+                    <ul>
+                        <li><strong>Roots:</strong> In the center (to withstand pulling forces).</li>
+                        <li><strong>Stem:</strong> In a ring near the outside (to withstand bending/wind).</li>
+                        <li><strong>Leaf:</strong> In veins (midrib) to support the leaf structure.</li>
+                    </ul>
+                </div>
+
+                <h2>2. Water Uptake in Roots</h2>
+                <p>Water enters the plant through <strong>Root Hair Cells</strong>.</p>
+                <ol>
+                    <li><strong>Adaptation:</strong> Root hair cells have a long extension which massively increases the <strong>Surface Area</strong> for absorption.</li>
+                    <li><strong>Mechanism:</strong> The soil water has a higher water potential than the cytoplasm of the root hair cell. Water enters by <strong>Osmosis</strong>.</li>
+                    <li><strong>Minerals:</strong> Mineral ions (like Nitrate/Magnesium) enter by <strong>Active Transport</strong> (against concentration gradient) using energy.</li>
+                </ol>
+                <p><strong>Path of Water:</strong> Root Hair &rarr; Root Cortex &rarr; Xylem &rarr; Stem &rarr; Leaf Mesophyll &rarr; Stomata (Vapour).</p>
+
+                <h2>3. Transpiration</h2>
+                <div class="concept-box">
+                    <strong>Definition:</strong> Transpiration is the loss of water vapour from plant leaves by evaporation of water at the surfaces of the mesophyll cells followed by diffusion of water vapour through the stomata.
+                </div>
+
+                <h3>Mechanism: The Transpiration Pull</h3>
+                <p>Water is pulled up the xylem in a continuous column. This happens because water molecules are cohesive (stick together) and adhesive (stick to xylem walls).</p>
+                <ol>
+                    <li>Water evaporates from mesophyll cells into air spaces.</li>
+                    <li>Water vapour diffuses out through stomata (lowering pressure at the top).</li>
+                    <li>This creates a suction force (Transpiration Pull) drawing water up from the roots.</li>
+                </ol>
+
+                <div class="exam-tip">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Exam Warning: Wilting</strong><br>
+                        If water loss (transpiration) is greater than water uptake, cells lose turgor pressure and become flaccid. The plant wilts. This actually helps reduce water loss by closing stomata and reducing surface area exposed to sun.
+                    </div>
+                </div>
+
+                <h2>4. Factors Affecting Transpiration Rate</h2>
+                <p>Anything that increases the rate of evaporation or diffusion increases transpiration.</p>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Factor</th><th>Change</th><th>Effect on Rate</th><th>Reason</th></tr>
+                        <tr><td><strong>Temperature</strong></td><td>Increase</td><td>Increases</td><td>Water molecules have more kinetic energy &rarr; faster evaporation.</td></tr>
+                        <tr><td><strong>Humidity</strong></td><td>Increase</td><td>Decreases</td><td>Air is saturated with water. Concentration gradient is lower &rarr; slower diffusion.</td></tr>
+                        <tr><td><strong>Wind Speed</strong></td><td>Increase</td><td>Increases</td><td>Wind blows away water vapour outside stomata, maintaining a high concentration gradient.</td></tr>
+                        <tr><td><strong>Light Intensity</strong></td><td>Increase</td><td>Increases</td><td>Stomata open wider for photosynthesis, allowing more water to escape.</td></tr>
+                    </table>
+                </div>
+
+                <h2>5. Translocation</h2>
+                <p>This is the movement of <strong>Sucrose and Amino Acids</strong> in the Phloem from regions of production (<strong>Source</strong>) to regions of storage or use (<strong>Sink</strong>).</p>
+                <ul>
+                    <li><strong>Source:</strong> Where sucrose is made (e.g., leaves in summer) or released (e.g., storage tubers in spring).</li>
+                    <li><strong>Sink:</strong> Where sucrose is used (e.g., growing roots/shoot tips) or stored (e.g., fruits/seeds).</li>
+                </ul>
+                <p>Unlike Xylem, transport in Phloem is active (requires energy) and goes in different directions depending on the season.</p>
+
+                <h2>6. Measuring Transpiration (Potometer)</h2>
+                <p>A potometer measures the rate of <strong>water uptake</strong> (which is roughly equal to transpiration rate).</p>
+                <ul>
+                    <li><strong>Setup:</strong> Cut shoot underwater (prevent air bubbles in xylem), airtight seal.</li>
+                    <li><strong>Method:</strong> Introduce an air bubble into the capillary tube. Measure how far the bubble moves in a set time.</li>
+                    <li><strong>Calculation:</strong> Rate = Distance / Time.</li>
+                </ul>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">PLANT TRANSPORT</div>
+                            <ul>
+                                <li>
+                                    <div class="node">Xylem (Water)</div>
+                                    <ul>
+                                        <li><div class="node">Dead/Hollow</div></li>
+                                        <li><div class="node">Lignin</div></li>
+                                        <li><div class="node">Upwards Only</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Phloem (Food)</div>
+                                    <ul>
+                                        <li><div class="node">Living/Sieve</div></li>
+                                        <li><div class="node">Sucrose/AA</div></li>
+                                        <li><div class="node">Translocation</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Transpiration</div>
+                                    <ul>
+                                        <li><div class="node">Evaporation/Diffusion</div></li>
+                                        <li><div class="node">Factors (Temp/Wind)</div></li>
+                                        <li><div class="node">Suction Pull</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Roots</div>
+                                    <ul>
+                                        <li><div class="node">Root Hair Cells</div></li>
+                                        <li><div class="node">Osmosis (Water)</div></li>
+                                        <li><div class="node">Active Trans. (Ions)</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container">
+                <!-- Questions injected via JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI LOGIC ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Bio_Ch8_TransportPlants.pdf');
+            });
+        }
+
+        // --- 50 QUESTIONS (Transport in Plants) ---
+        const qData = [
+            {q:"What is the main function of xylem?", o:["Transport sugar","Transport water","Photosynthesis","Reproduction"], a:1},
+            {q:"What is the main function of phloem?", o:["Transport water","Support","Transport sucrose","Absorb light"], a:2},
+            {q:"Which substance strengthens xylem walls?", o:["Cellulose","Lignin","Starch","Glycogen"], a:1},
+            {q:"In which direction does xylem transport substances?", o:["Down only","Up only","Both ways","Sideways"], a:1},
+            {q:"In which direction does phloem transport substances?", o:["Up only","Down only","Up and Down","Sideways"], a:2},
+            {q:"What defines transpiration?", o:["Uptake of water","Loss of water vapour","Transport of sugar","Growth of roots"], a:1},
+            {q:"Which cells absorb water from the soil?", o:["Guard cells","Palisade cells","Root hair cells","Xylem"], a:2},
+            {q:"Water enters root hair cells by which process?", o:["Active transport","Diffusion","Osmosis","Transpiration"], a:2},
+            {q:"Mineral ions enter root hair cells by which process?", o:["Osmosis","Active transport","Diffusion","Evaporation"], a:1},
+            {q:"What adaptation do root hair cells have?", o:["Large surface area","Chloroplasts","Thick walls","Lignin"], a:0},
+            {q:"Which factor decreases the rate of transpiration?", o:["High temperature","High wind speed","High humidity","High light intensity"], a:2},
+            {q:"Why does high temperature increase transpiration?", o:["Closes stomata","Increases kinetic energy","Decreases diffusion","Kills cells"], a:1},
+            {q:"What is the process of moving sucrose in phloem called?", o:["Transpiration","Translocation","Osmosis","Diffusion"], a:1},
+            {q:"What is a 'source' in translocation?", o:["Where sugar is used","Where sugar is made","The roots","The soil"], a:1},
+            {q:"What is a 'sink' in translocation?", o:["Where sugar is used/stored","Where sugar is made","The leaf","The sun"], a:0},
+            {q:"Xylem vessels are made of?", o:["Living cells","Dead hollow cells","Sieve plates","Companion cells"], a:1},
+            {q:"Phloem tissue consists of?", o:["Dead cells","Living cells with sieve plates","Hollow tubes","Lignified cells"], a:1},
+            {q:"Where are vascular bundles found in a dicot root?", o:["In the center","In a ring","Scattered","On the outside"], a:0},
+            {q:"Where are vascular bundles found in a dicot stem?", o:["In the center","Arranged in a ring","Scattered","Randomly"], a:1},
+            {q:"What apparatus is used to measure transpiration rate?", o:["Thermometer","Potometer","Barometer","Manometer"], a:1},
+            {q:"Why is the plant shoot cut underwater for a potometer?", o:["To clean it","To prevent air bubbles in xylem","To cool it down","To wash roots"], a:1},
+            {q:"What actually creates the pull for water up the xylem?", o:["Root pressure","Transpiration (evaporation)","Gravity","Phloem"], a:1},
+            {q:"Water leaves the leaf mainly through?", o:["Cuticle","Stomata","Veins","Roots"], a:1},
+            {q:"Which cells control the opening of stomata?", o:["Palisade cells","Epidermal cells","Guard cells","Xylem"], a:2},
+            {q:"If a plant loses more water than it gains, it will?", o:["Grow faster","Wilt","Flower","Photosynthesize"], a:1},
+            {q:"Wilting helps a plant by?", o:["Increasing surface area","Closing stomata / Reducing surface area","Absorbing more light","Increasing osmosis"], a:1},
+            {q:"What is the state of a cell when it is full of water?", o:["Flaccid","Plasmolysed","Turgid","Dead"], a:2},
+            {q:"The movement of water vapour out of the leaf is by?", o:["Osmosis","Active transport","Diffusion","Pumping"], a:2},
+            {q:"Why does wind increase transpiration?", o:["Heats the leaf","Blows away humid air","Closes stomata","Adds water"], a:1},
+            {q:"In spring, a storage tuber (potato) acts as a?", o:["Source","Sink","Root","Flower"], a:0},
+            {q:"In summer, a growing fruit acts as a?", o:["Source","Sink","Leaf","Stem"], a:1},
+            {q:"Phloem transport requires?", o:["No energy","Energy (Active)","Sunlight","Wind"], a:1},
+            {q:"The continuous column of water in xylem is held by?", o:["Gravity","Cohesion and Adhesion","Muscles","Valves"], a:1},
+            {q:"Which dye is often used to trace xylem paths?", o:["Iodine","Eosin / Food dye","Benedict's","Ethanol"], a:1},
+            {q:"Water moves from root cortex into?", o:["Phloem","Xylem","Epidermis","Soil"], a:1},
+            {q:"High light intensity affects stomata by?", o:["Closing them","Opening them","Killing them","No effect"], a:1},
+            {q:"A potometer directly measures?", o:["Water loss","Water uptake","Photosynthesis","Respiration"], a:1},
+            {q:"Why does humidity decrease transpiration?", o:["Increases concentration gradient","Decreases concentration gradient","Closes stomata","Cools leaf"], a:1},
+            {q:"Sucrose is transported instead of glucose because?", o:["It is more reactive","It is less reactive","It is smaller","It is blue"], a:1},
+            {q:"Companion cells are associated with?", o:["Xylem","Phloem","Roots","Stomata"], a:1},
+            {q:"Which part of the leaf does water evaporate from?", o:["Upper epidermis","Mesophyll cell surfaces","Cuticle","Veins"], a:1},
+            {q:"Which ion is needed to make chlorophyll?", o:["Nitrate","Magnesium","Calcium","Sodium"], a:1},
+            {q:"Which ion is needed to make amino acids?", o:["Nitrate","Magnesium","Iron","Potassium"], a:0},
+            {q:"Water potential in the soil is usually _____ than the root.", o:["Lower","Higher","Same","Variable"], a:1},
+            {q:"Active transport requires energy from?", o:["Photosynthesis","Respiration","Transpiration","Osmosis"], a:1},
+            {q:"Lignin prevents xylem vessels from?", o:["Growing","Collapsing inward","Absorbing water","Transporting"], a:1},
+            {q:"Transpiration is a side effect of keeping stomata open for?", o:["Respiration","Photosynthesis (CO2 entry)","Reproduction","Support"], a:1},
+            {q:"Which side of the leaf usually has more stomata?", o:["Top","Bottom","Both equal","Edges"], a:1},
+            {q:"The attraction of water molecules to each other is?", o:["Adhesion","Cohesion","Gravity","Tension"], a:1},
+            {q:"The attraction of water molecules to xylem walls is?", o:["Cohesion","Adhesion","Osmosis","Diffusion"], a:1}
+        ];
+
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            // Shuffle options
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem; color:#334155;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const text = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerText.includes(text)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IG-Chem | Unit 10: Redox Reactions</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* Theme: Volcanic Orange & Deep Teal */
+            --primary: #ea580c; /* Orange 600 */
+            --primary-dark: #7c2d12; /* Orange 900 */
+            --accent-ox: #dc2626; /* Red 600 for Oxidation */
+            --accent-red: #0d9488; /* Teal 600 for Reduction */
+            --bg: #fff7ed; /* Orange 50 */
+            --text: #1e293b;
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- NAVIGATION BUTTON --- */
+        .menu-toggle {
+            display: none;
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: var(--primary); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.4rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.9); }
+
+        /* --- MOBILE OVERLAY --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1999;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: var(--sidebar-w);
+            background: #1c1917; /* Stone 900 */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            z-index: 2000;
+            border-right: 1px solid #44403c;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand {
+            font-size: 1.4rem; font-weight: 800; color: #fb923c; margin-bottom: 40px;
+            display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            padding: 16px; margin-bottom: 8px; border-radius: 8px;
+            cursor: pointer; color: #a8a29e; font-weight: 600;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4); }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+        .view-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; padding: 0; display: none; opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .view-panel.active { display: block; opacity: 1; }
+
+        /* --- TEXTBOOK STYLING --- */
+        .paper {
+            max-width: 950px; margin: 0 auto; background: white;
+            padding: 80px; min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-family: 'Inter', sans-serif; font-size: 2.8rem; color: var(--primary-dark); margin-bottom: 10px; letter-spacing: -1px; line-height: 1.1; }
+        .meta { color: var(--primary); text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        h2 { 
+            font-family: 'Inter', sans-serif; font-size: 1.8rem; color: #1e293b; 
+            margin-top: 60px; margin-bottom: 25px; padding-bottom: 15px; 
+            border-bottom: 2px solid #ffedd5; display: flex; align-items: center; gap: 10px;
+        }
+        
+        h3 { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--primary-dark); margin-top: 35px; margin-bottom: 15px; font-weight: 800; }
+        
+        p {
+            font-family: 'Crimson Pro', serif; font-size: 1.2rem; line-height: 1.8;
+            color: #334155; margin-bottom: 20px;
+        }
+        li { font-family: 'Crimson Pro', serif; font-size: 1.15rem; line-height: 1.7; margin-bottom: 8px; }
+        
+        /* Concept Boxes */
+        .concept-box {
+            background: #fff7ed; border-left: 5px solid var(--primary);
+            padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;
+        }
+        .concept-box strong { color: var(--primary-dark); font-family: 'Inter', sans-serif; display:block; margin-bottom: 10px; }
+
+        .exam-tip {
+            background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 8px;
+            padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+        }
+        .exam-tip i { color: #059669; font-size: 1.5rem; margin-top: 3px; }
+        .exam-tip strong { color: #047857; font-family: 'Inter', sans-serif; }
+
+        /* Tables */
+        .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #e2e8f0; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #ffedd5; color: var(--primary-dark); padding: 16px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; border-bottom: 2px solid #fdba74; }
+        td { padding: 16px; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-family: 'Crimson Pro', serif; font-size: 1.1rem; }
+        tr:last-child td { border-bottom: none; }
+
+        /* Chemistry Specifics */
+        .chem-eq { 
+            font-family: 'Inter', monospace; 
+            background: #f8fafc; 
+            padding: 15px; 
+            border-left: 4px solid #94a3b8; 
+            display: block; 
+            margin: 15px 0; 
+            color: #334155; 
+            font-weight: 600;
+        }
+        .txt-ox { color: var(--accent-ox); font-weight: bold; }
+        .txt-red { color: var(--accent-red); font-weight: bold; }
+        
+        /* Mnemonic Box */
+        .mnemonic {
+            background: #fef2f2; border: 2px dashed #ef4444; padding: 20px;
+            border-radius: 12px; margin: 20px 0; position: relative;
+        }
+        .mnemonic::before {
+            content: 'MEMORISE THIS'; position: absolute; top: -12px; left: 20px;
+            background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 8px;
+            border-radius: 4px; font-family: 'Inter', sans-serif; font-weight: 800;
+        }
+        .big-letter { font-size: 2rem; font-weight: 900; color: #b91c1c; margin-right: 10px; vertical-align: middle; }
+
+        /* --- MIND MAP --- */
+        .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #fff7ed; }
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #a8a29e; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #a8a29e; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #a8a29e; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #a8a29e; width: 0; height: 20px; }
+
+        .node {
+            background: white; border: 1px solid #d6d3d1; padding: 12px 18px; border-radius: 8px;
+            display: inline-block; min-width: 140px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; z-index: 2;
+        }
+        .root-node { background: var(--primary); color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: none; }
+
+        /* --- QUIZ --- */
+        .quiz-area { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .q-card { background: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; }
+        .q-opt {
+            display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e2e8f0;
+            margin-top: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .q-opt:hover { background: #fff7ed; border-color: var(--primary); }
+        .q-let { font-weight: 900; color: #94a3b8; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .q-opt.correct { background: #dcfce7; border-color: #16a34a; }
+        .q-opt.correct .q-let { background: #16a34a; color: white; }
+        .q-opt.wrong { background: #fee2e2; border-color: #dc2626; }
+        .q-opt.wrong .q-let { background: #dc2626; color: white; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
+            aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.active { left: 0; }
+            .paper { padding: 30px 20px; }
+            h1 { font-size: 2.2rem; }
+            .mm-wrapper { justify-content: flex-start; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-atom"></i> IG-CHEM UNIT 10</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Detailed Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-sitemap"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-list-check"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #44403c;">
+             <div class="nav-item" onclick="genPDF()" style="color:#fb923c; border-color:#44403c;">
+                 <i class="fa-solid fa-download"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. DETAILED NOTES -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Chemistry 0620 • Topic 10</span>
+                <h1>Redox Reactions</h1>
+                <p>The term "Redox" is a combination of <strong>Red</strong>uction and <strong>Ox</strong>idation. These two processes always occur together—something cannot be oxidised unless something else is reduced.</p>
+
+                <h2>1. Three Ways to Define Redox</h2>
+                <p>In IGCSE Chemistry, you must be able to identify oxidation and reduction using three different definitions.</p>
+                
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Definition</th><th><span class="txt-ox">Oxidation</span></th><th><span class="txt-red">Reduction</span></th></tr>
+                        <tr><td><strong>1. Oxygen</strong></td><td>Gain of Oxygen</td><td>Loss of Oxygen</td></tr>
+                        <tr><td><strong>2. Electrons</strong></td><td>Loss of Electrons</td><td>Gain of Electrons</td></tr>
+                        <tr><td><strong>3. Oxidation Number</strong></td><td>Increase in Number</td><td>Decrease in Number</td></tr>
+                    </table>
+                </div>
+
+                <h3>A. Oxygen Transfer (Simple)</h3>
+                <p>Usually applied to simple reactions like burning magnesium or extracting iron.</p>
+                <div class="chem-eq">
+                    2Mg + O₂ → 2MgO
+                    <br><span style="font-size:0.9em; font-weight:normal;">Magnesium gains oxygen: It is <strong>Oxidised</strong>.</span>
+                </div>
+                <div class="chem-eq">
+                    CuO + H₂ → Cu + H₂O
+                    <br><span style="font-size:0.9em; font-weight:normal;">Copper Oxide loses oxygen: It is <strong>Reduced</strong>.</span>
+                    <br><span style="font-size:0.9em; font-weight:normal;">Hydrogen gains oxygen: It is <strong>Oxidised</strong>.</span>
+                </div>
+
+                <h3>B. Electron Transfer (Ionic)</h3>
+                <p>This is the most important definition for electrolysis and ionic reactions. Use the mnemonic OIL RIG.</p>
+
+                <div class="mnemonic">
+                    <span class="big-letter">OIL RIG</span>
+                    <br><strong>O</strong>xidation <strong>I</strong>s <strong>L</strong>oss of electrons.
+                    <br><strong>R</strong>eduction <strong>I</strong>s <strong>G</strong>ain of electrons.
+                </div>
+
+                <div class="concept-box">
+                    <strong>Half-Equations Example (Electrolysis)</strong>
+                    <p>Consider the reaction: 2Na + Cl₂ → 2NaCl</p>
+                    <ul>
+                        <li><span class="txt-ox">Oxidation:</span> Na → Na⁺ + e⁻ (Sodium loses an electron)</li>
+                        <li><span class="txt-red">Reduction:</span> Cl₂ + 2e⁻ → 2Cl⁻ (Chlorine gains electrons)</li>
+                    </ul>
+                </div>
+
+                <h2>2. Oxidation States (Numbers)</h2>
+                <p>An oxidation number (state) is a number assigned to an element that shows how many electrons it has lost or gained. This helps identify redox in complex equations where there is no oxygen.</p>
+                
+                <div class="exam-tip">
+                    <i class="fa-solid fa-list-ol"></i>
+                    <div>
+                        <strong>Rules for Assigning Oxidation Numbers:</strong><br>
+                        1. Elements by themselves (e.g., Mg, O₂, Cl₂) = <strong>0</strong><br>
+                        2. Simple ions (e.g., Na⁺, O²⁻) = <strong>Charge of the ion</strong><br>
+                        3. Compounds: The sum of oxidation numbers is <strong>0</strong>.<br>
+                        4. Oxygen is usually <strong>-2</strong>; Hydrogen is usually <strong>+1</strong>.
+                    </div>
+                </div>
+
+                <h3>How to use Ox. Numbers:</h3>
+                <ul>
+                    <li>If the number goes <strong>UP</strong> (e.g., -1 to 0), it is <span class="txt-ox">Oxidation</span>.</li>
+                    <li>If the number goes <strong>DOWN</strong> (e.g., +2 to 0), it is <span class="txt-red">Reduction</span>.</li>
+                </ul>
+
+                <h2>3. Agents: Oxidising & Reducing</h2>
+                <p>This part often confuses students. Remember: An "Agent" does something to <em>something else</em>.</p>
+                
+                <div class="concept-box">
+                    <strong>The Oxidising Agent</strong>
+                    <ul>
+                        <li>It oxidises the other substance.</li>
+                        <li>To do this, it must take electrons <em>from</em> the other substance.</li>
+                        <li>Therefore, the oxidising agent itself gets <strong>Reduced</strong>.</li>
+                    </ul>
+                </div>
+
+                <div class="concept-box">
+                    <strong>The Reducing Agent</strong>
+                    <ul>
+                        <li>It reduces the other substance.</li>
+                        <li>To do this, it gives electrons <em>to</em> the other substance.</li>
+                        <li>Therefore, the reducing agent itself gets <strong>Oxidised</strong>.</li>
+                    </ul>
+                </div>
+
+                <h2>4. Testing for Redox (Important!)</h2>
+                <p>You must memorise the color changes for two specific reagents used to test for oxidising and reducing agents.</p>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr>
+                            <th>Test Reagent</th>
+                            <th>Detects what?</th>
+                            <th>Color Change</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Potassium Manganate(VII)<br>(KMnO₄)</strong></td>
+                            <td>Reducing Agents</td>
+                            <td class="txt-ox">Purple → Colorless</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Potassium Iodide<br>(KI)</strong></td>
+                            <td>Oxidising Agents</td>
+                            <td class="txt-red">Colorless → Red/Brown</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="exam-tip">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Exam Tip:</strong><br>
+                        If KMnO₄ stays purple, no reaction occurred. If it turns colorless (often called 'decolourised'), a reducing agent is present (like SO₂).
+                        <br>
+                        Note: In older exams, Acidified Potassium Dichromate(VI) was used (Orange → Green), but KMnO₄ is the primary test in the new syllabus.
+                    </div>
+                </div>
+
+                <h2>5. Real World Examples</h2>
+                
+                <h3>A. Displacement Reactions</h3>
+                <p>A more reactive metal displaces a less reactive metal from its compound.</p>
+                <div class="chem-eq">Zn(s) + CuSO₄(aq) → ZnSO₄(aq) + Cu(s)</div>
+                <ul>
+                    <li><strong>Zinc:</strong> 0 → +2 (Oxidised/Reducing Agent)</li>
+                    <li><strong>Copper:</strong> +2 → 0 (Reduced/Oxidising Agent)</li>
+                    <li><strong>Color Change:</strong> Blue solution fades to colorless; reddish-brown solid forms.</li>
+                </ul>
+
+                <h3>B. Preventing Rusting</h3>
+                <p>Iron rusts when exposed to Oxygen AND Water. It is an oxidation process.</p>
+                <ul>
+                    <li><strong>Galvanising:</strong> Coating iron with Zinc. Zinc is more reactive, so it oxidises <em>instead</em> of the iron (Sacrificial Protection).</li>
+                </ul>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">REDOX</div>
+                            <ul>
+                                <li>
+                                    <div class="node">Definitions</div>
+                                    <ul>
+                                        <li><div class="node">Oxygen<br><small>Gain = Ox</small></div></li>
+                                        <li><div class="node">Electrons<br><small>OIL RIG</small></div></li>
+                                        <li><div class="node">Ox. State<br><small>Increase = Ox</small></div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Agents</div>
+                                    <ul>
+                                        <li><div class="node">Oxidising Agent<br><small>Gets Reduced</small></div></li>
+                                        <li><div class="node">Reducing Agent<br><small>Gets Oxidised</small></div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Tests (Colors)</div>
+                                    <ul>
+                                        <li><div class="node" style="color:#7e22ce; border-color:#7e22ce;">KMnO₄<br><small>Purple → Colorless</small></div></li>
+                                        <li><div class="node" style="color:#854d0e; border-color:#854d0e;">KI (Iodide)<br><small>Colorless → Brown</small></div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container"></div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI LOGIC ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Chem_Redox_Notes.pdf');
+            });
+        }
+
+        // --- 50 CHEMISTRY QUESTIONS (REDOX) ---
+        const qData = [
+            {q:"Oxidation involves the ______ of oxygen.", o:["Gain","Loss","Sharing","Creation"], a:0},
+            {q:"Reduction involves the ______ of oxygen.", o:["Loss","Gain","Movement","Boiling"], a:0},
+            {q:"What does OIL stand for in OIL RIG?", o:["Oxidation Is Loss (of electrons)","Oxidation Is Loss (of oxygen)","Oxygen Is Light","Oxidation Is Level"], a:0},
+            {q:"What does RIG stand for in OIL RIG?", o:["Reduction Is Gain (of electrons)","Reduction Is Good","Rust Is Gone","Reduction Is Gas"], a:0},
+            {q:"In terms of oxidation number, Oxidation is an...", o:["Increase","Decrease","Equalization","Inverse"], a:0},
+            {q:"In terms of oxidation number, Reduction is a...", o:["Decrease","Increase","Doubling","Halving"], a:0},
+            {q:"What is the oxidation state of an element like O₂ or Mg?", o:["0","+1","-1","Depends on mass"], a:0},
+            {q:"What is the usual oxidation state of Oxygen in compounds?", o:["-2","-1","+1","+2"], a:0},
+            {q:"What is the usual oxidation state of Hydrogen in compounds?", o:["+1","-1","0","+2"], a:0},
+            {q:"Calculate the oxidation state of S in SO₂.", o:["+4","+2","-2","+6"], a:0},
+            {q:"Calculate the oxidation state of S in H₂SO₄.", o:["+6","+4","-2","0"], a:0},
+            {q:"Calculate the oxidation state of C in CO₂.", o:["+4","+2","-4","+6"], a:0},
+            {q:"Calculate the oxidation state of Mn in KMnO₄.", o:["+7","+5","+2","+4"], a:0},
+            {q:"In reaction Mg + O₂ → MgO, Magnesium is...", o:["Oxidised","Reduced","Neutralised","Precipitated"], a:0},
+            {q:"In reaction CuO + H₂ → Cu + H₂O, Copper is...", o:["Reduced","Oxidised","Decomposed","Hydrated"], a:0},
+            {q:"An Oxidising Agent...", o:["Oxidises others and gets reduced","Oxidises others and gets oxidised","Reduces others","Does nothing"], a:0},
+            {q:"A Reducing Agent...", o:["Reduces others and gets oxidised","Reduces others and gets reduced","Accepts electrons","Gains oxygen"], a:0},
+            {q:"Which substance gains electrons?", o:["Oxidising Agent","Reducing Agent","Metal","Base"], a:0},
+            {q:"Which substance loses electrons?", o:["Reducing Agent","Oxidising Agent","Non-metal","Acid"], a:0},
+            {q:"Color change of Potassium Manganate(VII) with a reducing agent?", o:["Purple to Colorless","Orange to Green","Colorless to Brown","Blue to Pink"], a:0},
+            {q:"Color change of Potassium Iodide with an oxidising agent?", o:["Colorless to Brown","Purple to Colorless","Green to Red","Yellow to Blue"], a:0},
+            {q:"Potassium Manganate(VII) is used to test for...", o:["Reducing Agents","Oxidising Agents","Acids","Alkalis"], a:0},
+            {q:"Potassium Iodide is used to test for...", o:["Oxidising Agents","Reducing Agents","Gases","Metals"], a:0},
+            {q:"In Fe²⁺ → Fe³⁺ + e⁻, Iron(II) is...", o:["Oxidised","Reduced","Neutralised","Melted"], a:0},
+            {q:"In Cl₂ + 2e⁻ → 2Cl⁻, Chlorine is...", o:["Reduced","Oxidised","Burnt","Dissolved"], a:0},
+            {q:"What is the oxidation state of Cr in K₂Cr₂O₇?", o:["+6","+3","+7","+2"], a:0},
+            {q:"In the reaction Zn + CuSO₄ → ZnSO₄ + Cu, Zn acts as...", o:["Reducing Agent","Oxidising Agent","Catalyst","Solvent"], a:0},
+            {q:"Why is Zn + CuSO₄ considered redox?", o:["Electrons are transferred","It produces heat","It makes a salt","It involves water"], a:0},
+            {q:"Reaction: 2Na + Cl₂ → 2NaCl. The Na atom...", o:["Loses 1 electron","Gains 1 electron","Shares electrons","Loses 2 electrons"], a:0},
+            {q:"Reaction: 2Na + Cl₂ → 2NaCl. The Cl atom...", o:["Gains 1 electron","Loses 1 electron","Gains 2 electrons","Does nothing"], a:0},
+            {q:"What is the oxidation state of N in NO₂?", o:["+4","+2","-3","+5"], a:0},
+            {q:"What is the oxidation state of N in NH₃?", o:["-3","+3","+5","0"], a:0},
+            {q:"A reaction where oxidation and reduction happen together is called...", o:["Redox","Neutralisation","Precipitation","Combustion"], a:0},
+            {q:"Rusting of iron requires...", o:["Water and Oxygen","Water only","Oxygen only","Salt"], a:0},
+            {q:"Galvanising involves coating iron with...", o:["Zinc","Copper","Plastic","Paint"], a:0},
+            {q:"How does galvanising work?", o:["Zinc oxidises instead of iron","Zinc reduces the iron","Zinc prevents air contact only","Zinc makes iron harder"], a:0},
+            {q:"In electrolysis of molten PbBr₂, Pb²⁺ ions go to cathode and...", o:["Gain electrons (Reduced)","Lose electrons (Oxidised)","Dissolve","Evaporate"], a:0},
+            {q:"In electrolysis, oxidation always happens at the...", o:["Anode","Cathode","Wire","Battery"], a:0},
+            {q:"In electrolysis, reduction always happens at the...", o:["Cathode","Anode","Solution","Bulb"], a:0},
+            {q:"Which is a common oxidising agent?", o:["Chlorine water","Sulfur dioxide","Carbon","Hydrogen"], a:0},
+            {q:"Which is a common reducing agent?", o:["Carbon Monoxide","Potassium Manganate","Oxygen","Chlorine"], a:0},
+            {q:"H₂S + Cl₂ → 2HCl + S. What is oxidised?", o:["Sulfur (in H₂S)","Chlorine","Hydrogen","Nothing"], a:0},
+            {q:"H₂S + Cl₂ → 2HCl + S. Identify the oxidising agent.", o:["Cl₂","H₂S","S","HCl"], a:0},
+            {q:"Change in oxidation number of Manganese in the KMnO₄ test?", o:["+7 to +2","+7 to +4","+5 to +2","+2 to 0"], a:0},
+            {q:"If a solution turns Potassium Iodide brown, the solution contains...", o:["An Oxidising Agent","A Reducing Agent","An Acid","A Base"], a:0},
+            {q:"Identify the spectator ion: Zn + Cu²⁺ + SO₄²⁻ → Zn²⁺ + SO₄²⁻ + Cu", o:["SO₄²⁻","Zn","Cu²⁺","Zn²⁺"], a:0},
+            {q:"Oxidation state of Fe in Fe₂O₃?", o:["+3","+2","+1","0"], a:0},
+            {q:"Oxidation state of Fe in FeO?", o:["+2","+3","+1","0"], a:0},
+            {q:"Which mnemonic helps remember electron transfer?", o:["OIL RIG","MASH","BAWS","PANIC"], a:0},
+            {q:"Is Neutralisation (Acid+Alkali) a redox reaction?", o:["No","Yes","Sometimes","Only with strong acids"], a:0}
+        ];
+
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const text = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerText.includes(text)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

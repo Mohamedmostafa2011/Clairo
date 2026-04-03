@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IG-Bio | Ch 15: Human Reproduction</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* Theme: Teal / Slate Blue for Human Biology */
+            --primary: #0f766e; /* Teal 700 */
+            --primary-dark: #134e4a;
+            --accent: #f43f5e; /* Rose (for blood/tissue accents) */
+            --bg: #f0f9ff; /* Light Blue tint */
+            --text: #334155;
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- NAVIGATION BUTTON (Fixed Circular) --- */
+        .menu-toggle {
+            display: none; /* Hidden on desktop */
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: var(--primary); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.4rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.9); }
+
+        /* --- MOBILE OVERLAY --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1999;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: var(--sidebar-w);
+            background: #0f172a; /* Slate 900 */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            z-index: 2000;
+            border-right: 1px solid #1e293b;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand {
+            font-size: 1.5rem; font-weight: 800; color: #2dd4bf; margin-bottom: 40px;
+            display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            padding: 16px; margin-bottom: 8px; border-radius: 8px;
+            cursor: pointer; color: #cbd5e1; font-weight: 600;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(15, 118, 110, 0.4); }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+        .view-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; padding: 0; display: none; opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .view-panel.active { display: block; opacity: 1; }
+
+        /* --- TEXTBOOK STYLING --- */
+        .paper {
+            max-width: 950px; margin: 0 auto; background: white;
+            padding: 80px; min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-family: 'Inter', sans-serif; font-size: 3rem; color: var(--primary-dark); margin-bottom: 10px; letter-spacing: -1px; }
+        .meta { color: #64748b; text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        h2 { 
+            font-family: 'Inter', sans-serif; font-size: 1.8rem; color: #1e293b; 
+            margin-top: 60px; margin-bottom: 25px; padding-bottom: 15px; 
+            border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 10px;
+        }
+        
+        h3 { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--primary); margin-top: 35px; margin-bottom: 15px; }
+
+        p {
+            font-family: 'Crimson Pro', serif; font-size: 1.2rem; line-height: 1.8;
+            color: #334155; margin-bottom: 20px;
+        }
+        li { font-family: 'Crimson Pro', serif; font-size: 1.15rem; line-height: 1.7; margin-bottom: 8px; margin-left: 20px; }
+        
+        /* Concept Boxes */
+        .concept-box {
+            background: #ccfbf1; border-left: 5px solid var(--primary);
+            padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;
+        }
+        .concept-box strong { color: var(--primary-dark); font-family: 'Inter', sans-serif; }
+
+        .exam-tip {
+            background: #fff1f2; border: 1px solid #fda4af; border-radius: 8px;
+            padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+        }
+        .exam-tip i { color: var(--accent); font-size: 1.5rem; margin-top: 3px; }
+        .exam-tip strong { color: #9f1239; }
+
+        /* Tables */
+        .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #e2e8f0; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #ecfeff; color: var(--primary-dark); padding: 16px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; border-bottom: 2px solid #99f6e4; }
+        td { padding: 16px; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-family: 'Crimson Pro', serif; font-size: 1.1rem; }
+        tr:last-child td { border-bottom: none; }
+
+        /* --- MIND MAP --- */
+        .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #f8fafc; }
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #94a3b8; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #94a3b8; width: 0; height: 20px; }
+
+        .node {
+            background: white; border: 1px solid #cbd5e1; padding: 12px 18px; border-radius: 8px;
+            display: inline-block; min-width: 140px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; z-index: 2;
+        }
+        .root-node { background: var(--primary-dark); color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        /* --- QUIZ --- */
+        .quiz-area { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .q-card { background: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; }
+        .q-opt {
+            display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e2e8f0;
+            margin-top: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .q-opt:hover { background: #f1f5f9; border-color: #94a3b8; }
+        .q-let { font-weight: 900; color: #94a3b8; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .q-opt.correct { background: #ccfbf1; border-color: var(--primary); }
+        .q-opt.correct .q-let { background: var(--primary); color: white; }
+        .q-opt.wrong { background: #ffe4e6; border-color: #f43f5e; }
+        .q-opt.wrong .q-let { background: #f43f5e; color: white; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
+            aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.active { left: 0; }
+            .paper { padding: 30px 20px; }
+            h1 { font-size: 2.2rem; }
+            .mm-wrapper { justify-content: flex-start; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-venus-mars"></i> IG-BIO HUMAN</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-medical"></i> Full Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-network-wired"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-clipboard-question"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #334155;">
+             <div class="nav-item" onclick="genPDF()" style="color:#2dd4bf; border-color:#134e4a;">
+                 <i class="fa-solid fa-file-pdf"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. DETAILED NOTES -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Biology 0610 • Chapter 15</span>
+                <h1>Reproduction in Humans</h1>
+                <p>Human reproduction is sexual, involving the fusion of male and female gametes (sperm and egg) to create genetically distinct offspring. This chapter covers anatomy, gametes, fertilization, pregnancy, the menstrual cycle, and STIs.</p>
+
+                <h2>1. Reproductive Systems</h2>
+                
+                <h3>The Male Reproductive System</h3>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Part</th><th>Function</th></tr>
+                        <tr><td><strong>Testes</strong></td><td>Produce sperm and the hormone testosterone.</td></tr>
+                        <tr><td><strong>Scrotum</strong></td><td>Sac that holds the testes outside the body to keep them cooler (optimum temp for sperm production).</td></tr>
+                        <tr><td><strong>Sperm Duct</strong></td><td>Transports sperm from the testes to the urethra.</td></tr>
+                        <tr><td><strong>Prostate Gland</strong></td><td>Secretes fluids that nourish sperm and help them swim (forming semen).</td></tr>
+                        <tr><td><strong>Urethra</strong></td><td>Tube carrying urine or semen out of the body.</td></tr>
+                        <tr><td><strong>Penis</strong></td><td>Organ that passes urine out and deposits semen into the vagina.</td></tr>
+                    </table>
+                </div>
+
+                <h3>The Female Reproductive System</h3>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Part</th><th>Function</th></tr>
+                        <tr><td><strong>Ovary</strong></td><td>Produces egg cells (ova) and hormones (Oestrogen, Progesterone).</td></tr>
+                        <tr><td><strong>Oviduct (Fallopian Tube)</strong></td><td>Connects ovary to uterus. <strong>Site of fertilization</strong>. lined with cilia to move the egg.</td></tr>
+                        <tr><td><strong>Uterus (Womb)</strong></td><td>Muscular bag where the fetus develops.</td></tr>
+                        <tr><td><strong>Cervix</strong></td><td>Ring of muscle at the neck of the uterus; keeps fetus in place.</td></tr>
+                        <tr><td><strong>Vagina</strong></td><td>Receives penis during intercourse; birth canal.</td></tr>
+                    </table>
+                </div>
+
+                <h2>2. Gametes (Sex Cells)</h2>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Feature</th><th>Sperm (Male)</th><th>Egg / Ovum (Female)</th></tr>
+                        <tr><td><strong>Size</strong></td><td>Very small.</td><td>Large.</td></tr>
+                        <tr><td><strong>Motility</strong></td><td>Swims using a tail (flagellum).</td><td>Not motile (moved by cilia).</td></tr>
+                        <tr><td><strong>Numbers</strong></td><td>Millions produced continuously.</td><td>One released per month.</td></tr>
+                        <tr><td><strong>Energy Store</strong></td><td>Very little (relies on semen fluids).</td><td>Large yolk containing protein/fat.</td></tr>
+                        <tr><td><strong>Nucleus</strong></td><td>Haploid (23 chromosomes).</td><td>Haploid (23 chromosomes).</td></tr>
+                    </table>
+                </div>
+
+                <h2>3. Fertilization & Development</h2>
+                <div class="concept-box">
+                    <strong>Key Definition: Fertilization</strong><br>
+                    The fusion of the nuclei of the male gamete (sperm) and the female gamete (egg) to form a <strong>zygote</strong>. This produces a diploid cell (46 chromosomes).
+                </div>
+                
+                <ol>
+                    <li><strong>Ovulation:</strong> An egg is released from the ovary into the oviduct.</li>
+                    <li><strong>Copulation:</strong> Sperm is deposited in the vagina.</li>
+                    <li><strong>Fertilization:</strong> Happens in the <strong>oviduct</strong>. The zygote forms.</li>
+                    <li><strong>Implantation:</strong> The zygote divides by mitosis to form a ball of cells (embryo) which sinks into the uterus lining.</li>
+                </ol>
+
+                <h3>The Placenta and Amniotic Fluid</h3>
+                <p>The fetus connects to the placenta via the <strong>Umbilical Cord</strong>.</p>
+                <ul>
+                    <li><strong>Placenta:</strong> Allows exchange of materials. Oxygen and nutrients (glucose/amino acids) move from Mother &rarr; Fetus. CO2 and Urea move from Fetus &rarr; Mother. 
+                    <br><em>Note: It also acts as a barrier to most pathogens, but viruses (Rubella/HIV) and drugs (Nicotine/Alcohol) can cross it.</em></li>
+                    <li><strong>Amniotic Sac/Fluid:</strong> A membrane enclosing the fetus containing fluid. It protects the fetus from mechanical shock and drying out.</li>
+                </ul>
+
+                <div class="exam-tip">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Exam Warning: Blood Mixing</strong><br>
+                        The mother's blood and fetal blood <strong>DO NOT MIX</strong>. They are separated by a thin wall in the placenta. Mixing would cause clotting due to different blood types and high maternal blood pressure would damage the fetus.
+                    </div>
+                </div>
+
+                <h2>4. The Menstrual Cycle</h2>
+                <p>The cycle lasts about 28 days. It prepares the uterus for pregnancy.</p>
+                <ul>
+                    <li><strong>Days 1-5 (Menstruation):</strong> Uterus lining breaks down (period).</li>
+                    <li><strong>Days 6-13:</strong> Lining rebuilds.</li>
+                    <li><strong>Day 14 (Ovulation):</strong> Egg is released.</li>
+                    <li><strong>Days 15-28:</strong> Lining maintained. If no fertilization, cycle repeats.</li>
+                </ul>
+
+                <h3>Hormonal Control</h3>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Hormone</th><th>Source</th><th>Function</th></tr>
+                        <tr><td><strong>FSH</strong></td><td>Pituitary</td><td>Stimulates egg maturation in the ovary.</td></tr>
+                        <tr><td><strong>LH</strong></td><td>Pituitary</td><td>Stimulates <strong>Ovulation</strong> (release of egg).</td></tr>
+                        <tr><td><strong>Oestrogen</strong></td><td>Ovary</td><td>Thickens uterus lining; inhibits FSH.</td></tr>
+                        <tr><td><strong>Progesterone</strong></td><td>Ovary</td><td>Maintains uterus lining.</td></tr>
+                    </table>
+                </div>
+
+                <h2>5. Puberty & Secondary Characteristics</h2>
+                <p>Controlled by <strong>Testosterone</strong> (Male) and <strong>Oestrogen</strong> (Female).</p>
+                <ul>
+                    <li><strong>Males:</strong> Voice breaks (deepens), muscle growth, facial/body hair, sperm production starts.</li>
+                    <li><strong>Females:</strong> Breasts develop, hips widen, menstruation begins, body hair.</li>
+                </ul>
+
+                <h2>6. STIs (Sexually Transmitted Infections)</h2>
+                <p><strong>HIV (Human Immunodeficiency Virus):</strong> Attacks lymphocytes (white blood cells), leading to AIDS (Acquired Immune Deficiency Syndrome). The body cannot fight other infections.</p>
+                <ul>
+                    <li><strong>Transmission:</strong> Unprotected sex, sharing needles, blood transfusions, mother to child (placenta/breastmilk).</li>
+                    <li><strong>Prevention:</strong> Use condoms (barrier method), sterile needles, screening blood.</li>
+                </ul>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">HUMAN REPRO</div>
+                            <ul>
+                                <li>
+                                    <div class="node">Anatomy</div>
+                                    <ul>
+                                        <li><div class="node">Male (Testes/Sperm Duct)</div></li>
+                                        <li><div class="node">Female (Ovary/Uterus)</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Process</div>
+                                    <ul>
+                                        <li><div class="node">Gametes (Sperm/Egg)</div></li>
+                                        <li><div class="node">Fertilization (Oviduct)</div></li>
+                                        <li><div class="node">Implantation</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Pregnancy</div>
+                                    <ul>
+                                        <li><div class="node">Placenta (Exchange)</div></li>
+                                        <li><div class="node">Amnion (Protection)</div></li>
+                                        <li><div class="node">Umbilical Cord</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Hormones</div>
+                                    <ul>
+                                        <li><div class="node">Puberty (Test./Oest.)</div></li>
+                                        <li><div class="node">Cycle (FSH/LH)</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container"></div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI LOGIC ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            // Fix width to ensure consistent PDF layout
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Bio_Ch15_HumanRepro.pdf');
+            });
+        }
+
+        // --- 50 QUESTIONS (Human Reproduction) ---
+        const qData = [
+            {q:"Where are sperm produced?", o:["Testes","Prostate","Penis","Urethra"], a:0},
+            {q:"Where are eggs (ova) produced?", o:["Ovaries","Uterus","Cervix","Oviduct"], a:0},
+            {q:"Where does fertilization typically occur?", o:["Oviduct","Uterus","Vagina","Ovary"], a:0},
+            {q:"The fusion of male and female gamete nuclei forms a?", o:["Zygote","Fetus","Embryo","Gamete"], a:0},
+            {q:"Which hormone causes male secondary sexual characteristics?", o:["Testosterone","Oestrogen","FSH","Insulin"], a:0},
+            {q:"Which hormone causes female secondary sexual characteristics?", o:["Oestrogen","Testosterone","Adrenaline","Auxin"], a:0},
+            {q:"On which day of the menstrual cycle does ovulation usually occur?", o:["Day 14","Day 1","Day 28","Day 5"], a:0},
+            {q:"What is the function of the amniotic fluid?", o:["Protect from shock","Feed the baby","Provide oxygen","Remove waste"], a:0},
+            {q:"What connects the fetus to the placenta?", o:["Umbilical cord","Oviduct","Urethra","Cervix"], a:0},
+            {q:"Which substance passes from mother to fetus?", o:["Oxygen","Carbon dioxide","Urea","Cells"], a:0},
+            {q:"Which substance passes from fetus to mother?", o:["Urea","Glucose","Amino acids","Oxygen"], a:0},
+            {q:"The narrow opening (neck) of the uterus is the?", o:["Cervix","Vagina","Oviduct","Vulva"], a:0},
+            {q:"Sperm are mixed with fluid from the?", o:["Prostate gland","Testes","Scrotum","Bladder"], a:0},
+            {q:"The mixture of sperm and fluid is called?", o:["Semen","Urine","Plasma","Lymph"], a:0},
+            {q:"How many chromosomes are in a human gamete?", o:["23","46","2","92"], a:0},
+            {q:"How many chromosomes are in a human zygote?", o:["46","23","2","92"], a:0},
+            {q:"The release of an egg from the ovary is called?", o:["Ovulation","Menstruation","Fertilization","Implantation"], a:0},
+            {q:"Where does the embryo implant?", o:["Uterus lining","Oviduct","Cervix","Ovary"], a:0},
+            {q:"Which hormone maintains the uterus lining during pregnancy?", o:["Progesterone","FSH","LH","Adrenaline"], a:0},
+            {q:"Which hormone stimulates the egg to mature?", o:["FSH","LH","Oestrogen","Testosterone"], a:0},
+            {q:"Which hormone triggers ovulation?", o:["LH","FSH","Progesterone","Oestrogen"], a:0},
+            {q:"Which represents the correct size comparison?", o:["Egg is much larger than sperm","Sperm is larger than egg","Both are same size","Both visible to naked eye"], a:0},
+            {q:"What is the tail of the sperm for?", o:["Swimming (Motility)","Digesting egg","Protection","Storing food"], a:0},
+            {q:"The mitochondria in sperm provide?", o:["Energy for swimming","Food for egg","Genetic material","Enzymes"], a:0},
+            {q:"What helps move the egg along the oviduct?", o:["Cilia","Flagella","Peristalsis","Gravity"], a:0},
+            {q:"What prevents the mixing of maternal and fetal blood?", o:["Placenta barrier","Umbilical cord","Amnion","Uterus"], a:0},
+            {q:"Why must blood NOT mix?", o:["Blood type incompatibility / Pressure","To stop feeding","To stop oxygen","To mix DNA"], a:0},
+            {q:"HIV attacks which system?", o:["Immune system","Nervous system","Digestive system","Reproductive system"], a:0},
+            {q:"Which is a method of HIV transmission?", o:["Sharing needles","Shaking hands","Sneezing","Toilet seats"], a:0},
+            {q:"Which creates a barrier against STIs?", o:["Condom","Contraceptive pill","IUD","Sterilization"], a:0},
+            {q:"The permanent stopping of the menstrual cycle is?", o:["Menopause","Puberty","Menstruation","Ovulation"], a:0},
+            {q:"During menstruation, what is shed?", o:["Uterus lining","Ovary wall","Egg only","Placenta"], a:0},
+            {q:"The sac holding the testes is the?", o:["Scrotum","Bladder","Prostate","Urethra"], a:0},
+            {q:"Why are testes outside the body?", o:["Cooler temperature for sperm","Protection","Better blood flow","Appearance"], a:0},
+            {q:"What does the acrosome (head of sperm) contain?", o:["Enzymes to digest egg coat","Food","Water","Mitochondria"], a:0},
+            {q:"A fetus is genetically identical to?", o:["Neither parent","Mother","Father","Sibling"], a:0},
+            {q:"Nicotine crossing the placenta can cause?", o:["Low birth weight","Large baby","Better lungs","Stronger bones"], a:0},
+            {q:"Rubella virus crossing the placenta causes?", o:["Defects / Deafness","Flu","Strong immunity","Hiccups"], a:0},
+            {q:"Breast milk contains?", o:["Antibodies & Nutrients","Bacteria","Blood cells","Harmful toxins"], a:0},
+            {q:"Formula milk lacks?", o:["Antibodies","Calcium","Water","Sugar"], a:0},
+            {q:"The tube carrying urine and semen in males is?", o:["Urethra","Ureter","Sperm duct","Oviduct"], a:0},
+            {q:"Sperm duct is also known as?", o:["Vas deferens","Ureter","Fallopian tube","Eustachian tube"], a:0},
+            {q:"Implantation happens approximately how long after fertilization?", o:["1 week","1 hour","1 month","1 day"], a:0},
+            {q:"Which part dilates during birth?", o:["Cervix","Ovary","Oviduct","Ureter"], a:0},
+            {q:"The 'afterbirth' refers to the expulsion of?", o:["Placenta","Fluid","Baby","Urine"], a:0},
+            {q:"Which is a male secondary sexual characteristic?", o:["Deepening voice","Widening hips","Menstruation","Breast growth"], a:0},
+            {q:"Which is a female secondary sexual characteristic?", o:["Widening hips","Facial hair","Deep voice","Sperm production"], a:0},
+            {q:"What is a zygote?", o:["A fertilized egg cell","A sperm cell","An unfertilized egg","A fetus"], a:0},
+            {q:"What is the main role of the placenta?", o:["Exchange of nutrients/waste","Making blood","Protecting from shock","Digestion"], a:0},
+            {q:"Gametes are produced by which cell division?", o:["Meiosis","Mitosis","Binary fission","Cloning"], a:0}
+        ];
+
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            // Shuffle options
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem; color:#334155;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const text = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerText.includes(text)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immune System Defense Force | IGCSE Bio</title>
+    
+    <!-- Fonts (Gaming Style) -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            /* Arcade Theme */
+            --neon-green: #4ade80;
+            --neon-red: #f43f5e;
+            --neon-blue: #3b82f6;
+            --neon-yellow: #facc15;
+            --dark-bg: #111827;
+            --panel-bg: #1f2937;
+            --text: #f8fafc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Retro Header --- */
+        header {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: radial-gradient(circle, #1e3a8a 0%, #0f172a 100%);
+            border-bottom: 4px solid var(--neon-green);
+            position: relative;
+        }
+
+        h1 { 
+            font-family: 'Press Start 2P', cursive; 
+            color: var(--neon-green); 
+            text-shadow: 4px 4px var(--neon-blue);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .pixel-heart {
+            display: inline-block;
+            width: 20px; height: 20px; background: var(--neon-red);
+            box-shadow: 20px 0 var(--neon-red), 40px 0 var(--neon-red);
+            margin-bottom: 20px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+
+        /* --- CARDS (Character Select Style) --- */
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 4rem;
+        }
+
+        .char-card {
+            background: var(--panel-bg);
+            border: 2px solid #374151;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            transition: 0.3s;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .char-card:hover { 
+            transform: translateY(-10px) scale(1.05); 
+            border-color: var(--neon-yellow);
+            box-shadow: 0 0 20px var(--neon-yellow); 
+        }
+
+        .char-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        /* Unique Animations for Characters */
+        .phagocyte-anim { animation: bounce 1s infinite; }
+        .lymphocyte-anim { animation: spin 3s linear infinite; }
+        .pathogen-anim { animation: shake 0.5s infinite; }
+
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .char-title { 
+            font-family: 'Press Start 2P', cursive; 
+            font-size: 1rem; 
+            color: var(--neon-blue); 
+            margin-bottom: 10px;
+        }
+
+        .char-desc { font-size: 0.9rem; color: #94a3b8; }
+
+        /* --- BATTLE SIMULATOR --- */
+        .battle-arena {
+            background: #000;
+            border: 4px solid var(--neon-red);
+            border-radius: 10px;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sprite {
+            position: absolute;
+            font-size: 2rem;
+            transition: all 0.5s;
+        }
+
+        #hero { left: 20%; color: var(--neon-green); font-size: 3rem; }
+        #enemy { right: 20%; color: var(--neon-red); font-size: 3rem; }
+        
+        .projectile {
+            position: absolute; width: 10px; height: 10px; background: var(--neon-yellow);
+            border-radius: 50%; opacity: 0;
+        }
+
+        .damage-text {
+            position: absolute; color: white; font-weight: bold; font-size: 1.5rem;
+            opacity: 0; top: 40%;
+        }
+
+        .controls {
+            display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+        }
+
+        .btn {
+            background: var(--panel-bg); color: var(--text);
+            border: 2px solid var(--neon-blue);
+            padding: 15px 25px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 15px var(--neon-blue); }
+        
+        .btn-phago { border-color: var(--neon-green); color: var(--neon-green); }
+        .btn-phago:hover { background: var(--neon-green); color: black; box-shadow: 0 0 15px var(--neon-green); }
+
+        /* --- 5 SECOND STORY --- */
+        .story-timeline {
+            background: var(--panel-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 4rem;
+            border: 2px dashed #4b5563;
+        }
+
+        .story-step {
+            display: flex; align-items: center; gap: 20px; margin-bottom: 20px;
+            opacity: 0.3; transition: 0.5s; transform: translateX(-20px);
+        }
+
+        .story-step.active { opacity: 1; transform: translateX(0); }
+
+        .step-num {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem; color: var(--neon-yellow);
+        }
+
+        /* --- Footer --- */
+        footer { margin-top: 4rem; text-align: center; color: #64748b; font-size: 0.8rem; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="pixel-heart"></div>
+        <h1>DEFENCE FORCE<br>COMMAND CENTER</h1>
+        <p>Select your unit to learn their abilities.</p>
+    </header>
+
+    <div class="container">
+
+        <!-- CHARACTER SELECT -->
+        <div class="char-grid">
+            
+            <!-- 1. Pathogen -->
+            <div class="char-card">
+                <div class="char-icon pathogen-anim">🦠</div>
+                <div class="char-title" style="color:var(--neon-red)">THE ENEMY (Pathogen)</div>
+                <p class="char-desc">
+                    <strong>Class:</strong> Villain<br>
+                    <strong>Identity:</strong> Virus, Bacteria, Fungus.<br>
+                    <strong>Mission:</strong> Cause Disease.<br>
+                    "I'm here to make you sick!"
+                </p>
+            </div>
+
+            <!-- 2. Phagocyte -->
+            <div class="char-card">
+                <div class="char-icon phagocyte-anim">👻</div>
+                <div class="char-title" style="color:var(--neon-green)">PHAGOCYTE</div>
+                <p class="char-desc">
+                    <strong>Class:</strong> Tank / Eater<br>
+                    <strong>Ability:</strong> Phagocytosis.<br>
+                    <strong>Action:</strong> Finds enemy -> Engulfs -> Digest.<br>
+                    "Nom nom nom!"
+                </p>
+            </div>
+
+            <!-- 3. Lymphocyte -->
+            <div class="char-card">
+                <div class="char-icon lymphocyte-anim">🛡️</div>
+                <div class="char-title">LYMPHOCYTE</div>
+                <p class="char-desc">
+                    <strong>Class:</strong> Sniper / Support<br>
+                    <strong>Weapon:</strong> Antibodies.<br>
+                    <strong>Action:</strong> Shoots sticky Y-shaped traps.<br>
+                    "Target locked."
+                </p>
+            </div>
+
+            <!-- 4. Antibody -->
+            <div class="char-card">
+                <div class="char-icon">YY</div>
+                <div class="char-title" style="color:var(--neon-yellow)">ANTIBODY</div>
+                <p class="char-desc">
+                    <strong>Class:</strong> Trap<br>
+                    <strong>Effect:</strong> Sticks to pathogen. Stops them moving. Flags them for the eater.<br>
+                    "Gotcha!"
+                </p>
+            </div>
+
+        </div>
+
+        <!-- BATTLE SIMULATOR -->
+        <h2 style="text-align:center; margin-bottom:20px; font-family:'Press Start 2P'; color:white;">BATTLE ARENA</h2>
+        
+        <div class="battle-arena" id="arena">
+            <div id="hero" class="sprite">🛡️</div> <!-- Lymphocyte -->
+            <div id="enemy" class="sprite">🦠</div> <!-- Pathogen -->
+            <div id="projectile" class="projectile"></div>
+            <div id="damage" class="damage-text">💥</div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="attack('antibody')">Fire Antibodies</button>
+            <button class="btn btn-phago" onclick="attack('phago')">Summon Phagocyte</button>
+            <button class="btn" onclick="attack('antitoxin')" style="border-color:#a855f7; color:#a855f7">Use Antitoxin</button>
+        </div>
+        <p id="battle-log" style="text-align:center; margin-top:15px; color:#94a3b8; min-height: 20px;">...</p>
+
+
+        <!-- 5 SECOND STORY -->
+        <div class="story-timeline">
+            <h2 style="font-family:'Press Start 2P'; font-size:1.2rem; margin-bottom:30px; color:var(--neon-yellow);">SPEED RUN: THE 5 SECOND STORY</h2>
+            
+            <div class="story-step" id="s1">
+                <div class="step-num">1</div>
+                <div><strong>Pathogen Enters!</strong> The enemy breaches the walls (skin).</div>
+            </div>
+            <div class="story-step" id="s2">
+                <div class="step-num">2</div>
+                <div><strong>Phagocyte Feeds!</strong> The eater chomps a few enemies.</div>
+            </div>
+            <div class="story-step" id="s3">
+                <div class="step-num">3</div>
+                <div><strong>Lymphocyte Activated!</strong> The sniper creates weapons.</div>
+            </div>
+            <div class="story-step" id="s4">
+                <div class="step-num">4</div>
+                <div><strong>Antibodies Attack!</strong> They stick to the pathogen and freeze them.</div>
+            </div>
+            <div class="story-step" id="s5">
+                <div class="step-num">5</div>
+                <div><strong>Antitoxins Shield!</strong> Neutralizes any poison (toxins). VICTORY!</div>
+            </div>
+
+            <button class="btn" onclick="playStory()" style="width:100%; margin-top:20px; background:var(--neon-blue); color:black;">PLAY STORY ▶</button>
+        </div>
+
+        <button class="btn" onclick="downloadPDF()" style="width:100%; margin-top:50px; border-color:white; color:white;">SAVE GAME (Download PDF)</button>
+
+    </div>
+
+    <script>
+        // --- BATTLE LOGIC ---
+        function attack(type) {
+            const hero = document.getElementById('hero');
+            const enemy = document.getElementById('enemy');
+            const proj = document.getElementById('projectile');
+            const dmg = document.getElementById('damage');
+            const log = document.getElementById('battle-log');
+
+            // Reset animations
+            proj.style.transition = 'none';
+            proj.style.opacity = 0;
+            proj.style.left = '25%';
+            
+            dmg.style.opacity = 0;
+            enemy.style.transform = "scale(1)";
+            hero.innerText = "🛡️"; 
+
+            if(type === 'antibody') {
+                log.innerText = "Lymphocyte fires Antibodies! Pathogen is stuck!";
+                
+                // Projectile Animation
+                setTimeout(() => {
+                    proj.innerHTML = "Y"; // Shape of antibody
+                    proj.style.background = "transparent";
+                    proj.style.color = "yellow";
+                    proj.style.fontSize = "20px";
+                    proj.style.opacity = 1;
+                    proj.style.transition = "left 0.5s linear";
+                    proj.style.left = "75%";
+                }, 50);
+
+                // Hit effect
+                setTimeout(() => {
+                    proj.style.opacity = 0;
+                    dmg.style.opacity = 1;
+                    enemy.style.transform = "rotate(90deg)"; // Stuck
+                    dmg.style.left = "75%";
+                }, 550);
+
+            } else if (type === 'phago') {
+                log.innerText = "Phagocyte enters! ENGULFING MODE ACTIVATED!";
+                hero.innerText = "👻"; // Change to Pacman ghost style
+                
+                // Move Hero to Enemy
+                hero.style.transition = "left 1s ease-in";
+                hero.style.left = "70%";
+
+                setTimeout(() => {
+                    dmg.innerText = "CHOMP!";
+                    dmg.style.opacity = 1;
+                    dmg.style.left = "75%";
+                    enemy.style.opacity = 0; // Eaten
+                }, 1000);
+
+                // Reset positions
+                setTimeout(() => {
+                    hero.style.transition = "none";
+                    hero.style.left = "20%";
+                    hero.innerText = "🛡️";
+                    enemy.style.opacity = 1;
+                    dmg.style.opacity = 0;
+                }, 2000);
+
+            } else if (type === 'antitoxin') {
+                log.innerText = "Antitoxin deployed! Toxin NEUTRALIZED!";
+                
+                // Shield effect on hero
+                hero.style.boxShadow = "0 0 20px white";
+                setTimeout(() => hero.style.boxShadow = "none", 1000);
+            }
+        }
+
+        // --- STORY LOGIC ---
+        function playStory() {
+            const steps = [1, 2, 3, 4, 5];
+            
+            // Reset
+            steps.forEach(id => document.getElementById('s'+id).classList.remove('active'));
+
+            // Play sequence
+            steps.forEach((id, index) => {
+                setTimeout(() => {
+                    document.getElementById('s'+id).classList.add('active');
+                }, index * 1000); // 1 second per step = 5 seconds total
+            });
+        }
+
+        // --- PDF DOWNLOAD ---
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFont("courier", "bold"); // Monospaced font for game feel
+            doc.setFontSize(20);
+            doc.text("DEFENCE AGAINST DISEASE: LEVEL 1", 20, 20);
+            
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            
+            const notes = `
+1. THE ENEMY (Pathogen):
+   - Organism that causes disease (Bacteria, Virus, Fungus).
+
+2. THE TANK (Phagocyte):
+   - "The Big Eater".
+   - Finds pathogen -> Engulfs it -> Digests it.
+
+3. THE SOLDIER (Lymphocyte):
+   - "The Smart One".
+   - Produces Weapons:
+     A) Antibodies: Stick to pathogen, stop it moving, help phagocytes.
+     B) Antitoxins: Neutralize toxins produced by bacteria.
+
+4. THE STORY:
+   1. Pathogen enters.
+   2. Phagocyte eats some.
+   3. Lymphocyte makes specific antibodies.
+   4. Antibodies attack/clump pathogens.
+   5. Immune system wins.
+            `;
+            
+            doc.text(notes, 20, 40);
+            doc.save('Immunity_Game_Guide.pdf');
+        }
+    </script>
+</body>
+</html>

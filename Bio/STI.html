@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Breakdown: STIs & Reproduction (CIE 0610)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7; /* Video Theme Purple */
+            --secondary: #00cec9; /* Bio Cyan */
+            --danger: #ff7675;
+            --dark: #2d3436;
+            --light: #dfe6e9;
+            --bg: #f5f6fa;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* NAVIGATION & PROGRESS */
+        nav {
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-title { font-weight: 800; color: var(--primary); }
+        
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: transparent;
+            z-index: 1001;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: var(--primary);
+            width: 0%;
+        }
+
+        /* HERO */
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--primary), #a29bfe);
+            color: var(--white);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 40px;
+        }
+
+        header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        header p { font-family: 'Roboto Mono', monospace; opacity: 0.9; }
+
+        /* TIMELINE LAYOUT */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 50px;
+            position: relative;
+        }
+
+        /* Vertical Line */
+        .container::before {
+            content: '';
+            position: absolute;
+            left: 50px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #d1d8e0;
+            border-radius: 2px;
+        }
+
+        .timeline-block {
+            position: relative;
+            margin-bottom: 60px;
+            padding-left: 80px;
+        }
+
+        /* Timestamp Circle */
+        .timestamp {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            width: 60px;
+            height: 60px;
+            background: var(--white);
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--primary);
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Content Cards */
+        .card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .card:hover { transform: translateY(-5px); }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 10px;
+        }
+
+        /* SPECIFIC STYLES */
+        .keyword {
+            background: rgba(108, 92, 231, 0.1);
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .exam-alert {
+            background: #fff0f0;
+            border-left: 5px solid var(--danger);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .exam-alert strong { color: var(--danger); }
+
+        /* Flowchart steps */
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .arrow { margin: 0 15px; color: #b2bec3; }
+
+        /* Grid for Birth Control */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .sub-card {
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .sub-card h4 { color: var(--dark); margin-bottom: 5px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container::before { left: 20px; }
+            .timeline-block { padding-left: 50px; }
+            .timestamp { 
+                width: 40px; height: 40px; left: 0; font-size: 0.7rem; border-width: 3px;
+            }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <nav>
+        <div class="nav-title">Science With Hazel Breakdown</div>
+        <div style="font-size: 0.9rem; color: #666;">CIE IGCSE Biology 0610</div>
+    </nav>
+
+    <header>
+        <h1>Reproduction, STIs & Fertility</h1>
+        <p>Detailed chronological explanation of the video content.</p>
+    </header>
+
+    <div class="container">
+
+        <!-- SECTION 1: STIs -->
+        <div class="timeline-block">
+            <div class="timestamp">START</div>
+            <div class="card">
+                <h2>Introduction to STIs</h2>
+                <p><strong>Definition:</strong> An STI (Sexually Transmitted Infection) is an infection transmitted via body fluids through sexual contact.</p>
+                <p style="margin-top: 15px;">The syllabus focuses specifically on <span class="keyword">HIV</span> (Human Immunodeficiency Virus).</p>
+            </div>
+        </div>
+
+        <div class="timeline-block">
+            <div class="timestamp">HIV</div>
+            <div class="card">
+                <h2>HIV Transmission & Mechanism</h2>
+                <p>HIV is a <strong>Virus</strong>. It is transmitted via exchange of body fluids.</p>
+                
+                <div class="grid-2">
+                    <div class="sub-card">
+                        <h4>Transmission Methods</h4>
+                        <ul style="padding-left: 20px;">
+                            <li>Unprotected sexual intercourse</li>
+                            <li>Sharing needles (drug use)</li>
+                            <li>Blood transfusions</li>
+                            <li>Mother to child (birth/milk)</li>
+                        </ul>
+                    </div>
+                    <div class="sub-card" style="border: 1px solid var(--danger);">
+                        <h4>The Immune Attack</h4>
+                        <div class="flow-step">1. HIV attacks <span class="keyword">Lymphocytes</span></div>
+                        <div class="flow-step">2. Less <span class="keyword">Antibodies</span> are produced</div>
+                        <div class="flow-step">3. Immune system weakens</div>
+                        <div class="flow-step">4. Develops into <span class="keyword">AIDS</span></div>
+                    </div>
+                </div>
+
+                <div class="exam-alert">
+                    <strong>EXAM TRAP:</strong> You cannot treat HIV with antibiotics because antibiotics kill bacteria, but HIV is a <strong>virus</strong>.
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: BIRTH CONTROL -->
+        <div class="timeline-block">
+            <div class="timestamp">MID</div>
+            <div class="card">
+                <h2>Method 1: Natural Birth Control</h2>
+                <p>These methods involve avoiding sex during the fertile window or completely.</p>
+                <div class="grid-2">
+                    <div class="sub-card">
+                        <h4>Abstinence</h4>
+                        <p>Refraining from sex entirely. <br><strong>100% Effective.</strong></p>
+                    </div>
+                    <div class="sub-card">
+                        <h4>Monitoring</h4>
+                        <p>Checking Body Temperature or Cervical Mucus texture to predict ovulation.</p>
+                        <p style="color: var(--danger); font-size: 0.8rem;">Result: Unreliable.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-block">
+            <div class="timestamp">MID</div>
+            <div class="card">
+                <h2>Method 2: Chemical Methods</h2>
+                <p>Using hormones or chemicals to prevent fertilization.</p>
+                
+                <h3 style="margin-top:20px; font-size:1.2rem; color: var(--secondary);">The Contraceptive Pill</h3>
+                <p>Contains <strong>Progesterone</strong> and <strong>Estrogen</strong>.</p>
+                <ul style="margin: 10px 0 20px 20px;">
+                    <li>Prevents production of <span class="keyword">FSH</span> (So eggs don't mature).</li>
+                    <li>Prevents production of <span class="keyword">LH</span> (So ovulation doesn't happen).</li>
+                </ul>
+
+                <h3 style="font-size:1.2rem; color: var(--secondary);">IUD (Intrauterine Device)</h3>
+                <p>Inserted into uterus. Prevents the embryo from <strong>implanting</strong> in the lining.</p>
+
+                <h3 style="font-size:1.2rem; color: var(--secondary); margin-top:15px;">Spermicide</h3>
+                <p>Chemical that kills sperm. Usually used with barrier methods.</p>
+            </div>
+        </div>
+
+        <div class="timeline-block">
+            <div class="timestamp">IMP</div>
+            <div class="card">
+                <h2>Method 3: Mechanical (Barrier)</h2>
+                <p>Physical barriers that stop sperm meeting egg.</p>
+                <ul style="padding-left:20px; margin-top:10px;">
+                    <li>Condom (Male)</li>
+                    <li>Femidom (Female Condom)</li>
+                    <li>Diaphragm (Cap over cervix)</li>
+                </ul>
+
+                <div class="exam-alert" style="border-color: var(--primary); background: #f0eeff;">
+                    <strong>CRITICAL POINT:</strong> The <strong>Condom</strong> is the ONLY method of birth control that also prevents the spread of STIs like HIV.
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-block">
+            <div class="timestamp">END</div>
+            <div class="card">
+                <h2>Method 4: Surgical</h2>
+                <p>Permanent sterilization procedures.</p>
+                <div class="grid-2">
+                    <div class="sub-card">
+                        <h4>Vasectomy (Men)</h4>
+                        <p>Cutting and tying the <span class="keyword">Sperm Ducts</span>.</p>
+                        <p style="font-size:0.8rem;">Sperm cannot leave testes.</p>
+                    </div>
+                    <div class="sub-card">
+                        <h4>Tubal Ligation (Women)</h4>
+                        <p>Cutting and tying the <span class="keyword">Oviducts</span>.</p>
+                        <p style="font-size:0.8rem;">Egg cannot reach uterus.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: FERTILITY -->
+        <div class="timeline-block">
+            <div class="timestamp">IVF</div>
+            <div class="card">
+                <h2>Fertility Treatments</h2>
+                <p>When couples cannot conceive naturally.</p>
+
+                <div style="margin-top:20px; padding:15px; background:var(--bg); border-radius:10px;">
+                    <h3 style="font-size:1.1rem;">1. Artificial Insemination</h3>
+                    <p>Used for low sperm count. Sperm is injected directly into the female.</p>
+                </div>
+
+                <div style="margin-top:20px;">
+                    <h3 style="font-size:1.1rem;">2. IVF (In Vitro Fertilization)</h3>
+                    <p><em>"In Glass" fertilization.</em></p>
+                    <ol style="padding-left:20px; margin-top:10px; line-height:1.8;">
+                        <li>Mother takes <strong>Fertility Drugs</strong> (FSH/LH) to mature multiple eggs.</li>
+                        <li>Eggs are <strong>collected</strong> from ovaries. Sperm is collected.</li>
+                        <li><strong>Fertilization</strong> happens in a petri dish (lab).</li>
+                        <li>Eggs develop into <strong>Embryos</strong>.</li>
+                        <li>Embryos are <strong>implanted</strong> into mother's uterus.</li>
+                    </ol>
+                </div>
+
+                <div class="exam-alert">
+                    <strong>Social Implications (Syllabus Requirement):</strong><br>
+                    1. Very Expensive.<br>
+                    2. Increases risk of multiple births (twins/triplets).<br>
+                    3. Ethical issues regarding unused embryos.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer style="text-align:center; padding: 40px; color: #888; font-size: 0.8rem;">
+        <p>Generated based on Science With Hazel Video Content</p>
+        <p>IGCSE Biology Revision Tool</p>
+    </footer>
+
+    <script>
+        // Simple Scroll Progress Bar
+        window.onscroll = function() {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+    </script>
+</body>
+</html>

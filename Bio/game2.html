@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cell-Making Shop | Fixed</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Image Gen -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-green: #00ff41;
+            --gold: #ffd700;
+            --dark-bg: #111;
+            --panel-bg: #222;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            background-color: var(--dark-bg);
+            font-family: 'Roboto Mono', monospace;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Game Wrapper for Blur Effect */
+        #gameContainer {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .blur-me { filter: blur(10px); pointer-events: none; }
+
+        header { text-align: center; margin-bottom: 20px; }
+        h1 { font-family: 'Bangers'; font-size: 3.5rem; color: var(--neon-blue); margin: 0; letter-spacing: 2px; }
+
+        /* --- MAIN LAYOUT --- */
+        .shop-floor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        /* --- MICROSCOPE VIEW --- */
+        .microscope {
+            width: 350px;
+            height: 350px;
+            background: #000;
+            border: 4px solid #444;
+            border-radius: 50%; /* Circular Viewport */
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 50px rgba(0, 243, 255, 0.2);
+            overflow: hidden;
+        }
+
+        #cellSvg { width: 100%; height: 100%; }
+
+        /* --- CONTROLS --- */
+        .controls {
+            flex: 1;
+            min-width: 300px;
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #444;
+        }
+
+        .order-box {
+            background: #333;
+            padding: 15px;
+            border-left: 5px solid var(--neon-blue);
+            margin-bottom: 20px;
+        }
+        .order-title { font-weight: bold; color: var(--neon-blue); font-size: 1.2rem; }
+
+        .grid-btns {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+        }
+
+        .btn-part {
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+            gap: 5px;
+        }
+
+        .btn-part:hover { background: #444; }
+        
+        /* Selected State */
+        .btn-part.active {
+            background: var(--neon-blue);
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 10px var(--neon-blue);
+            font-weight: bold;
+        }
+
+        .action-row {
+            display: flex; gap: 10px; margin-top: 20px;
+        }
+        
+        .btn-big {
+            flex: 1; padding: 15px; font-family: 'Bangers'; font-size: 1.2rem;
+            border: none; border-radius: 5px; cursor: pointer;
+        }
+        .btn-reset { background: #ef4444; color: white; }
+        .btn-ship { background: var(--neon-green); color: black; }
+
+        #errorMsg { color: #ff4444; text-align: center; margin-top: 10px; min-height: 20px; font-weight: bold; }
+
+        /* --- OVERLAYS --- */
+        #shippingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100;
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--neon-blue);
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        .ship-text { font-family: 'Bangers'; font-size: 3rem; color: white; text-shadow: 0 0 10px var(--neon-blue); }
+
+        #winScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 200;
+        }
+        .trophy-card {
+            background: linear-gradient(135deg, #111, #333);
+            border: 4px solid var(--gold);
+            padding: 30px; border-radius: 20px; text-align: center;
+            box-shadow: 0 0 50px rgba(255,215,0,0.3);
+        }
+        #playerName { padding: 10px; font-size: 1.2rem; text-align: center; margin: 20px 0; width: 100%; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div id="gameContainer">
+        <header>
+            <h1>CELL-MAKING SHOP</h1>
+            <p>Status: <span id="statusBadge" style="color:var(--neon-green)">OPEN</span></p>
+        </header>
+
+        <div class="shop-floor">
+            
+            <!-- VIEW -->
+            <div class="microscope">
+                <svg id="cellSvg" viewBox="0 0 300 300">
+                    <!-- 1. SHAPES (Visibility toggled by JS) -->
+                    <circle id="vis-AnimalShape" cx="150" cy="150" r="130" fill="none" stroke="white" stroke-width="2" style="display:block"/>
+                    <rect id="vis-PlantShape" x="50" y="50" width="200" height="200" rx="20" fill="none" stroke="#39ff14" stroke-width="10" style="display:none"/>
+                    <path id="vis-RootShape" d="M50,100 L200,100 L250,100 L250,150 L280,150 L280,200 L250,200 L250,250 L50,250 Z" fill="none" stroke="#39ff14" stroke-width="5" style="display:none"/>
+                    <path id="vis-SpermShape" d="M50,150 Q100,100 150,150 T250,150" fill="none" stroke="white" stroke-width="2" style="display:none"/>
+
+                    <!-- 2. FILLS -->
+                    <circle id="vis-Cytoplasm" cx="150" cy="150" r="120" fill="rgba(255,255,255,0.2)" style="display:none"/>
+                    <circle id="vis-Haemoglobin" cx="150" cy="150" r="120" fill="#ef4444" opacity="0.8" style="display:none"/>
+
+                    <!-- 3. PARTS -->
+                    <circle id="vis-Nucleus" cx="120" cy="120" r="30" fill="#d946ef" stroke="white" stroke-width="2" style="display:none"/>
+                    <rect id="vis-Vacuole" x="100" y="100" width="100" height="100" fill="rgba(0,255,255,0.4)" stroke="cyan" style="display:none"/>
+                    
+                    <g id="vis-Chloroplast" fill="#00ff41" style="display:none">
+                        <circle cx="80" cy="80" r="10"/><circle cx="220" cy="80" r="10"/>
+                        <circle cx="80" cy="220" r="10"/><circle cx="220" cy="220" r="10"/>
+                    </g>
+
+                    <g id="vis-Mitochondria" fill="#ffd700" style="display:none">
+                        <ellipse cx="150" cy="180" rx="10" ry="5"/><ellipse cx="180" cy="150" rx="10" ry="5"/>
+                    </g>
+
+                    <g id="vis-Cilia" stroke="#aaa" stroke-width="3" style="display:none">
+                        <line x1="100" y1="20" x2="100" y2="5"/><line x1="120" y1="15" x2="120" y2="0"/>
+                        <line x1="140" y1="10" x2="140" y2="-5"/><line x1="160" y1="10" x2="160" y2="-5"/>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- PANEL -->
+            <div class="controls">
+                <div class="order-box">
+                    <div class="order-title">ORDER #<span id="levelNum">1</span>: <span id="targetName">Loading...</span></div>
+                    <div style="font-size:0.8rem; color:#ccc;" id="targetHint">...</div>
+                </div>
+
+                <div class="grid-btns">
+                    <!-- Buttons map directly to parts -->
+                    <div class="btn-part" id="btn-Membrane" onclick="toggle('Membrane')"><i class="fa-solid fa-circle-notch"></i> Membrane</div>
+                    <div class="btn-part" id="btn-Cytoplasm" onclick="toggle('Cytoplasm')"><i class="fa-solid fa-water"></i> Cytoplasm</div>
+                    <div class="btn-part" id="btn-Nucleus" onclick="toggle('Nucleus')"><i class="fa-solid fa-dna"></i> Nucleus</div>
+                    <div class="btn-part" id="btn-Wall" onclick="toggle('Wall')"><i class="fa-solid fa-square"></i> Cell Wall</div>
+                    <div class="btn-part" id="btn-Chloroplast" onclick="toggle('Chloroplast')"><i class="fa-solid fa-sun"></i> Chloroplast</div>
+                    <div class="btn-part" id="btn-Vacuole" onclick="toggle('Vacuole')"><i class="fa-solid fa-soap"></i> Vacuole</div>
+                    <div class="btn-part" id="btn-Mitochondria" onclick="toggle('Mitochondria')"><i class="fa-solid fa-bolt"></i> Mitochondria</div>
+                    <div class="btn-part" id="btn-Haemoglobin" onclick="toggle('Haemoglobin')"><i class="fa-solid fa-droplet"></i> Haemoglobin</div>
+                    <div class="btn-part" id="btn-Tail" onclick="toggle('Tail')"><i class="fa-solid fa-worm"></i> Tail</div>
+                    <div class="btn-part" id="btn-RootHair" onclick="toggle('RootHair')"><i class="fa-solid fa-arrow-right"></i> Root Hair</div>
+                    <div class="btn-part" id="btn-Cilia" onclick="toggle('Cilia')"><i class="fa-solid fa-broom"></i> Cilia</div>
+                </div>
+
+                <div class="action-row">
+                    <button class="btn-big btn-reset" onclick="resetGame()">RESET</button>
+                    <button class="btn-big btn-ship" onclick="checkAnswer()">SHIP IT</button>
+                </div>
+                <div id="errorMsg"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHIPPING ANIMATION -->
+    <div id="shippingOverlay">
+        <div class="spinner" id="spinner"></div>
+        <div class="ship-text" id="shipText">SHIPPING...</div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="winScreen">
+        <div class="trophy-card" id="captureArea">
+            <i class="fa-solid fa-trophy" style="font-size:6rem; color:var(--gold); margin-bottom:10px;"></i>
+            <h2 style="font-family:'Bangers'; color:white; font-size:2.5rem;">CELL-MAKER</h2>
+            <p style="color:#ccc;">Certified Master of Organization</p>
+            <input type="text" id="playerName" placeholder="Enter Name">
+            <p style="color:#555; font-size:0.7rem;">IGCSE BIO 0610</p>
+        </div>
+        <button class="btn-big btn-ship" style="margin-top:20px; width:200px;" onclick="downloadTrophy()">DOWNLOAD</button>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const levels = [
+            { name: "Red Blood Cell", hint: "Transport Oxygen. Biconcave. No Nucleus.", req: ['Membrane','Cytoplasm','Haemoglobin'], ban: ['Nucleus','Wall','Chloroplast','Vacuole','Tail','Cilia','RootHair'] },
+            { name: "Root Hair Cell", hint: "Absorb water underground. Needs Extension. No Chloroplasts.", req: ['Membrane','Cytoplasm','Nucleus','Wall','Vacuole','Mitochondria','RootHair'], ban: ['Chloroplast','Tail','Haemoglobin','Cilia'] },
+            { name: "Sperm Cell", hint: "Swimmer. Needs Tail & Energy.", req: ['Membrane','Cytoplasm','Nucleus','Tail','Mitochondria'], ban: ['Wall','Chloroplast','Vacuole','Haemoglobin','Cilia','RootHair'] },
+            { name: "Palisade Cell", hint: "Photosynthesis Factory (Plant). Needs Everything.", req: ['Membrane','Cytoplasm','Nucleus','Wall','Chloroplast','Vacuole','Mitochondria'], ban: ['Tail','Haemoglobin','Cilia','RootHair'] }
+        ];
+
+        let currentLevel = 0;
+        let activeParts = new Set();
+
+        // --- SETUP ---
+        window.onload = function() {
+            loadLevel();
+        };
+
+        function loadLevel() {
+            if(currentLevel >= levels.length) {
+                document.getElementById('winScreen').style.display = "flex";
+                return;
+            }
+            const lvl = levels[currentLevel];
+            document.getElementById('levelNum').innerText = currentLevel + 1;
+            document.getElementById('targetName').innerText = lvl.name;
+            document.getElementById('targetHint').innerText = lvl.hint;
+            resetGame();
+        }
+
+        // --- INTERACTION ---
+        function toggle(part) {
+            const btn = document.getElementById('btn-' + part);
+            
+            if(activeParts.has(part)) {
+                activeParts.delete(part);
+                btn.classList.remove('active');
+            } else {
+                activeParts.add(part);
+                btn.classList.add('active');
+            }
+            updateVisuals();
+        }
+
+        function updateVisuals() {
+            // 1. Reset all shapes to hidden
+            ['AnimalShape', 'PlantShape', 'RootShape', 'SpermShape'].forEach(id => {
+                document.getElementById('vis-'+id).style.display = 'none';
+            });
+
+            // 2. Determine Shape
+            let shape = 'AnimalShape'; // Default
+            if(activeParts.has('Wall')) shape = 'PlantShape';
+            if(activeParts.has('RootHair')) shape = 'RootShape';
+            if(activeParts.has('Tail')) shape = 'SpermShape';
+
+            // 3. Show Shape & Membrane
+            if(activeParts.has('Membrane')) {
+                document.getElementById('vis-'+shape).style.display = 'block';
+            }
+
+            // 4. Show Parts
+            const simpleParts = ['Cytoplasm','Nucleus','Vacuole','Chloroplast','Mitochondria','Haemoglobin','Cilia'];
+            simpleParts.forEach(p => {
+                const el = document.getElementById('vis-'+p);
+                el.style.display = activeParts.has(p) ? 'block' : 'none';
+            });
+        }
+
+        function resetGame() {
+            activeParts.clear();
+            document.querySelectorAll('.btn-part').forEach(b => b.classList.remove('active'));
+            document.getElementById('errorMsg').innerText = "";
+            updateVisuals();
+        }
+
+        function checkAnswer() {
+            const lvl = levels[currentLevel];
+            const err = document.getElementById('errorMsg');
+            err.innerText = "";
+
+            // Missing?
+            let missing = lvl.req.filter(x => !activeParts.has(x));
+            if(missing.length > 0) {
+                err.innerText = "Missing: " + missing[0];
+                return;
+            }
+
+            // Forbidden?
+            for(let item of lvl.ban) {
+                if(activeParts.has(item)) {
+                    err.innerText = "Error: remove " + item;
+                    return;
+                }
+            }
+
+            // Success Animation
+            startShipping();
+        }
+
+        function startShipping() {
+            const overlay = document.getElementById('shippingOverlay');
+            const container = document.getElementById('gameContainer');
+            const txt = document.getElementById('shipText');
+            const spinner = document.getElementById('spinner');
+
+            overlay.style.display = "flex";
+            container.classList.add('blur-me');
+            spinner.style.display = "block";
+            txt.innerText = "SHIPPING...";
+            txt.style.color = "white";
+
+            setTimeout(() => {
+                spinner.style.display = "none";
+                txt.innerText = "DONE ✅";
+                txt.style.color = "#00ff41";
+                
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                    container.classList.remove('blur-me');
+                    currentLevel++;
+                    loadLevel();
+                }, 1500);
+            }, 2000);
+        }
+
+        // --- IMAGE GEN ---
+        function downloadTrophy() {
+            const capture = document.getElementById('captureArea');
+            const nameInput = document.getElementById('playerName');
+            
+            // Replace input with text for clean screenshot
+            const nameVal = nameInput.value || "Student";
+            const tempText = document.createElement('div');
+            tempText.innerText = nameVal.toUpperCase();
+            tempText.style.color = "#00f3ff";
+            tempText.style.fontFamily = "Bangers";
+            tempText.style.fontSize = "2rem";
+            tempText.style.margin = "20px 0";
+            
+            nameInput.replaceWith(tempText);
+
+            html2canvas(capture, { backgroundColor: "#111" }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'CellMaker_Trophy.png';
+                link.href = canvas.toDataURL();
+                link.click();
+                
+                // Restore
+                tempText.replaceWith(nameInput);
+            });
+        }
+    </script>
+</body>
+</html>

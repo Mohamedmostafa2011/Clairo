@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IG-Bio | Ch 7: Human Nutrition</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* Theme: Orange / Amber for Nutrition & Energy */
+            --primary: #ea580c; /* Orange 600 */
+            --primary-dark: #7c2d12; /* Orange 900 */
+            --accent: #d97706; /* Amber */
+            --bg: #fff7ed; /* Very light orange tint */
+            --text: #334155;
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- NAVIGATION BUTTON (Fixed Circular) --- */
+        .menu-toggle {
+            display: none; /* Hidden on desktop */
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: var(--primary); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.4rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.9); }
+
+        /* --- MOBILE OVERLAY --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1999;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: var(--sidebar-w);
+            background: #27120a; /* Deep Brown */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            z-index: 2000;
+            border-right: 1px solid #431407;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand {
+            font-size: 1.5rem; font-weight: 800; color: #fdba74; margin-bottom: 40px;
+            display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            padding: 16px; margin-bottom: 8px; border-radius: 8px;
+            cursor: pointer; color: #fed7aa; font-weight: 600;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4); }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+        .view-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; padding: 0; display: none; opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .view-panel.active { display: block; opacity: 1; }
+
+        /* --- TEXTBOOK STYLING --- */
+        .paper {
+            max-width: 950px; margin: 0 auto; background: white;
+            padding: 80px; min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-family: 'Inter', sans-serif; font-size: 3rem; color: var(--primary-dark); margin-bottom: 10px; letter-spacing: -1px; }
+        .meta { color: #9a3412; text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        h2 { 
+            font-family: 'Inter', sans-serif; font-size: 1.8rem; color: #431407; 
+            margin-top: 60px; margin-bottom: 25px; padding-bottom: 15px; 
+            border-bottom: 2px solid #ffedd5; display: flex; align-items: center; gap: 10px;
+        }
+        
+        h3 { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--primary); margin-top: 35px; margin-bottom: 15px; }
+
+        p {
+            font-family: 'Crimson Pro', serif; font-size: 1.2rem; line-height: 1.8;
+            color: #334155; margin-bottom: 20px;
+        }
+        li { font-family: 'Crimson Pro', serif; font-size: 1.15rem; line-height: 1.7; margin-bottom: 8px; margin-left: 20px; }
+        
+        /* Concept Boxes */
+        .concept-box {
+            background: #ffedd5; border-left: 5px solid var(--primary);
+            padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;
+        }
+        .concept-box strong { color: var(--primary-dark); font-family: 'Inter', sans-serif; }
+
+        .exam-tip {
+            background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+            padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+        }
+        .exam-tip i { color: #ef4444; font-size: 1.5rem; margin-top: 3px; }
+        .exam-tip strong { color: #991b1b; }
+
+        /* Tables */
+        .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #fed7aa; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #fff7ed; color: var(--primary-dark); padding: 16px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; border-bottom: 2px solid #fdba74; }
+        td { padding: 16px; border-bottom: 1px solid #fed7aa; vertical-align: top; font-family: 'Crimson Pro', serif; font-size: 1.1rem; }
+        tr:last-child td { border-bottom: none; }
+
+        /* --- MIND MAP --- */
+        .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #fffaf5; }
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #cbd5e1; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #cbd5e1; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #cbd5e1; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #cbd5e1; width: 0; height: 20px; }
+
+        .node {
+            background: white; border: 1px solid #fdba74; padding: 12px 18px; border-radius: 8px;
+            display: inline-block; min-width: 140px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; z-index: 2;
+        }
+        .root-node { background: var(--primary); color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: none; }
+
+        /* --- QUIZ --- */
+        .quiz-area { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .q-card { background: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #fed7aa; }
+        .q-opt {
+            display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e2e8f0;
+            margin-top: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .q-opt:hover { background: #fff7ed; border-color: #fdba74; }
+        .q-let { font-weight: 900; color: #94a3b8; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .q-opt.correct { background: #dcfce7; border-color: #16a34a; }
+        .q-opt.correct .q-let { background: #16a34a; color: white; }
+        .q-opt.wrong { background: #fee2e2; border-color: #ef4444; }
+        .q-opt.wrong .q-let { background: #ef4444; color: white; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
+            aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.active { left: 0; }
+            .paper { padding: 30px 20px; }
+            h1 { font-size: 2.2rem; }
+            .mm-wrapper { justify-content: flex-start; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-utensils"></i> IG-BIO NUTRITION</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Full Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-sitemap"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-clipboard-question"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #431407;">
+             <div class="nav-item" onclick="genPDF()" style="color:#fdba74; border-color:#431407;">
+                 <i class="fa-solid fa-file-pdf"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. DETAILED NOTES -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Biology 0610 • Chapter 7</span>
+                <h1>Human Nutrition</h1>
+                <p>Nutrition is the taking in of materials for energy, growth, and development. Humans require a balanced diet containing Carbohydrates, Fats, Proteins, Vitamins, Minerals, Fiber, and Water.</p>
+
+                <h2>1. Diet and Nutrients</h2>
+                <div class="concept-box">
+                    <strong>Balanced Diet:</strong> A diet that contains all the essential nutrients in the correct proportions to maintain health. Age, gender, and activity level affect energy needs.
+                </div>
+
+                <h3>Key Nutrients & Functions</h3>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Nutrient</th><th>Source</th><th>Function</th><th>Deficiency</th></tr>
+                        <tr><td><strong>Carbohydrate</strong></td><td>Rice, potatoes, bread</td><td>Source of energy.</td><td>Low energy.</td></tr>
+                        <tr><td><strong>Fats (Lipids)</strong></td><td>Butter, oil, nuts</td><td>Insulation & energy storage.</td><td>Weight loss.</td></tr>
+                        <tr><td><strong>Proteins</strong></td><td>Meat, fish, eggs</td><td>Growth and repair of cells.</td><td>Kwashiorkor / Marasmus.</td></tr>
+                        <tr><td><strong>Vitamin C</strong></td><td>Citrus fruits, kiwi</td><td>Makes collagen (skin/gums).</td><td><strong>Scurvy</strong> (bleeding gums).</td></tr>
+                        <tr><td><strong>Vitamin D</strong></td><td>Fish oil, sunlight</td><td>Absorb calcium for bones.</td><td><strong>Rickets</strong> (soft bones).</td></tr>
+                        <tr><td><strong>Calcium</strong></td><td>Milk, cheese</td><td>Strong bones and teeth.</td><td>Brittle bones.</td></tr>
+                        <tr><td><strong>Iron</strong></td><td>Red meat, spinach</td><td>Makes Haemoglobin.</td><td><strong>Anaemia</strong> (tiredness).</td></tr>
+                        <tr><td><strong>Fibre</strong></td><td>Vegetables, whole grains</td><td>Prevents constipation (peristalsis).</td><td>Constipation.</td></tr>
+                        <tr><td><strong>Water</strong></td><td>Water, drinks</td><td>Solvent for chemical reactions.</td><td>Dehydration.</td></tr>
+                    </table>
+                </div>
+
+                <h3>Malnutrition</h3>
+                <ul>
+                    <li><strong>Starvation:</strong> Lack of energy intake leading to weight loss and organ damage.</li>
+                    <li><strong>Coronary Heart Disease:</strong> Too much saturated fat blocks arteries.</li>
+                    <li><strong>Constipation:</strong> Lack of fibre; intestines cannot push food (peristalsis).</li>
+                    <li><strong>Obesity:</strong> Taking in more energy than is used; leads to diabetes and heart disease.</li>
+                    <li><strong>Kwashiorkor:</strong> Lack of Protein (swollen belly).</li>
+                    <li><strong>Marasmus:</strong> Lack of Protein AND Energy (severe wasting).</li>
+                </ul>
+
+                <h2>2. The Alimentary Canal</h2>
+                <p>The digestive system is a long tube from mouth to anus. The process involves five stages:</p>
+                <ol>
+                    <li><strong>Ingestion:</strong> Taking food into the mouth.</li>
+                    <li><strong>Digestion:</strong> Breaking down large, insoluble molecules into small, soluble ones.</li>
+                    <li><strong>Absorption:</strong> Movement of digested food into the blood.</li>
+                    <li><strong>Assimilation:</strong> Using food molecules to build new cells.</li>
+                    <li><strong>Egestion:</strong> Passing out undigested food (faeces).</li>
+                </ol>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Organ</th><th>Function</th></tr>
+                        <tr><td><strong>Mouth</strong></td><td>Mechanical digestion (teeth) and Chemical digestion (amylase).</td></tr>
+                        <tr><td><strong>Oesophagus</strong></td><td>Tube connecting mouth to stomach. Moves food by peristalsis.</td></tr>
+                        <tr><td><strong>Stomach</strong></td><td>Muscular bag. Acid kills bacteria. Protease (Pepsin) digests protein.</td></tr>
+                        <tr><td><strong>Small Intestine (Duodenum)</strong></td><td>Digestion is completed here using enzymes from pancreas and bile from liver.</td></tr>
+                        <tr><td><strong>Small Intestine (Ileum)</strong></td><td>Absorption of digested food into blood.</td></tr>
+                        <tr><td><strong>Pancreas</strong></td><td>Produces enzymes (Amylase, Protease, Lipase).</td></tr>
+                        <tr><td><strong>Liver</strong></td><td>Produces <strong>Bile</strong>. Assimilates glucose to glycogen.</td></tr>
+                        <tr><td><strong>Gall Bladder</strong></td><td>Stores Bile.</td></tr>
+                        <tr><td><strong>Large Intestine</strong></td><td>Absorbs <strong>water</strong> from undigested food.</td></tr>
+                    </table>
+                </div>
+
+                <h2>3. Digestion Processes</h2>
+                
+                <h3>Mechanical Digestion</h3>
+                <p>Physical breakdown of food to increase surface area for enzymes.</p>
+                <ul>
+                    <li><strong>Teeth:</strong> Incisors (cutting), Canines (tearing), Premolars/Molars (grinding).</li>
+                    <li><strong>Bile:</strong> Produced by Liver, stored in Gall Bladder. It <strong>Emulsifies Fats</strong> (breaks large drops into small droplets) and neutralizes stomach acid.</li>
+                    <li><strong>Peristalsis:</strong> Waves of muscle contraction to push food along.</li>
+                </ul>
+
+                <h3>Chemical Digestion (Enzymes)</h3>
+                <p>Enzymes act as biological catalysts to break chemical bonds.</p>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Enzyme</th><th>Substrate</th><th>Product</th><th>Where produced?</th><th>Where active?</th></tr>
+                        <tr><td><strong>Amylase</strong></td><td>Starch</td><td>Maltose</td><td>Salivary glands, Pancreas</td><td>Mouth, Duodenum</td></tr>
+                        <tr><td><strong>Maltase</strong></td><td>Maltose</td><td>Glucose</td><td>Small Intestine wall</td><td>Small Intestine</td></tr>
+                        <tr><td><strong>Protease (Pepsin)</strong></td><td>Protein</td><td>Amino Acids</td><td>Stomach</td><td>Stomach (Acidic pH)</td></tr>
+                        <tr><td><strong>Protease (Trypsin)</strong></td><td>Protein</td><td>Amino Acids</td><td>Pancreas</td><td>Duodenum (Alkaline pH)</td></tr>
+                        <tr><td><strong>Lipase</strong></td><td>Fats</td><td>Fatty Acids + Glycerol</td><td>Pancreas</td><td>Duodenum</td></tr>
+                    </table>
+                </div>
+
+                <div class="exam-tip">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Exam Warning: Bile</strong><br>
+                        Bile is <strong>NOT</strong> an enzyme. It does not break chemical bonds. It only breaks physical droplets (emulsification) to increase surface area for Lipase to work.
+                    </div>
+                </div>
+
+                <h2>4. Absorption (The Villi)</h2>
+                <p>The Ileum (small intestine) is adapted for absorption by having <strong>Villi</strong> and <strong>Microvilli</strong> which massively increase the surface area.</p>
+                <ul>
+                    <li><strong>Thin walls:</strong> Only one cell thick for fast diffusion.</li>
+                    <li><strong>Capillaries:</strong> Transport Glucose and Amino Acids.</li>
+                    <li><strong>Lacteal:</strong> Transports Fatty Acids and Glycerol.</li>
+                </ul>
+
+                <h2>5. Diarrhoea & Cholera</h2>
+                <p>Diarrhoea is the loss of watery faeces. It can be caused by the <strong>Cholera</strong> bacterium.</p>
+                <ol>
+                    <li>Bacteria produce a toxin.</li>
+                    <li>Toxin causes secretion of <strong>Chloride ions</strong> into the small intestine.</li>
+                    <li>This lowers the water potential in the gut.</li>
+                    <li>Water moves from blood into the intestine by <strong>Osmosis</strong>.</li>
+                    <li>Result: Dehydration and loss of salts. Treatment: Oral Rehydration Therapy.</li>
+                </ol>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">HUMAN NUTRITION</div>
+                            <ul>
+                                <li>
+                                    <div class="node">Diet</div>
+                                    <ul>
+                                        <li><div class="node">7 Nutrients</div></li>
+                                        <li><div class="node">Deficiencies (Scurvy/Rickets)</div></li>
+                                        <li><div class="node">Energy Needs</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Alimentary Canal</div>
+                                    <ul>
+                                        <li><div class="node">Mouth/Stomach</div></li>
+                                        <li><div class="node">Sm. Intestine (Duodenum/Ileum)</div></li>
+                                        <li><div class="node">Liver/Pancreas</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Digestion</div>
+                                    <ul>
+                                        <li><div class="node">Mechanical (Teeth/Bile)</div></li>
+                                        <li><div class="node">Chemical (Enzymes)</div></li>
+                                        <li><div class="node">Amylase/Protease/Lipase</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Absorption</div>
+                                    <ul>
+                                        <li><div class="node">Villi / Microvilli</div></li>
+                                        <li><div class="node">Capillaries (Sugar/AA)</div></li>
+                                        <li><div class="node">Lacteals (Fats)</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container">
+                <!-- Questions injected via JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI LOGIC ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Bio_Ch7_Nutrition.pdf');
+            });
+        }
+
+        // --- 50 QUESTIONS (Human Nutrition) ---
+        const qData = [
+            {q:"Which nutrient provides the most energy per gram?", o:["Carbohydrate","Protein","Fat","Vitamin C"], a:2},
+            {q:"Which nutrient is needed for growth and repair?", o:["Fat","Fibre","Protein","Iron"], a:2},
+            {q:"Deficiency of Vitamin C causes?", o:["Rickets","Scurvy","Anaemia","Blindness"], a:1},
+            {q:"Deficiency of Vitamin D causes?", o:["Scurvy","Rickets","Constipation","Obesity"], a:1},
+            {q:"Which mineral is needed to make haemoglobin?", o:["Calcium","Iron","Magnesium","Sodium"], a:1},
+            {q:"Which mineral is needed for strong bones?", o:["Iron","Calcium","Potassium","Iodine"], a:1},
+            {q:"What prevents constipation?", o:["Fats","Proteins","Fibre","Water"], a:2},
+            {q:"Scurvy is characterized by?", o:["Soft bones","Bleeding gums","Pale skin","Night blindness"], a:1},
+            {q:"Which disease is caused by lack of protein (swollen belly)?", o:["Marasmus","Kwashiorkor","Obesity","Diabetes"], a:1},
+            {q:"Which disease is caused by lack of protein AND energy (severe wasting)?", o:["Marasmus","Kwashiorkor","Scurvy","Anaemia"], a:0},
+            {q:"Where does ingestion happen?", o:["Stomach","Mouth","Anus","Small Intestine"], a:1},
+            {q:"What is digestion?", o:["Eating food","Breaking down large molecules","Passing out waste","Absorbing water"], a:1},
+            {q:"Where does most absorption happen?", o:["Stomach","Duodenum","Ileum","Colon"], a:2},
+            {q:"Where does egestion happen?", o:["Mouth","Anus","Kidney","Liver"], a:1},
+            {q:"Which organ produces bile?", o:["Gall bladder","Pancreas","Liver","Stomach"], a:2},
+            {q:"Where is bile stored?", o:["Liver","Pancreas","Gall bladder","Stomach"], a:2},
+            {q:"What is the function of bile?", o:["Digest protein","Emulsify fats","Digest starch","Kill bacteria"], a:1},
+            {q:"Bile neutralizes stomach acid to create?", o:["Acidic pH","Alkaline pH","Neutral pH","High temp"], a:1},
+            {q:"Which enzyme breaks down starch?", o:["Protease","Lipase","Amylase","Maltase"], a:2},
+            {q:"Amylase breaks starch down into?", o:["Glucose","Maltose","Amino acids","Fatty acids"], a:1},
+            {q:"Protease breaks protein down into?", o:["Fatty acids","Glucose","Amino acids","Glycerol"], a:2},
+            {q:"Lipase breaks fats down into?", o:["Amino acids","Starch","Fatty acids and Glycerol","Maltose"], a:2},
+            {q:"Which acid is found in the stomach?", o:["Sulfuric acid","Hydrochloric acid","Nitric acid","Citric acid"], a:1},
+            {q:"What is the function of stomach acid?", o:["Digest starch","Kill bacteria","Emulsify fat","Absorb water"], a:1},
+            {q:"Which protease is found in the stomach?", o:["Trypsin","Pepsin","Amylase","Lipase"], a:1},
+            {q:"Which protease is produced by the pancreas?", o:["Pepsin","Trypsin","Maltase","Bile"], a:1},
+            {q:"Where are feces stored before egestion?", o:["Anus","Colon","Rectum","Ileum"], a:2},
+            {q:"What is the main function of the large intestine?", o:["Digest fat","Absorb water","Absorb glucose","Produce bile"], a:1},
+            {q:"The movement of food along the gut is called?", o:["Digestion","Absorption","Peristalsis","Assimilation"], a:2},
+            {q:"Villi are found in the?", o:["Stomach","Oesophagus","Small Intestine","Large Intestine"], a:2},
+            {q:"What is the function of the lacteal in a villus?", o:["Absorb glucose","Absorb amino acids","Absorb fats","Transport blood"], a:2},
+            {q:"Capillaries in the villi absorb?", o:["Fats","Glucose and Amino Acids","Starch","Fibre"], a:1},
+            {q:"Villi increase surface area for?", o:["Digestion","Absorption","Egestion","Ingestion"], a:1},
+            {q:"Cholera bacteria produce a toxin that affects?", o:["Stomach","Lungs","Small Intestine","Heart"], a:2},
+            {q:"Cholera toxin causes the secretion of?", o:["Sodium ions","Chloride ions","Water","Calcium"], a:1},
+            {q:"Secretion of ions into the gut causes water to move by?", o:["Active transport","Diffusion","Osmosis","Digestion"], a:2},
+            {q:"The result of Cholera infection is?", o:["Obesity","Constipation","Severe Diarrhoea","Scurvy"], a:2},
+            {q:"Treatment for Cholera includes?", o:["Antibiotics only","Oral Rehydration Therapy","Surgery","Fasting"], a:1},
+            {q:"Which teeth are used for tearing?", o:["Incisors","Canines","Molars","Premolars"], a:1},
+            {q:"Which teeth are used for grinding?", o:["Incisors","Canines","Molars","Wisdom teeth"], a:2},
+            {q:"The hard outer layer of a tooth is?", o:["Dentine","Pulp","Enamel","Gum"], a:2},
+            {q:"Bacteria on teeth ferment sugar to produce?", o:["Alkali","Acid","Salt","Enzymes"], a:1},
+            {q:"Acid dissolves enamel causing?", o:["Gum disease","Tooth decay","Bad breath","Plaque"], a:1},
+            {q:"Assimilation means?", o:["Eating food","Moving into blood","Using molecules to build cells","Removing waste"], a:2},
+            {q:"Excess glucose is stored in the liver as?", o:["Starch","Fat","Glycogen","Protein"], a:2},
+            {q:"Which nutrient is NOT digested?", o:["Starch","Protein","Fibre","Fat"], a:2},
+            {q:"The tube connecting mouth to stomach is?", o:["Trachea","Oesophagus","Ureter","Bronchus"], a:1},
+            {q:"A good source of fibre is?", o:["Milk","Meat","Wholemeal bread","Cheese"], a:2},
+            {q:"Microvilli are found on?", o:["Stomach lining","Epithelial cells of Villi","Large intestine","Skin"], a:1},
+            {q:"Physical breakdown of food droplets is called?", o:["Digestion","Emulsification","Assimilation","Absorption"], a:1}
+        ];
+
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            // Shuffle options
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem; color:#334155;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const text = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerText.includes(text)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

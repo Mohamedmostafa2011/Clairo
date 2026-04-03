@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clairo — Chem Final Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  :root {
+    --purple-50: #faf5ff;
+    --purple-100: #f3e8ff;
+    --purple-200: #e9d5ff;
+    --purple-300: #d8b4fe;
+    --purple-400: #c084fc;
+    --purple-500: #a855f7;
+    --purple-600: #9333ea;
+    --purple-700: #7c3aed;
+    --purple-800: #6b21a8;
+    --purple-900: #581c87;
+    
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+
+    --accent: var(--purple-600);
+    --accent-light: var(--purple-100);
+    --accent-dark: var(--purple-800);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    font-size: 11pt;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #fff;
+    color: var(--gray-800);
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     FRONT COVER
+  ═══════════════════════════════════════════════════════════════ */
+  .cover-front {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--purple-700) 0%, var(--purple-900) 50%, #1e1b4b 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 3rem;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover-front::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(168,85,247,0.2) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(139,92,246,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cover-front::after {
+    content: '';
+    position: absolute;
+    inset: 2rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    pointer-events: none;
+  }
+
+  .cover-logo {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+  }
+
+  .cover-logo-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 1.5rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .cover-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 3rem;
+  }
+
+  .cover-title {
+    position: relative;
+    z-index: 1;
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .cover-title em {
+    font-style: italic;
+    background: linear-gradient(135deg, #c4b5fd, #f0abfc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cover-subtitle {
+    position: relative;
+    z-index: 1;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 400;
+    font-style: italic;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 3rem;
+  }
+
+  .cover-divider {
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    margin: 0 auto 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-meta {
+    position: relative;
+    z-index: 1;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.8);
+    margin-top: 2rem;
+  }
+
+  .cover-year {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.2em;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+  ═══════════════════════════════════════════════════════════════ */
+  .toc-page {
+    min-height: 100vh;
+    padding: 4rem 3rem;
+    page-break-after: always;
+    background: var(--gray-50);
+  }
+
+  .toc-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .toc-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--purple-800);
+    margin-bottom: 0.5rem;
+  }
+
+  .toc-header p {
+    color: var(--gray-500);
+    font-size: 0.9rem;
+  }
+
+  .toc-list {
+    max-width: 600px;
+    margin: 0 auto;
+    list-style: none;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 0.95rem;
+  }
+
+  .toc-item:last-child {
+    border-bottom: none;
+  }
+
+  .toc-num {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--purple-600);
+    width: 50px;
+    flex-shrink: 0;
+  }
+
+  .toc-title {
+    flex: 1;
+    font-weight: 500;
+    color: var(--gray-700);
+  }
+
+  .toc-dots {
+    flex: 1;
+    border-bottom: 1px dotted var(--gray-300);
+    margin: 0 0.75rem;
+    min-width: 30px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     MAIN CONTENT AREA
+  ═══════════════════════════════════════════════════════════════ */
+  .book-content {
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     CHAPTER CARDS
+  ═══════════════════════════════════════════════════════════════ */
+  .chapter {
+    margin-bottom: 2.5rem;
+    page-break-inside: avoid;
+  }
+
+  .chapter-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--purple-200);
+  }
+
+  .chapter-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--purple-100), var(--purple-200));
+    border: 2px solid var(--purple-300);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .chapter-meta {
+    flex: 1;
+  }
+
+  .chapter-number {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--purple-500);
+    margin-bottom: 2px;
+  }
+
+  .chapter-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--purple-800);
+    line-height: 1.2;
+  }
+
+  .chapter-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     SECTION TITLES
+  ═══════════════════════════════════════════════════════════════ */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--purple-600);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--purple-200);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     TABLES
+  ═══════════════════════════════════════════════════════════════ */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .data-table th {
+    background: var(--purple-100);
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--purple-700);
+    border: 1px solid var(--purple-200);
+  }
+
+  .data-table td {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--gray-200);
+    vertical-align: top;
+    color: var(--gray-600);
+    line-height: 1.5;
+  }
+
+  .data-table td:first-child {
+    color: var(--gray-800);
+    font-weight: 600;
+  }
+
+  .data-table tr:nth-child(even) td {
+    background: var(--gray-50);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     KEYBOX / INFO BOXES
+  ═══════════════════════════════════════════════════════════════ */
+  .keybox {
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-size: 0.85rem;
+    background: var(--purple-50);
+    border: 1px solid var(--purple-200);
+    page-break-inside: avoid;
+  }
+
+  .keybox.highlight {
+    background: linear-gradient(135deg, var(--purple-50), #fdf4ff);
+    border-color: var(--purple-300);
+  }
+
+  .keybox.warning {
+    background: #fffbeb;
+    border-color: #fcd34d;
+  }
+
+  .keybox.success {
+    background: #ecfdf5;
+    border-color: #6ee7b7;
+  }
+
+  .keybox.info {
+    background: #eff6ff;
+    border-color: #93c5fd;
+  }
+
+  .keybox-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--purple-700);
+    margin-bottom: 0.6rem;
+  }
+
+  .keybox.warning .keybox-label { color: #b45309; }
+  .keybox.success .keybox-label { color: #047857; }
+  .keybox.info .keybox-label { color: #1d4ed8; }
+
+  .keybox ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .keybox ul li {
+    color: var(--gray-600);
+    padding-left: 1.2rem;
+    position: relative;
+  }
+
+  .keybox ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--purple-400);
+  }
+
+  .keybox ul li strong {
+    color: var(--gray-800);
+    font-weight: 600;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     DEFINITION LIST
+  ═══════════════════════════════════════════════════════════════ */
+  .def-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .def-item {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    align-items: baseline;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .def-item:last-child {
+    border-bottom: none;
+  }
+
+  .def-term {
+    font-weight: 700;
+    color: var(--purple-700);
+  }
+
+  .def-desc {
+    color: var(--gray-600);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     EQUATION BOXES
+  ═══════════════════════════════════════════════════════════════ */
+  .eq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .eq {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.9rem;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-left: 3px solid var(--purple-400);
+    border-radius: 0 6px 6px 0;
+    font-family: 'Playfair Display', serif;
+    color: var(--gray-800);
+  }
+
+  .eq .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--purple-500);
+    min-width: 90px;
+    flex-shrink: 0;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     TWO COLUMN LAYOUT
+  ═══════════════════════════════════════════════════════════════ */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     MNEMONIC BOX
+  ═══════════════════════════════════════════════════════════════ */
+  .mnemonic {
+    text-align: center;
+    padding: 1.25rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--purple-100), #fdf4ff);
+    border: 2px solid var(--purple-300);
+  }
+
+  .mnemonic-word {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--purple-700);
+    letter-spacing: 0.15em;
+    margin-bottom: 0.35rem;
+  }
+
+  .mnemonic-desc {
+    font-size: 0.8rem;
+    color: var(--gray-600);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     PROCESS STEPS
+  ═══════════════════════════════════════════════════════════════ */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 1rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 0.85rem;
+    align-items: flex-start;
+  }
+
+  .step:last-child {
+    border-bottom: none;
+  }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--purple-600);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-text {
+    color: var(--gray-600);
+  }
+
+  .step-text strong {
+    color: var(--gray-800);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     BACK COVER
+  ═══════════════════════════════════════════════════════════════ */
+  .cover-back {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--purple-800) 0%, var(--purple-900) 50%, #1e1b4b 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 3rem;
+    page-break-before: always;
+    position: relative;
+  }
+
+  .cover-back::before {
+    content: '';
+    position: absolute;
+    inset: 2rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+  }
+
+  .back-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-style: italic;
+    color: rgba(255,255,255,0.9);
+    max-width: 500px;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .back-quote::before {
+    content: '"';
+    font-size: 4rem;
+    color: var(--purple-400);
+    position: absolute;
+    top: -1.5rem;
+    left: -1.5rem;
+    opacity: 0.5;
+  }
+
+  .back-stats {
+    display: flex;
+    gap: 3rem;
+    margin: 2rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .back-stat {
+    text-align: center;
+  }
+
+  .back-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .back-stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .back-divider {
+    width: 80px;
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+    margin: 2rem 0;
+  }
+
+  .back-tagline {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.05em;
+    position: relative;
+    z-index: 1;
+  }
+
+  .back-logo {
+    position: absolute;
+    bottom: 3rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     PRINT STYLES
+  ═══════════════════════════════════════════════════════════════ */
+  @media print {
+    body {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .chapter {
+      page-break-inside: avoid;
+    }
+
+    .cover-front, .cover-back, .toc-page {
+      page-break-after: always;
+    }
+
+    .keybox, .mnemonic, .data-table {
+      page-break-inside: avoid;
+    }
+  }
+
+  /* Page separator for screen view */
+  .page-break {
+    height: 2rem;
+    background: var(--gray-100);
+    border-top: 1px dashed var(--gray-300);
+    border-bottom: 1px dashed var(--gray-300);
+    margin: 2rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media print {
+    .page-break {
+      display: none;
+      page-break-after: always;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FRONT COVER
+═══════════════════════════════════════════════════════════════ -->
+<div class="cover-front">
+  <div class="cover-logo">
+    <div class="cover-logo-icon">⚗️</div>
+    <div class="cover-brand">Clairo</div>
+  </div>
+  
+  <h1 class="cover-title">Chemistry<br><em>Final Revision</em></h1>
+  <p class="cover-subtitle">Complete Study Guide</p>
+  
+  <div class="cover-divider"></div>
+  
+  <p class="cover-meta">Cambridge IGCSE Chemistry</p>
+  <div class="cover-badge">Syllabus 0620</div>
+  
+  <span class="cover-year">2024 / 2025</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+═══════════════════════════════════════════════════════════════ -->
+<div class="toc-page">
+  <div class="toc-header">
+    <h2>Contents</h2>
+    <p>Complete coverage of all 19 syllabus topics</p>
+  </div>
+  
+  <ul class="toc-list">
+    <li class="toc-item"><span class="toc-num">01</span><span class="toc-title">States of Matter</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">02</span><span class="toc-title">Atomic Structure</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">03</span><span class="toc-title">Chemical Bonding</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">04</span><span class="toc-title">Formulae, Equations & Stoichiometry</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">05</span><span class="toc-title">Chemical Energetics</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">06</span><span class="toc-title">Electrochemistry</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">07</span><span class="toc-title">Rates of Reaction</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">08</span><span class="toc-title">Reversible Reactions & Equilibrium</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">09</span><span class="toc-title">Redox Reactions</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">10</span><span class="toc-title">Acids and Bases</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">11</span><span class="toc-title">Preparation of Salts</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">12</span><span class="toc-title">The Periodic Table</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">13</span><span class="toc-title">Metallic Elements & Alloys</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">14</span><span class="toc-title">Reactivity of Metals</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">15</span><span class="toc-title">Extraction & Corrosion of Metals</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">16</span><span class="toc-title">Introduction to Organic Chemistry</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">17</span><span class="toc-title">Reactions of Organic Compounds</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">18</span><span class="toc-title">Petrochemicals & Polymers</span><span class="toc-dots"></span></li>
+    <li class="toc-item"><span class="toc-num">19</span><span class="toc-title">Chemistry of Our Environment</span><span class="toc-dots"></span></li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════════════════ -->
+<div class="book-content">
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 1: STATES OF MATTER
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">⚗️</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 01</span>
+      <h2 class="chapter-title">States of Matter</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">The Three States</p>
+      <table class="data-table">
+        <thead><tr><th>Property</th><th>Solid</th><th>Liquid</th><th>Gas</th></tr></thead>
+        <tbody>
+          <tr><td>Shape</td><td>Fixed</td><td>Takes container shape</td><td>No fixed shape</td></tr>
+          <tr><td>Volume</td><td>Fixed</td><td>Fixed</td><td>Variable (expands)</td></tr>
+          <tr><td>Compressibility</td><td>Cannot be compressed</td><td>Almost incompressible</td><td>Easily compressed</td></tr>
+          <tr><td>Fluidity</td><td>Does not flow</td><td>Flows easily</td><td>Flows easily</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">Kinetic Particle Theory</p>
+      <div class="keybox">
+        <p class="keybox-label">Memorise These Definitions</p>
+        <ul>
+          <li><strong>Solids:</strong> Particles packed closely in a regular lattice. Vibrate about fixed positions. Strong forces.</li>
+          <li><strong>Liquids:</strong> Particles close together but arranged randomly. Slide over each other. Weaker forces.</li>
+          <li><strong>Gases:</strong> Particles far apart, arranged randomly. Move randomly at high speeds. Negligible forces.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Changes of State</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Melting</span><span class="def-desc">Solid → Liquid (heat absorbed — endothermic)</span></div>
+        <div class="def-item"><span class="def-term">Boiling</span><span class="def-desc">Liquid → Gas at fixed temp (heat absorbed)</span></div>
+        <div class="def-item"><span class="def-term">Freezing</span><span class="def-desc">Liquid → Solid (heat released — exothermic)</span></div>
+        <div class="def-item"><span class="def-term">Condensation</span><span class="def-desc">Gas → Liquid (heat released)</span></div>
+        <div class="def-item"><span class="def-term">Sublimation</span><span class="def-desc">Solid → Gas directly (e.g., dry ice, iodine)</span></div>
+        <div class="def-item"><span class="def-term">Deposition</span><span class="def-desc">Gas → Solid directly</span></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="keybox warning">
+        <p class="keybox-label">⚡ Exam Tip — Boiling vs Evaporation</p>
+        <ul>
+          <li><strong>Boiling:</strong> At a specific temperature; happens throughout the liquid (bubbles form).</li>
+          <li><strong>Evaporation:</strong> At any temperature; happens only at the surface.</li>
+        </ul>
+      </div>
+      <div class="keybox success">
+        <p class="keybox-label">Diffusion</p>
+        <ul>
+          <li>Net movement from <strong>high → low</strong> concentration down a gradient.</li>
+          <li>Faster at higher temperature; lighter molecules diffuse faster.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 2: ATOMIC STRUCTURE
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">⚛️</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 02</span>
+      <h2 class="chapter-title">Atomic Structure</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Subatomic Particles</p>
+      <table class="data-table">
+        <thead><tr><th>Particle</th><th>Charge</th><th>Relative Mass</th><th>Location</th></tr></thead>
+        <tbody>
+          <tr><td>Proton</td><td>+1 (Positive)</td><td>1</td><td>Nucleus</td></tr>
+          <tr><td>Neutron</td><td>0 (Neutral)</td><td>1</td><td>Nucleus</td></tr>
+          <tr><td>Electron</td><td>−1 (Negative)</td><td>1/1840 (negligible)</td><td>Shells</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">Key Definitions</p>
+      <div class="keybox highlight">
+        <p class="keybox-label">Must Memorise</p>
+        <ul>
+          <li><strong>Atomic Number (Z):</strong> Number of protons in nucleus = number of electrons in neutral atom.</li>
+          <li><strong>Mass Number (A):</strong> Total protons + neutrons in nucleus.</li>
+          <li><strong>Neutrons:</strong> A − Z</li>
+          <li><strong>Isotopes:</strong> Same element (same Z), different number of neutrons (different A).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Electron Shells</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Shell 1</span><span class="def-desc">Max 2 electrons</span></div>
+        <div class="def-item"><span class="def-term">Shell 2</span><span class="def-desc">Max 8 electrons</span></div>
+        <div class="def-item"><span class="def-term">Shell 3</span><span class="def-desc">Max 8 electrons (at IGCSE level)</span></div>
+        <div class="def-item"><span class="def-term">Noble Gas config.</span><span class="def-desc">Full outer shell = chemically stable (unreactive)</span></div>
+      </div>
+    </div>
+
+    <div class="keybox">
+      <p class="keybox-label">RAM & Relative Atomic Mass</p>
+      <ul>
+        <li>Relative Atomic Mass (Ar): Average mass of naturally occurring atoms compared to 1/12 of Carbon-12.</li>
+        <li>Chlorine isotopes: Cl-35 (75%) and Cl-37 (25%) → Ar = (75×35 + 25×37)/100 = <strong>35.5</strong></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 3: CHEMICAL BONDING
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🔗</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 03</span>
+      <h2 class="chapter-title">Chemical Bonding</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="two-col">
+      <div class="keybox">
+        <p class="keybox-label">Ionic Bonding</p>
+        <ul>
+          <li>Between <strong>Metal + Non-Metal</strong></li>
+          <li>Metal loses electrons → cation (+)</li>
+          <li>Non-metal gains electrons → anion (−)</li>
+          <li>Strong electrostatic attraction between oppositely charged ions</li>
+          <li>Forms giant lattice structure</li>
+        </ul>
+      </div>
+      <div class="keybox success">
+        <p class="keybox-label">Covalent Bonding</p>
+        <ul>
+          <li>Between <strong>Non-Metal + Non-Metal</strong></li>
+          <li>Atoms share electrons</li>
+          <li>Single bond = 1 shared pair</li>
+          <li>Double bond = 2 shared pairs</li>
+          <li>Forms molecules or giant covalent structures</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Properties of Ionic Compounds</p>
+      <table class="data-table">
+        <thead><tr><th>Property</th><th>Observation</th><th>Explanation</th></tr></thead>
+        <tbody>
+          <tr><td>Melting Point</td><td>High</td><td>Strong electrostatic forces require much energy to break</td></tr>
+          <tr><td>Volatility</td><td>Non-volatile</td><td>Strong bonds — do not evaporate easily</td></tr>
+          <tr><td>Conductivity (solid)</td><td>Does NOT conduct</td><td>Ions fixed in lattice, cannot move</td></tr>
+          <tr><td>Conductivity (liquid/aq)</td><td>Conducts</td><td>Ions free to move and carry charge</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">Properties of Simple Molecular Covalent</p>
+      <table class="data-table">
+        <thead><tr><th>Property</th><th>Explanation</th></tr></thead>
+        <tbody>
+          <tr><td>Low melting/boiling point</td><td>Weak intermolecular forces between molecules (not the strong covalent bonds)</td></tr>
+          <tr><td>Usually gas/liquid at RTP</td><td>Easy to overcome weak forces</td></tr>
+          <tr><td>Do NOT conduct electricity</td><td>No free ions or electrons</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="keybox highlight">
+      <p class="keybox-label">Giant Covalent (e.g. Diamond, Silicon Dioxide)</p>
+      <ul>
+        <li><strong>Diamond:</strong> Each C bonded to 4 others. Very hard, very high melting point, does not conduct.</li>
+        <li><strong>Graphite:</strong> Layers of hexagonal C. Each C bonded to 3. Delocalised electrons → conducts electricity. Layers slide → lubricant.</li>
+        <li><strong>SiO₂:</strong> Very high melting point, does not conduct.</li>
+      </ul>
+    </div>
+
+    <div class="keybox info">
+      <p class="keybox-label">Metallic Bonding</p>
+      <ul>
+        <li>Regular lattice of positive ions surrounded by a "sea" of delocalised electrons.</li>
+        <li>Conducts electricity: delocalised electrons carry charge.</li>
+        <li>Malleable/ductile: layers slide without breaking bond.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 4: FORMULAE & EQUATIONS
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🧮</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 04</span>
+      <h2 class="chapter-title">Formulae, Equations & Stoichiometry</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="keybox">
+      <p class="keybox-label">Balancing Equations — Steps</p>
+      <ul>
+        <li>Write correct formulae for every reactant and product.</li>
+        <li>Count atoms of each element on both sides.</li>
+        <li>Add big numbers (coefficients) <strong>in front</strong> of formulae. NEVER change subscripts!</li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="section-title">The Mole Concept</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">1 Mole</span><span class="def-desc">6.02 × 10²³ particles (Avogadro's number)</span></div>
+        <div class="def-item"><span class="def-term">Molar Mass</span><span class="def-desc">Mass of 1 mole in grams = numerically equal to Ar or Mr</span></div>
+        <div class="def-item"><span class="def-term">n = m/M</span><span class="def-desc">moles = mass (g) ÷ molar mass (g/mol)</span></div>
+        <div class="def-item"><span class="def-term">Concentration</span><span class="def-desc">mol/dm³ = moles ÷ volume (dm³)</span></div>
+        <div class="def-item"><span class="def-term">Gas Volume</span><span class="def-desc">1 mole of any gas at RTP = 24 dm³ (24,000 cm³)</span></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Key Formulae</p>
+      <div class="eq-list">
+        <div class="eq"><span class="label">Moles</span>n = m ÷ M</div>
+        <div class="eq"><span class="label">Concentration</span>c = n ÷ V</div>
+        <div class="eq"><span class="label">Gas Volume</span>V = n × 24 dm³ (at RTP)</div>
+        <div class="eq"><span class="label">% Yield</span>(actual yield ÷ theoretical yield) × 100</div>
+        <div class="eq"><span class="label">% Purity</span>(mass of pure substance ÷ total mass) × 100</div>
+      </div>
+    </div>
+
+    <div class="keybox warning">
+      <p class="keybox-label">Empirical vs Molecular Formula</p>
+      <ul>
+        <li><strong>Empirical formula:</strong> Simplest whole-number ratio of atoms (e.g., CH₂O).</li>
+        <li><strong>Molecular formula:</strong> Actual number of atoms in a molecule (e.g., C₆H₁₂O₆).</li>
+        <li>To find empirical formula: divide % by Ar, then find simplest ratio.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 5: CHEMICAL ENERGETICS
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🔥</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 05</span>
+      <h2 class="chapter-title">Chemical Energetics</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Exothermic vs Endothermic</p>
+      <table class="data-table">
+        <thead><tr><th>Feature</th><th>Exothermic 🔥</th><th>Endothermic ❄️</th></tr></thead>
+        <tbody>
+          <tr><td>Heat transfer</td><td>Released to surroundings</td><td>Absorbed from surroundings</td></tr>
+          <tr><td>Temperature</td><td>Surroundings temperature rises</td><td>Surroundings temperature falls</td></tr>
+          <tr><td>Enthalpy ΔH</td><td>Negative (−ve)</td><td>Positive (+ve)</td></tr>
+          <tr><td>Energy content</td><td>Products have less energy</td><td>Products have more energy</td></tr>
+          <tr><td>Examples</td><td>Combustion, neutralisation, respiration</td><td>Thermal decomposition, photosynthesis</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="keybox warning">
+      <p class="keybox-label">Bond Energy Calculations</p>
+      <ul>
+        <li>Energy <strong>input</strong> = breaking bonds (endothermic)</li>
+        <li>Energy <strong>output</strong> = forming bonds (exothermic)</li>
+        <li>ΔH = Energy to break bonds − Energy released forming bonds</li>
+        <li>If ΔH is negative → exothermic reaction overall.</li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="section-title">Activation Energy (Ea)</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Activation Energy</span><span class="def-desc">Minimum energy particles need to collide successfully and start a reaction. Shown as the "hump" on an energy level diagram.</span></div>
+        <div class="def-item"><span class="def-term">Catalyst</span><span class="def-desc">Lowers activation energy by providing an alternative reaction pathway. Not consumed in the reaction.</span></div>
+      </div>
+    </div>
+
+    <div class="keybox success">
+      <p class="keybox-label">Heating Curves</p>
+      <ul>
+        <li>During a change of state, <strong>temperature remains constant</strong>.</li>
+        <li>Heat energy is used to break attractive bonds, not increase kinetic energy.</li>
+        <li>Flat sections on graph = melting point or boiling point.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 6: ELECTROCHEMISTRY
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🔋</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 06</span>
+      <h2 class="chapter-title">Electrochemistry</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Key Definitions</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Electrolysis</span><span class="def-desc">Breakdown of an ionic compound (molten or in solution) by passage of electricity.</span></div>
+        <div class="def-item"><span class="def-term">Electrolyte</span><span class="def-desc">Compound that conducts electricity when molten or dissolved (free-moving ions).</span></div>
+        <div class="def-item"><span class="def-term">Electrode</span><span class="def-desc">Rod (usually graphite or platinum) that carries current into the liquid.</span></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="mnemonic">
+        <div class="mnemonic-word">PANIC</div>
+        <div class="mnemonic-desc"><strong>P</strong>ositive <strong>A</strong>node <strong>N</strong>egative <strong>I</strong>s <strong>C</strong>athode</div>
+      </div>
+      <div class="keybox">
+        <p class="keybox-label">Electron Flow</p>
+        <ul>
+          <li><strong>Anode (+):</strong> Anions (−) attracted. Lose electrons → Oxidation.</li>
+          <li><strong>Cathode (−):</strong> Cations (+) attracted. Gain electrons → Reduction.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Electrolysis of Aqueous Solutions</p>
+      <table class="data-table">
+        <thead><tr><th>Electrolyte</th><th>At Cathode (−)</th><th>At Anode (+)</th></tr></thead>
+        <tbody>
+          <tr><td>Dilute H₂SO₄ / NaOH</td><td>Hydrogen (H₂)</td><td>Oxygen (O₂)</td></tr>
+          <tr><td>Dilute NaCl (aq)</td><td>Hydrogen (H₂)</td><td>Oxygen (O₂)</td></tr>
+          <tr><td>Concentrated NaCl (aq)</td><td>Hydrogen (H₂)</td><td>Chlorine (Cl₂)</td></tr>
+          <tr><td>CuSO₄ (aq)</td><td>Copper (Cu)</td><td>Oxygen (O₂)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="keybox warning">
+      <p class="keybox-label">Discharge Priority at Cathode</p>
+      <ul>
+        <li>Metal ions discharged in preference to H⁺ if the metal is <strong>below hydrogen</strong> in the reactivity series.</li>
+        <li>At anode: Cl⁻ or Br⁻ discharged in preference to OH⁻ only in concentrated solution.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 7: RATES OF REACTION
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">⏱️</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 07</span>
+      <h2 class="chapter-title">Rates of Reaction</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="keybox highlight">
+      <p class="keybox-label">Collision Theory — Successful Collision Conditions</p>
+      <ul>
+        <li><strong>Correct orientation:</strong> Particles must collide at the right angle.</li>
+        <li><strong>Activation Energy:</strong> Particles must have energy ≥ Ea to break existing bonds.</li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="section-title">Factors Affecting Rate</p>
+      <table class="data-table">
+        <thead><tr><th>Factor</th><th>Effect on Rate</th><th>Explanation (Collision Theory)</th></tr></thead>
+        <tbody>
+          <tr><td>Concentration (aq)</td><td>Increases</td><td>More particles per unit volume → more frequent collisions.</td></tr>
+          <tr><td>Pressure (gases)</td><td>Increases</td><td>Particles squeezed closer together → more frequent collisions.</td></tr>
+          <tr><td>Surface Area (solids)</td><td>Increases</td><td>More particles exposed on surface. Powder > Lumps.</td></tr>
+          <tr><td>Temperature</td><td>Increases significantly</td><td>Particles have more KE, move faster, AND more particles have energy ≥ Ea.</td></tr>
+          <tr><td>Catalyst</td><td>Increases</td><td>Lowers Ea → greater proportion of particles have sufficient energy.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="keybox warning">
+      <p class="keybox-label">Measuring Rate of Reaction</p>
+      <ul>
+        <li>Gas collected: measure volume vs time</li>
+        <li>Precipitate formed: time for cross to disappear (turbidity)</li>
+        <li>Mass change: measure mass lost on balance (gas escaping)</li>
+        <li>Colour change: colorimetry</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 8: EQUILIBRIUM
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">⚖️</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 08</span>
+      <h2 class="chapter-title">Reversible Reactions & Equilibrium</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Dynamic Equilibrium</p>
+      <div class="keybox success">
+        <p class="keybox-label">Key Characteristics</p>
+        <ul>
+          <li>Occurs in a <strong>closed system</strong>.</li>
+          <li>Forward and reverse reactions occur simultaneously.</li>
+          <li>Rates of forward and reverse reactions are <strong>equal</strong>.</li>
+          <li>Concentrations of reactants and products remain <strong>constant</strong> (not necessarily equal).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Le Chatelier's Principle</p>
+      <div class="keybox highlight">
+        <p class="keybox-label">The Principle</p>
+        <ul>
+          <li>If a change is made to a system at equilibrium, the system shifts to <strong>oppose</strong> that change.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <table class="data-table">
+        <thead><tr><th>Change</th><th>Shift Direction</th></tr></thead>
+        <tbody>
+          <tr><td>Increase concentration of reactant</td><td>→ Forward (more products)</td></tr>
+          <tr><td>Increase concentration of product</td><td>← Backward (more reactants)</td></tr>
+          <tr><td>Increase pressure</td><td>→ Side with fewer moles of gas</td></tr>
+          <tr><td>Decrease pressure</td><td>→ Side with more moles of gas</td></tr>
+          <tr><td>Increase temperature</td><td>→ Endothermic direction</td></tr>
+          <tr><td>Decrease temperature</td><td>→ Exothermic direction</td></tr>
+          <tr><td>Add catalyst</td><td>No shift; reaches equilibrium faster</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">Haber Process (N₂ + 3H₂ ⇌ 2NH₃)</p>
+      <div class="keybox">
+        <p class="keybox-label">Industrial Conditions & Reasons</p>
+        <ul>
+          <li><strong>Temperature: ~450°C</strong> — Compromise. Low T gives more yield (exothermic) but too slow. 450°C balances yield and rate.</li>
+          <li><strong>Pressure: ~200 atm</strong> — High pressure favours products (4 moles gas → 2 moles). Higher pressure = more cost.</li>
+          <li><strong>Catalyst: Iron</strong> — Lowers Ea, increases rate without shifting equilibrium.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Tests for Water Presence</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Cobalt(II) Chloride</span><span class="def-desc">Blue (anhydrous) → Pink (hydrated) — presence of water</span></div>
+        <div class="def-item"><span class="def-term">Copper(II) Sulfate</span><span class="def-desc">White (anhydrous) → Blue (hydrated) — presence of water</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 9: REDOX
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">⚡</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 09</span>
+      <h2 class="chapter-title">Redox Reactions</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="mnemonic">
+      <div class="mnemonic-word">OIL RIG</div>
+      <div class="mnemonic-desc"><strong>O</strong>xidation <strong>I</strong>s <strong>L</strong>oss (of electrons) &nbsp;|&nbsp; <strong>R</strong>eduction <strong>I</strong>s <strong>G</strong>ain (of electrons)</div>
+    </div>
+
+    <div>
+      <p class="section-title">Three Ways to Define Redox</p>
+      <table class="data-table">
+        <thead><tr><th>Definition</th><th>Oxidation</th><th>Reduction</th></tr></thead>
+        <tbody>
+          <tr><td>1. Oxygen</td><td>Gain of oxygen</td><td>Loss of oxygen</td></tr>
+          <tr><td>2. Electrons (most important)</td><td>Loss of electrons</td><td>Gain of electrons</td></tr>
+          <tr><td>3. Oxidation Number</td><td>Increase in number</td><td>Decrease in number</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two-col">
+      <div class="keybox success">
+        <p class="keybox-label">Oxidising Agent</p>
+        <ul>
+          <li>Causes oxidation of another substance</li>
+          <li>Is itself <strong>reduced</strong> (gains electrons)</li>
+          <li>Examples: O₂, Cl₂, H₂O₂, KMnO₄</li>
+        </ul>
+      </div>
+      <div class="keybox">
+        <p class="keybox-label">Reducing Agent</p>
+        <ul>
+          <li>Causes reduction of another substance</li>
+          <li>Is itself <strong>oxidised</strong> (loses electrons)</li>
+          <li>Examples: H₂, C, CO, metals</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Oxidation Number Rules</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Free element</span><span class="def-desc">Always 0 (e.g., O₂, Fe, Na)</span></div>
+        <div class="def-item"><span class="def-term">Monatomic ion</span><span class="def-desc">Equals the ion's charge (e.g., Na⁺ = +1)</span></div>
+        <div class="def-item"><span class="def-term">Oxygen</span><span class="def-desc">Usually −2 (except in peroxides: −1; F₂O: +2)</span></div>
+        <div class="def-item"><span class="def-term">Hydrogen</span><span class="def-desc">Usually +1 (except metal hydrides: −1)</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 10: ACIDS AND BASES
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🧪</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 10</span>
+      <h2 class="chapter-title">Acids and Bases</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Precise Definitions</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Acid</span><span class="def-desc">Proton <strong>donor</strong>. Dissolves in water to produce H⁺ ions. HCl(aq) → H⁺(aq) + Cl⁻(aq)</span></div>
+        <div class="def-item"><span class="def-term">Base</span><span class="def-desc">Proton <strong>acceptor</strong>. Usually a metal oxide or metal hydroxide.</span></div>
+        <div class="def-item"><span class="def-term">Alkali</span><span class="def-desc">A <strong>soluble</strong> base. Produces OH⁻ ions in water. NaOH(aq) → Na⁺(aq) + OH⁻(aq)</span></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Strong vs Weak Acids</p>
+      <div class="two-col">
+        <div class="keybox info">
+          <p class="keybox-label">Strong Acid</p>
+          <ul>
+            <li>Completely ionises in water</li>
+            <li>Examples: HCl, H₂SO₄, HNO₃</li>
+            <li>Lower pH for same concentration</li>
+          </ul>
+        </div>
+        <div class="keybox success">
+          <p class="keybox-label">Weak Acid</p>
+          <ul>
+            <li>Partially ionises in water (equilibrium)</li>
+            <li>Examples: CH₃COOH (ethanoic acid), H₂CO₃</li>
+            <li>Higher pH for same concentration</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">MASH Reactions (Acids + ...)</p>
+      <div class="eq-list">
+        <div class="eq"><span class="label">Metal</span>Metal + Acid → Salt + Hydrogen</div>
+        <div class="eq"><span class="label">Metal Oxide</span>Metal Oxide + Acid → Salt + Water</div>
+        <div class="eq"><span class="label">Metal Hydroxide</span>Metal Hydroxide + Acid → Salt + Water</div>
+        <div class="eq"><span class="label">Carbonate</span>Metal Carbonate + Acid → Salt + Water + CO₂</div>
+        <div class="eq"><span class="label">Ammonia</span>Ammonia + Acid → Ammonium Salt</div>
+      </div>
+    </div>
+
+    <div class="keybox warning">
+      <p class="keybox-label">The pH Scale</p>
+      <ul>
+        <li>pH 1–6: Acid (lower = stronger)</li>
+        <li>pH 7: Neutral</li>
+        <li>pH 8–14: Alkali (higher = stronger)</li>
+        <li>Universal indicator: Red (acid) → Green (neutral) → Purple (alkali)</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 11: SALT PREPARATION
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🧂</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 11</span>
+      <h2 class="chapter-title">Preparation of Salts</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Solubility Rules — Must Memorise!</p>
+      <table class="data-table">
+        <thead><tr><th>Type of Salt</th><th>Solubility Rule</th><th>Exceptions (Insoluble)</th></tr></thead>
+        <tbody>
+          <tr><td>Nitrates</td><td style="color:#047857">ALL Soluble</td><td>None</td></tr>
+          <tr><td>Chlorides</td><td style="color:#047857">Most Soluble</td><td style="color:#dc2626">AgCl, PbCl₂</td></tr>
+          <tr><td>Sulfates</td><td style="color:#047857">Most Soluble</td><td style="color:#dc2626">BaSO₄, CaSO₄, PbSO₄</td></tr>
+          <tr><td>Carbonates</td><td style="color:#dc2626">Most Insoluble</td><td style="color:#047857">Sodium, Potassium, Ammonium</td></tr>
+          <tr><td>Hydroxides</td><td style="color:#dc2626">Most Insoluble</td><td style="color:#047857">NaOH, KOH, NH₄OH, Ca(OH)₂ (partial)</td></tr>
+          <tr><td>Group 1 + NH₄⁺ salts</td><td style="color:#047857">ALL Soluble</td><td>None</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">Decision Process</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Is the salt <strong>soluble or insoluble</strong>? (Check solubility rules above)</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">If <strong>insoluble</strong> → Use <strong>Method C: Precipitation</strong> (mix two aqueous solutions)</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">If <strong>soluble</strong> → Is the metal/base Group 1 (Na, K) or NH₄⁺?</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text">If <strong>Yes</strong> (soluble base) → Use <strong>Method B: Titration</strong></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text">If <strong>No</strong> (insoluble base/metal/carbonate) → Use <strong>Method A: Excess Solid Method</strong></div></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Methods Summary</p>
+      <div class="keybox success">
+        <p class="keybox-label">Method A — Excess Solid</p>
+        <ul>
+          <li>Add excess insoluble solid (metal, oxide, carbonate, hydroxide) to acid.</li>
+          <li>Filter to remove excess solid. Evaporate solution to crystallise salt.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="keybox">
+        <p class="keybox-label">Method B — Titration (for Na, K, NH₄ salts)</p>
+        <ul>
+          <li>Titrate alkali with acid using indicator to find exact volumes.</li>
+          <li>Repeat with exact volumes, no indicator. Evaporate to crystallise.</li>
+        </ul>
+      </div>
+      <div class="keybox highlight">
+        <p class="keybox-label">Method C — Precipitation</p>
+        <ul>
+          <li>Mix two aqueous solutions whose ions form an insoluble salt.</li>
+          <li>Filter, wash with distilled water, dry the precipitate.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 12: PERIODIC TABLE
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">📊</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 12</span>
+      <h2 class="chapter-title">The Periodic Table</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Structure of the Table</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Groups (vertical)</span><span class="def-desc">Same number of outer shell electrons → similar chemical properties.</span></div>
+        <div class="def-item"><span class="def-term">Periods (horizontal)</span><span class="def-desc">Same number of electron shells. Character changes from metallic → non-metallic left to right.</span></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Group I — Alkali Metals (Li, Na, K)</p>
+      <table class="data-table">
+        <thead><tr><th>Property</th><th>Trend Going Down (Li → K)</th></tr></thead>
+        <tbody>
+          <tr><td>Melting Point</td><td>Decreases (Li highest)</td></tr>
+          <tr><td>Density</td><td>Increases (Li lightest)</td></tr>
+          <tr><td>Reactivity</td><td>Increases (K most reactive)</td></tr>
+        </tbody>
+      </table>
+      <div class="eq-list" style="margin-top:1rem">
+        <div class="eq"><span class="label">+Water</span>2M(s) + 2H₂O(l) → 2MOH(aq) + H₂(g)</div>
+        <div class="eq"><span class="label">+Oxygen</span>4M(s) + O₂(g) → 2M₂O(s)</div>
+        <div class="eq"><span class="label">+Chlorine</span>2M(s) + Cl₂(g) → 2MCl(s)</div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Group VII — Halogens (F, Cl, Br, I)</p>
+      <table class="data-table">
+        <thead><tr><th>Property</th><th>Trend Going Down (F → I)</th></tr></thead>
+        <tbody>
+          <tr><td>Melting/Boiling Point</td><td>Increases</td></tr>
+          <tr><td>Reactivity</td><td>Decreases (F most reactive)</td></tr>
+          <tr><td>Colour</td><td>Becomes darker (F: pale yellow → I: grey/black)</td></tr>
+        </tbody>
+      </table>
+      <div class="keybox info" style="margin-top:1rem">
+        <p class="keybox-label">Displacement Reactions</p>
+        <ul>
+          <li>A more reactive halogen displaces a less reactive halogen from its salt solution.</li>
+          <li>Cl₂(aq) + 2KBr(aq) → 2KCl(aq) + Br₂(aq) ✓</li>
+          <li>I₂(aq) + 2KCl(aq) → No reaction ✗ (Iodine less reactive than Cl)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Transition Elements</p>
+      <div class="keybox">
+        <p class="keybox-label">Properties</p>
+        <ul>
+          <li>Located between Groups II and III (d-block).</li>
+          <li>Form coloured compounds (e.g., Cu²⁺ = blue, Fe³⁺ = orange/brown).</li>
+          <li>Variable oxidation states (e.g., Fe²⁺ and Fe³⁺).</li>
+          <li>Good catalysts (e.g., Fe in Haber process, V₂O₅ in Contact process).</li>
+          <li>High density, high melting points compared to Group I.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 13: METALS & ALLOYS
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🏗️</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 13</span>
+      <h2 class="chapter-title">Metallic Elements & Alloys</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Properties of Metals</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Conductivity</span><span class="def-desc">Conduct heat and electricity due to a "sea" of delocalised electrons that are free to move.</span></div>
+        <div class="def-item"><span class="def-term">Malleability</span><span class="def-desc">Can be hammered into shape. Layers of positive ions slide over each other without breaking the metallic bond.</span></div>
+        <div class="def-item"><span class="def-term">Ductility</span><span class="def-desc">Can be drawn into wires for same reason as malleability.</span></div>
+        <div class="def-item"><span class="def-term">Structure</span><span class="def-desc">Regular lattice of positive ions in a sea of delocalised electrons.</span></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Alloys</p>
+      <div class="keybox success">
+        <p class="keybox-label">Why are alloys harder than pure metals?</p>
+        <ul>
+          <li>Atoms of different sizes are introduced into the lattice.</li>
+          <li>These disrupt the regular arrangement of layers.</li>
+          <li>The layers can no longer slide easily → harder and stronger.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <table class="data-table">
+        <thead><tr><th>Alloy</th><th>Composition</th><th>Uses</th></tr></thead>
+        <tbody>
+          <tr><td>Brass</td><td>Copper + Zinc</td><td>Musical instruments, pins</td></tr>
+          <tr><td>Stainless Steel</td><td>Iron + Chromium + Nickel</td><td>Cutlery, surgical instruments (does not rust)</td></tr>
+          <tr><td>Bronze</td><td>Copper + Tin</td><td>Statues, medals</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 14: REACTIVITY OF METALS
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">💥</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 14</span>
+      <h2 class="chapter-title">Reactivity of Metals</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">The Reactivity Series</p>
+      <table class="data-table">
+        <thead><tr><th>Metal (↓ Decreasing Reactivity)</th><th>Symbol</th><th>Reaction with Water</th><th>Reaction with Dilute Acid</th></tr></thead>
+        <tbody>
+          <tr><td>Potassium</td><td>K</td><td>Violent, lilac flame</td><td>Explosive</td></tr>
+          <tr><td>Sodium</td><td>Na</td><td>Very rapid, fizzes</td><td>Explosive</td></tr>
+          <tr><td>Calcium</td><td>Ca</td><td>Steady, grey granules</td><td>Violent</td></tr>
+          <tr><td>Magnesium</td><td>Mg</td><td>Very slow (hot water) / fast (steam)</td><td>Rapid fizzing</td></tr>
+          <tr><td>Aluminium</td><td>Al</td><td>No reaction (oxide layer)</td><td>Slow until oxide removed</td></tr>
+          <tr><td>Zinc</td><td>Zn</td><td>Reacts only with steam</td><td>Steady fizzing</td></tr>
+          <tr><td>Iron</td><td>Fe</td><td>Reacts with steam (reversible)</td><td>Slow fizzing</td></tr>
+          <tr><td>Lead</td><td>Pb</td><td>No reaction</td><td>Very slow</td></tr>
+          <tr><td>Copper</td><td>Cu</td><td>No reaction</td><td>No reaction</td></tr>
+          <tr><td>Silver / Gold</td><td>Ag/Au</td><td>No reaction</td><td>No reaction</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="keybox warning">
+      <p class="keybox-label">Position of Carbon & Hydrogen</p>
+      <ul>
+        <li><strong>Carbon</strong> is placed between Aluminium and Zinc. Metals below Carbon (Zn, Fe, Pb, Cu) can be extracted by reduction with Carbon.</li>
+        <li><strong>Hydrogen</strong> is placed between Lead and Copper. Metals above H react with dilute acid to produce H₂. Metals below H (Cu, Ag, Au) do not.</li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="section-title">Displacement Reactions</p>
+      <div class="keybox highlight">
+        <p class="keybox-label">Rule</p>
+        <ul>
+          <li>A more reactive metal displaces a less reactive metal from its solution.</li>
+          <li>Fe(s) + CuSO₄(aq) → FeSO₄(aq) + Cu(s) ✓ (Iron is more reactive than Copper)</li>
+          <li>Cu(s) + ZnSO₄(aq) → No reaction ✗ (Copper less reactive than Zinc)</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 15: EXTRACTION & CORROSION
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">⛏️</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 15</span>
+      <h2 class="chapter-title">Extraction & Corrosion of Metals</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Principles of Extraction</p>
+      <table class="data-table">
+        <thead><tr><th>Metals</th><th>Ore Example</th><th>Method of Extraction</th></tr></thead>
+        <tbody>
+          <tr><td>K, Na, Ca, Mg, Al</td><td>Bauxite (Al)</td><td>Electrolysis of molten ore (expensive)</td></tr>
+          <tr><td colspan="3" style="text-align:center; color:var(--gray-400);">— — — CARBON — — —</td></tr>
+          <tr><td>Zn, Fe, Pb</td><td>Hematite (Fe), Blende (Zn)</td><td>Reduction by Carbon/Coke in a furnace</td></tr>
+          <tr><td>Cu, Ag, Au</td><td>Found native</td><td>Found uncombined (digging/panning)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">Extraction of Iron — Blast Furnace</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Combustion:</strong> C(s) + O₂(g) → CO₂(g) + Heat</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Reducing agent formed:</strong> CO₂(g) + C(s) → 2CO(g)</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Reduction of iron ore:</strong> Fe₂O₃(s) + 3CO(g) → 2Fe(l) + 3CO₂(g)</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Removal of impurities:</strong> Limestone (CaCO₃) → CaO + CO₂, then CaO + SiO₂ → CaSiO₃ (slag)</div></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Rusting & Corrosion Prevention</p>
+      <div class="keybox warning">
+        <p class="keybox-label">Conditions for Rusting</p>
+        <ul>
+          <li>Both <strong>oxygen AND water</strong> must be present. Neither alone causes rusting.</li>
+          <li>Equation: 4Fe + 3O₂ + 6H₂O → 2Fe₂O₃·3H₂O (hydrated iron oxide = rust)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <table class="data-table">
+        <thead><tr><th>Prevention Method</th><th>How it works</th></tr></thead>
+        <tbody>
+          <tr><td>Painting / Coating</td><td>Physical barrier — keeps out O₂ and H₂O</td></tr>
+          <tr><td>Galvanising (Zinc coat)</td><td>Zinc sacrifices itself (more reactive). Barrier + sacrificial protection.</td></tr>
+          <tr><td>Sacrificial Protection</td><td>More reactive metal (Mg or Zn) attached — corrodes instead of iron.</td></tr>
+          <tr><td>Stainless Steel</td><td>Alloying with Cr and Ni — inherently corrosion-resistant.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 16: INTRO TO ORGANIC
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🌿</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 16</span>
+      <h2 class="chapter-title">Introduction to Organic Chemistry</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="two-col">
+      <div class="keybox success">
+        <p class="keybox-label">Prefixes — Memorise!</p>
+        <ul>
+          <li><strong>Meth-</strong> = 1 Carbon</li>
+          <li><strong>Eth-</strong> = 2 Carbons</li>
+          <li><strong>Prop-</strong> = 3 Carbons</li>
+          <li><strong>But-</strong> = 4 Carbons</li>
+        </ul>
+      </div>
+      <div class="mnemonic">
+        <div class="mnemonic-word">M E P B</div>
+        <div class="mnemonic-desc"><strong>M</strong>onkeys <strong>E</strong>at <strong>P</strong>eeled <strong>B</strong>ananas</div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Homologous Series — Suffixes</p>
+      <table class="data-table">
+        <thead><tr><th>Series</th><th>Suffix</th><th>Functional Group</th><th>General Formula</th></tr></thead>
+        <tbody>
+          <tr><td>Alkanes</td><td>-ane</td><td>C–C single bond only</td><td>CₙH₂ₙ₊₂</td></tr>
+          <tr><td>Alkenes</td><td>-ene</td><td>C=C double bond</td><td>CₙH₂ₙ</td></tr>
+          <tr><td>Alcohols</td><td>-ol</td><td>–OH group</td><td>CₙH₂ₙ₊₁OH</td></tr>
+          <tr><td>Carboxylic Acids</td><td>-oic acid</td><td>–COOH group</td><td>CₙH₂ₙ₊₁COOH</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">Key Definitions</p>
+      <div class="def-list">
+        <div class="def-item"><span class="def-term">Saturated</span><span class="def-desc">Only C–C single bonds (alkanes). Cannot undergo addition reactions.</span></div>
+        <div class="def-item"><span class="def-term">Unsaturated</span><span class="def-desc">Contains at least one C=C double bond (alkenes). Can undergo addition reactions.</span></div>
+        <div class="def-item"><span class="def-term">Isomers</span><span class="def-desc">Compounds with the same molecular formula but different structural arrangements.</span></div>
+        <div class="def-item"><span class="def-term">Test for alkene</span><span class="def-desc">Add bromine water → decolourises (orange to colourless) if C=C present.</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 17: ORGANIC REACTIONS
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🔬</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 17</span>
+      <h2 class="chapter-title">Reactions of Organic Compounds</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Alkane Reactions</p>
+      <div class="keybox success">
+        <p class="keybox-label">Combustion (main reaction)</p>
+        <ul>
+          <li><strong>Complete combustion:</strong> CH₄ + 2O₂ → CO₂ + 2H₂O (excess O₂)</li>
+          <li><strong>Incomplete combustion:</strong> Produces CO (toxic) and/or C (soot) when O₂ is limited.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="keybox">
+      <p class="keybox-label">Substitution with Halogens (UV light required)</p>
+      <ul>
+        <li>CH₄ + Cl₂ → CH₃Cl + HCl (UV light initiates reaction)</li>
+        <li>Called free radical substitution. H atoms replaced by halogen atoms.</li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="section-title">Alkene Reactions</p>
+      <table class="data-table">
+        <thead><tr><th>Reaction</th><th>Reagent/Condition</th><th>Product</th></tr></thead>
+        <tbody>
+          <tr><td>Addition with H₂</td><td>Ni catalyst, heat (hydrogenation)</td><td>Alkane</td></tr>
+          <tr><td>Addition with Br₂</td><td>Bromine water (room temp)</td><td>Dibromoalkane (decolourises)</td></tr>
+          <tr><td>Addition with H₂O</td><td>Steam, H₃PO₄ catalyst, high temp</td><td>Alcohol (hydration)</td></tr>
+          <tr><td>Addition with HCl/HBr</td><td>Room temperature</td><td>Halogenoalkane</td></tr>
+          <tr><td>Polymerisation</td><td>High pressure, catalyst</td><td>Addition polymer</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">Alcohol Reactions</p>
+      <div class="keybox info">
+        <p class="keybox-label">Key Reactions of Alcohols</p>
+        <ul>
+          <li><strong>Combustion:</strong> C₂H₅OH + 3O₂ → 2CO₂ + 3H₂O (clean burning fuel)</li>
+          <li><strong>Oxidation → Carboxylic Acid:</strong> C₂H₅OH + [O] → CH₃COOH + H₂O (using acidified KMnO₄)</li>
+          <li><strong>Dehydration → Alkene:</strong> C₂H₅OH → CH₂=CH₂ + H₂O (Al₂O₃ catalyst, heat)</li>
+          <li><strong>Esterification:</strong> Alcohol + Carboxylic Acid → Ester + Water (H₂SO₄ catalyst, heat)</li>
+          <li><strong>Fermentation:</strong> C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ (yeast, 37°C, anaerobic)</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 18: PETROCHEMICALS
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🛢️</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 18</span>
+      <h2 class="chapter-title">Petrochemicals & Polymers</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">Crude Oil & Fractional Distillation</p>
+      <div class="keybox warning">
+        <p class="keybox-label">How It Works</p>
+        <ul>
+          <li>Crude oil heated and vaporised. Vapours rise up fractionating column.</li>
+          <li>As they rise, they cool down. Each fraction condenses at a different level.</li>
+          <li>Shorter chains → lower boiling point → condense at top.</li>
+          <li>Longer chains → higher boiling point → condense at bottom.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <table class="data-table">
+        <thead><tr><th>Fraction</th><th>Carbon Chain</th><th>Boiling Point</th><th>Main Use</th></tr></thead>
+        <tbody>
+          <tr><td>Refinery Gas</td><td>C₁–C₄</td><td>Below 25°C</td><td>Fuel (LPG)</td></tr>
+          <tr><td>Gasoline (Petrol)</td><td>C₅–C₁₀</td><td>25–60°C</td><td>Car engines</td></tr>
+          <tr><td>Naphtha</td><td>C₇–C₁₂</td><td>60–180°C</td><td>Feedstock for chemicals</td></tr>
+          <tr><td>Kerosene</td><td>C₁₁–C₁₆</td><td>150–250°C</td><td>Jet fuel, heating</td></tr>
+          <tr><td>Diesel</td><td>C₁₅–C₂₅</td><td>220–350°C</td><td>Diesel engines</td></tr>
+          <tr><td>Fuel Oil</td><td>C₂₀–C₇₀</td><td>350–400°C</td><td>Ships, power stations</td></tr>
+          <tr><td>Bitumen</td><td>C₇₀+</td><td>Above 400°C</td><td>Road surfacing, roofing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">Cracking</p>
+      <div class="keybox">
+        <p class="keybox-label">Why Crack?</p>
+        <ul>
+          <li>Long-chain alkanes are in low demand; short-chain alkenes are in high demand.</li>
+          <li><strong>Thermal cracking:</strong> Very high temperature and pressure. Produces alkanes and alkenes.</li>
+          <li><strong>Catalytic cracking:</strong> High temperature, zeolite catalyst. More efficient. Produces branched alkanes + alkenes.</li>
+          <li>Example: C₁₀H₂₂ → C₅H₁₂ + C₅H₁₀</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Polymers</p>
+      <div class="two-col">
+        <div class="keybox success">
+          <p class="keybox-label">Addition Polymerisation</p>
+          <ul>
+            <li>Alkene monomers join together; C=C opens up.</li>
+            <li>No other product formed.</li>
+            <li>e.g., ethene → poly(ethene) [polythene]</li>
+            <li>e.g., chloroethene → PVC</li>
+            <li>e.g., styrene → polystyrene</li>
+          </ul>
+        </div>
+        <div class="keybox highlight">
+          <p class="keybox-label">Condensation Polymerisation</p>
+          <ul>
+            <li>Two different monomers with two different functional groups.</li>
+            <li>Small molecule (usually H₂O) released each time.</li>
+            <li>e.g., Nylon (diamine + dicarboxylic acid)</li>
+            <li>e.g., Polyester (diol + dicarboxylic acid)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-break">— page break —</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHAPTER 19: ENVIRONMENT
+═══════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🌍</div>
+    <div class="chapter-meta">
+      <span class="chapter-number">Chapter 19</span>
+      <h2 class="chapter-title">Chemistry of Our Environment</h2>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div>
+      <p class="section-title">The Atmosphere</p>
+      <div class="keybox success">
+        <p class="keybox-label">Composition (Mnemonic: 78-21-1 "Neon Lights Are Off")</p>
+        <ul>
+          <li><strong>~78%</strong> Nitrogen (N₂)</li>
+          <li><strong>~21%</strong> Oxygen (O₂)</li>
+          <li><strong>~1%</strong> Argon (Ar)</li>
+          <li><strong>~0.04%</strong> Carbon Dioxide (CO₂)</li>
+          <li>Variable: Water vapour + traces</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Air Pollution & Pollutant Gases</p>
+      <table class="data-table">
+        <thead><tr><th>Pollutant</th><th>Source</th><th>Environmental Effect</th></tr></thead>
+        <tbody>
+          <tr><td>Carbon Monoxide (CO)</td><td>Incomplete combustion of carbon fuels</td><td>Toxic — binds to haemoglobin, reduces O₂ transport</td></tr>
+          <tr><td>Sulfur Dioxide (SO₂)</td><td>Burning sulfur-containing fuels (coal, oil)</td><td>Acid rain → damages buildings, kills trees, acidifies lakes</td></tr>
+          <tr><td>Oxides of Nitrogen (NOₓ)</td><td>High temp in car engines (N₂ + O₂)</td><td>Acid rain; photochemical smog</td></tr>
+          <tr><td>Carbon Dioxide (CO₂)</td><td>Combustion of all carbon fuels</td><td>Enhanced greenhouse effect → global warming</td></tr>
+          <tr><td>Methane (CH₄)</td><td>Livestock, landfill, wetlands</td><td>Potent greenhouse gas</td></tr>
+          <tr><td>CFCs</td><td>Old aerosols, fridges</td><td>Ozone layer depletion</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <p class="section-title">The Greenhouse Effect</p>
+      <div class="keybox info">
+        <p class="keybox-label">How It Works</p>
+        <ul>
+          <li>Sun's radiation passes through atmosphere and warms Earth's surface.</li>
+          <li>Earth re-emits heat (infrared radiation).</li>
+          <li>Greenhouse gases (CO₂, CH₄, H₂O) absorb and re-emit this heat → atmosphere warms.</li>
+          <li><strong>Enhanced</strong> greenhouse effect: human activities increase CO₂ and CH₄ → excess warming.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Water Treatment</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Sedimentation:</strong> Large particles settle by gravity.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Filtration:</strong> Water passed through fine sand/gravel beds to remove smaller particles.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Chlorination:</strong> Chlorine added to kill bacteria and microorganisms.</div></div>
+      </div>
+    </div>
+
+    <div class="keybox warning">
+      <p class="keybox-label">Acid Rain</p>
+      <ul>
+        <li>SO₂ + H₂O → H₂SO₃ (sulfurous acid)</li>
+        <li>2SO₂ + O₂ + 2H₂O → 2H₂SO₄ (sulfuric acid)</li>
+        <li>Effects: Corrodes limestone buildings, kills fish in lakes, damages forests.</li>
+        <li>Solution: Remove sulfur before burning; use catalytic converters; use lime to neutralise lakes.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end book-content -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+     BACK COVER
+═══════════════════════════════════════════════════════════════ -->
+<div class="cover-back">
+  <blockquote class="back-quote">
+    Study with intention.<br>Master the concepts.<br>Ace your exam.
+  </blockquote>
+
+  <div class="back-stats">
+    <div class="back-stat">
+      <div class="back-stat-num">19</div>
+      <div class="back-stat-label">Chapters</div>
+    </div>
+    <div class="back-stat">
+      <div class="back-stat-num">100+</div>
+      <div class="back-stat-label">Key Facts</div>
+    </div>
+    <div class="back-stat">
+      <div class="back-stat-num">30+</div>
+      <div class="back-stat-label">Equations</div>
+    </div>
+  </div>
+
+  <div class="back-divider"></div>
+
+  <p class="back-tagline">The complete Cambridge IGCSE Chemistry revision guide.<br>Syllabus 0620 — All topics covered.</p>
+
+  <div class="back-logo">Clairo ✦ Chemistry</div>
+</div>
+
+</body>
+</html>

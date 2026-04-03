@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Chemical Structures</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        :root {
+            --atom-c-fill: #2d3436; /* Dark Carbon */
+            --atom-c-text: #ffffff;
+            
+            --atom-h-fill: #f5f6fa; /* White Hydrogen */
+            --atom-h-text: #2d3436;
+            
+            --atom-o-fill: #e74c3c; /* Red Oxygen */
+            --atom-o-text: #ffffff;
+            
+            --bond-color: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column; /* Stack cards and button vertically */
+            justify-content: center;
+            align-items: center;
+            /* Deep Ocean Animated Background */
+            background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e3c72);
+            background-size: 400% 400%;
+            animation: oceanFlow 15s ease infinite;
+            color: white;
+            padding-bottom: 50px; /* Space for the button */
+        }
+
+        @keyframes oceanFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 90%;
+            max-width: 1400px;
+            padding: 40px 0;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        h2 {
+            margin: 0 0 20px 0;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.4rem;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Molecule Viz Area */
+        .molecule-viz {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+        }
+
+        svg {
+            overflow: visible;
+            width: 100%;
+            height: 100%;
+            max-width: 280px;
+        }
+
+        /* SVG Elements */
+        .bond {
+            stroke: var(--bond-color);
+            stroke-width: 4;
+            stroke-linecap: round;
+        }
+
+        .atom-circle {
+            stroke: rgba(255,255,255,0.2);
+            stroke-width: 2;
+        }
+        
+        /* Text inside atoms */
+        .atom-label {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        /* Formula Table */
+        .info-panel {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+            font-weight: 400;
+        }
+
+        .value {
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        sub {
+            font-size: 0.7em;
+            vertical-align: sub;
+        }
+
+        /* ============ BUTTON STYLES ============ */
+        .btn-container {
+            margin-top: 20px;
+            z-index: 100;
+        }
+
+        .download-btn {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 18px 40px;
+            border-radius: 50px;
+            
+            /* Glass Effect for Button */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn:hover {
+            background: white;
+            color: #0f2027; /* Dark text on hover */
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .download-btn:active {
+            transform: translateY(1px);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- ================= ETHANE ================= -->
+        <div class="card">
+            <h2>Ethane</h2>
+            <div class="molecule-viz">
+                <svg viewBox="0 0 200 140">
+                    <!-- Bonds -->
+                    <line x1="70" y1="70" x2="130" y2="70" class="bond" /> <!-- C-C -->
+                    <line x1="70" y1="70" x2="70" y2="25" class="bond" /> <!-- C-H Top -->
+                    <line x1="70" y1="70" x2="70" y2="115" class="bond" /> <!-- C-H Bottom -->
+                    <line x1="70" y1="70" x2="25" y2="70" class="bond" /> <!-- C-H Left -->
+                    <line x1="130" y1="70" x2="130" y2="25" class="bond" /> <!-- C-H Top -->
+                    <line x1="130" y1="70" x2="130" y2="115" class="bond" /> <!-- C-H Bottom -->
+                    <line x1="130" y1="70" x2="175" y2="70" class="bond" /> <!-- C-H Right -->
+
+                    <!-- ATOMS -->
+                    <circle cx="70" cy="70" r="14" fill="var(--atom-c-fill)" class="atom-circle"/>
+                    <text x="70" y="70" fill="var(--atom-c-text)" class="atom-label">C</text>
+                    
+                    <circle cx="130" cy="70" r="14" fill="var(--atom-c-fill)" class="atom-circle"/>
+                    <text x="130" y="70" fill="var(--atom-c-text)" class="atom-label">C</text>
+
+                    <circle cx="70" cy="25" r="10" fill="var(--atom-h-fill)" /> <text x="70" y="25" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="70" cy="115" r="10" fill="var(--atom-h-fill)" /> <text x="70" y="115" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="25" cy="70" r="10" fill="var(--atom-h-fill)" /> <text x="25" y="70" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    
+                    <circle cx="130" cy="25" r="10" fill="var(--atom-h-fill)" /> <text x="130" y="25" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="130" cy="115" r="10" fill="var(--atom-h-fill)" /> <text x="130" y="115" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="175" cy="70" r="10" fill="var(--atom-h-fill)" /> <text x="175" y="70" fill="var(--atom-h-text)" class="atom-label">H</text>
+                </svg>
+            </div>
+            <div class="info-panel">
+                <div class="row">
+                    <span class="label">Family</span>
+                    <span class="value">Alkane</span>
+                </div>
+                <div class="row">
+                    <span class="label">General Formula</span>
+                    <span class="value">C<sub>n</sub>H<sub>2n+2</sub></span>
+                </div>
+                <div class="row">
+                    <span class="label">Molecular Formula</span>
+                    <span class="value">C<sub>2</sub>H<sub>6</sub></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ETHENE ================= -->
+        <div class="card">
+            <h2>Ethene</h2>
+            <div class="molecule-viz">
+                <svg viewBox="0 0 200 140">
+                    <!-- Double Bond (Two parallel lines) -->
+                    <line x1="80" y1="65" x2="120" y2="65" class="bond" /> 
+                    <line x1="80" y1="75" x2="120" y2="75" class="bond" /> 
+
+                    <!-- H Bonds -->
+                    <line x1="80" y1="70" x2="50" y2="30" class="bond" />
+                    <line x1="80" y1="70" x2="50" y2="110" class="bond" />
+                    <line x1="120" y1="70" x2="150" y2="30" class="bond" />
+                    <line x1="120" y1="70" x2="150" y2="110" class="bond" />
+
+                    <!-- ATOMS -->
+                    <circle cx="80" cy="70" r="14" fill="var(--atom-c-fill)" class="atom-circle"/>
+                    <text x="80" y="70" fill="var(--atom-c-text)" class="atom-label">C</text>
+
+                    <circle cx="120" cy="70" r="14" fill="var(--atom-c-fill)" class="atom-circle"/>
+                    <text x="120" y="70" fill="var(--atom-c-text)" class="atom-label">C</text>
+
+                    <circle cx="50" cy="30" r="10" fill="var(--atom-h-fill)"/> <text x="50" y="30" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="50" cy="110" r="10" fill="var(--atom-h-fill)"/> <text x="50" y="110" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="150" cy="30" r="10" fill="var(--atom-h-fill)"/> <text x="150" y="30" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="150" cy="110" r="10" fill="var(--atom-h-fill)"/> <text x="150" y="110" fill="var(--atom-h-text)" class="atom-label">H</text>
+                </svg>
+            </div>
+            <div class="info-panel">
+                <div class="row">
+                    <span class="label">Family</span>
+                    <span class="value">Alkene</span>
+                </div>
+                <div class="row">
+                    <span class="label">General Formula</span>
+                    <span class="value">C<sub>n</sub>H<sub>2n</sub></span>
+                </div>
+                <div class="row">
+                    <span class="label">Molecular Formula</span>
+                    <span class="value">C<sub>2</sub>H<sub>4</sub></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ETHANOL ================= -->
+        <div class="card">
+            <h2>Ethanol</h2>
+            <div class="molecule-viz">
+                <svg viewBox="0 0 220 140">
+                    <!-- Backbone Bonds -->
+                    <line x1="60" y1="70" x2="110" y2="70" class="bond" /> <!-- C-C -->
+                    <line x1="110" y1="70" x2="150" y2="70" class="bond" /> <!-- C-O -->
+                    <line x1="150" y1="70" x2="180" y2="45" class="bond" /> <!-- O-H -->
+
+                    <!-- H Bonds -->
+                    <line x1="60" y1="70" x2="60" y2="30" class="bond" />
+                    <line x1="60" y1="70" x2="60" y2="110" class="bond" />
+                    <line x1="60" y1="70" x2="25" y2="70" class="bond" />
+                    <line x1="110" y1="70" x2="110" y2="30" class="bond" />
+                    <line x1="110" y1="70" x2="110" y2="110" class="bond" />
+
+                    <!-- ATOMS -->
+                    <circle cx="60" cy="70" r="14" fill="var(--atom-c-fill)" class="atom-circle"/>
+                    <text x="60" y="70" fill="var(--atom-c-text)" class="atom-label">C</text>
+                    
+                    <circle cx="110" cy="70" r="14" fill="var(--atom-c-fill)" class="atom-circle"/>
+                    <text x="110" y="70" fill="var(--atom-c-text)" class="atom-label">C</text>
+                    
+                    <circle cx="150" cy="70" r="14" fill="var(--atom-o-fill)" class="atom-circle"/>
+                    <text x="150" y="70" fill="var(--atom-o-text)" class="atom-label">O</text>
+                    
+                    <circle cx="60" cy="30" r="10" fill="var(--atom-h-fill)"/> <text x="60" y="30" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="60" cy="110" r="10" fill="var(--atom-h-fill)"/> <text x="60" y="110" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="25" cy="70" r="10" fill="var(--atom-h-fill)"/> <text x="25" y="70" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="110" cy="30" r="10" fill="var(--atom-h-fill)"/> <text x="110" y="30" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="110" cy="110" r="10" fill="var(--atom-h-fill)"/> <text x="110" y="110" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="180" cy="45" r="10" fill="var(--atom-h-fill)"/> <text x="180" y="45" fill="var(--atom-h-text)" class="atom-label">H</text>
+                </svg>
+            </div>
+            <div class="info-panel">
+                <div class="row">
+                    <span class="label">Family</span>
+                    <span class="value">Alcohol</span>
+                </div>
+                <div class="row">
+                    <span class="label">General Formula</span>
+                    <span class="value">C<sub>n</sub>H<sub>2n+1</sub>OH</span>
+                </div>
+                <div class="row">
+                    <span class="label">Molecular Formula</span>
+                    <span class="value">C<sub>2</sub>H<sub>5</sub>OH</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ETHANOIC ACID ================= -->
+        <div class="card">
+            <h2>Ethanoic Acid</h2>
+            <div class="molecule-viz">
+                <svg viewBox="0 0 220 140">
+                    <!-- Bonds -->
+                    <line x1="60" y1="80" x2="120" y2="80" class="bond" /> <!-- C-C Single -->
+                    
+                    <!-- C=O Double Bond (Two distinct lines) -->
+                    <line x1="116" y1="80" x2="116" y2="35" class="bond" style="stroke-width:4" />
+                    <line x1="124" y1="80" x2="124" y2="35" class="bond" style="stroke-width:4" />
+
+                    <!-- C-OH Bond -->
+                    <line x1="120" y1="80" x2="155" y2="110" class="bond" /> <!-- C-O -->
+                    <line x1="155" y1="110" x2="185" y2="110" class="bond" /> <!-- O-H -->
+
+                    <!-- H Bonds on Methyl Group -->
+                    <line x1="60" y1="80" x2="60" y2="40" class="bond" />
+                    <line x1="60" y1="80" x2="60" y2="120" class="bond" />
+                    <line x1="60" y1="80" x2="25" y2="80" class="bond" />
+
+                    <!-- ATOMS -->
+                    <circle cx="60" cy="80" r="14" fill="var(--atom-c-fill)" class="atom-circle"/>
+                    <text x="60" y="80" fill="var(--atom-c-text)" class="atom-label">C</text>
+                    
+                    <circle cx="120" cy="80" r="14" fill="var(--atom-c-fill)" class="atom-circle"/>
+                    <text x="120" y="80" fill="var(--atom-c-text)" class="atom-label">C</text>
+
+                    <circle cx="120" cy="35" r="14" fill="var(--atom-o-fill)" class="atom-circle"/>
+                    <text x="120" y="35" fill="var(--atom-o-text)" class="atom-label">O</text>
+
+                    <circle cx="155" cy="110" r="14" fill="var(--atom-o-fill)" class="atom-circle"/>
+                    <text x="155" y="110" fill="var(--atom-o-text)" class="atom-label">O</text>
+
+                    <circle cx="60" cy="40" r="10" fill="var(--atom-h-fill)"/> <text x="60" y="40" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="60" cy="120" r="10" fill="var(--atom-h-fill)"/> <text x="60" y="120" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    <circle cx="25" cy="80" r="10" fill="var(--atom-h-fill)"/> <text x="25" y="80" fill="var(--atom-h-text)" class="atom-label">H</text>
+                    
+                    <circle cx="185" cy="110" r="10" fill="var(--atom-h-fill)"/> <text x="185" y="110" fill="var(--atom-h-text)" class="atom-label">H</text>
+
+                </svg>
+            </div>
+            <div class="info-panel">
+                <div class="row">
+                    <span class="label">Family</span>
+                    <span class="value">Carboxylic Acid</span>
+                </div>
+                <div class="row">
+                    <span class="label">General Formula</span>
+                    <span class="value">C<sub>n</sub>H<sub>2n+1</sub>COOH</span>
+                </div>
+                <div class="row">
+                    <span class="label">Molecular Formula</span>
+                    <span class="value">CH<sub>3</sub>COOH</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= DOWNLOAD BUTTON ================= -->
+    <div class="btn-container">
+        <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+        <!-- REPLACE 'PUT_YOUR_PDF_NAME_HERE.pdf' WITH YOUR FILE -->
+        <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+        <a href="Modern Chemical Structures.pdf" class="download-btn" download>
+            Download PDF
+        </a>
+    </div>
+
+</body>
+</html>

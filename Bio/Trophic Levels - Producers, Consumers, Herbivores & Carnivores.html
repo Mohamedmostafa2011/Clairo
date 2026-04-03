@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Trophic Levels</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --text-main: #2d3748;
+            --text-secondary: #718096;
+            --card-bg: #ffffff;
+            --primary: #38a169; /* Green */
+            --accent: #ed8936; /* Orange */
+            --danger: #e53e3e; /* Red */
+            --purple: #805ad5; /* Purple */
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        /* Header & Video Section */
+        header {
+            background: linear-gradient(135deg, #2c5282 0%, #2b6cb0 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+        }
+
+        .video-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto -80px auto; /* Overlap effect */
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            aspect-ratio: 16/9;
+            background: #000;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1100px;
+            margin: 100px auto 0 auto;
+            padding: 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background-color: var(--primary);
+            margin: 10px auto 0 auto;
+            border-radius: 2px;
+        }
+
+        /* Grid Layout for Levels */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+
+        /* Card Styling */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 5px solid transparent;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .level-1 { border-color: var(--primary); }
+        .level-2 { border-color: #ecc94b; }
+        .level-3 { border-color: var(--accent); }
+        .level-4 { border-color: var(--danger); }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .timestamp {
+            background-color: #e2e8f0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Special Sections (Energy & Roles) */
+        .info-block {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--purple);
+        }
+
+        .info-block h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .energy-example {
+            margin-top: 20px;
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e0;
+        }
+
+        .energy-step {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        .highlight {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        /* Responsive Tweaks */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .container { padding: 15px; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Trophic Levels in Food Chains</h1>
+        <p class="subtitle">A visual breakdown of energy transfer, producers, and consumers in an ecosystem.</p>
+    </header>
+
+    <div class="video-container">
+        <!-- Embedded YouTube Video -->
+        <iframe src="https://www.youtube.com/embed/D1In8W2qev4" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+
+    <div class="container">
+        
+        <!-- The 4 Levels -->
+        <h2 class="section-title">The Four Trophic Levels</h2>
+        <div class="grid">
+            <!-- Level 1 -->
+            <div class="card level-1">
+                <div class="card-header">
+                    <span class="card-title">Level 1: Producers</span>
+                    <span class="timestamp">0:28</span>
+                </div>
+                <ul>
+                    <li>Organisms like <strong>plants or algae</strong>.</li>
+                    <li>Produce their own food via <strong>photosynthesis</strong> using sunlight.</li>
+                    <li>The origin of <strong>all energy</strong> in the food chain.</li>
+                </ul>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="card level-2">
+                <div class="card-header">
+                    <span class="card-title">Level 2: Primary</span>
+                    <span class="timestamp">0:49</span>
+                </div>
+                <ul>
+                    <li>The first consumers in the chain.</li>
+                    <li>Known as <strong>Herbivores</strong>.</li>
+                    <li>They exclusively eat plants and algae.</li>
+                </ul>
+            </div>
+
+            <!-- Level 3 -->
+            <div class="card level-3">
+                <div class="card-header">
+                    <span class="card-title">Level 3: Secondary</span>
+                    <span class="timestamp">1:11</span>
+                </div>
+                <ul>
+                    <li>The second level of consumers.</li>
+                    <li>Known as <strong>Carnivores</strong>.</li>
+                    <li>Their diet consists of eating other animals.</li>
+                </ul>
+            </div>
+
+            <!-- Level 4 -->
+            <div class="card level-4">
+                <div class="card-header">
+                    <span class="card-title">Level 4: Tertiary</span>
+                    <span class="timestamp">1:25</span>
+                </div>
+                <ul>
+                    <li>The third level of consumers.</li>
+                    <li>Also carnivores, eating secondary consumers.</li>
+                    <li>Often sits near the top of the chain.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Mechanics: Energy & Limits -->
+        <h2 class="section-title">Energy Mechanics</h2>
+        <div class="grid">
+            <div class="info-block">
+                <h3>⚡ The 10% Rule <span class="timestamp">1:53</span></h3>
+                <p>Only about <strong>10% of energy</strong> is passed from one trophic level to the next. The rest is lost (mostly as heat or used for metabolic processes).</p>
+                <div class="energy-example">
+                    <div class="energy-step"><span>Level 1 (Producers):</span> <span>1000 Joules</span></div>
+                    <div class="energy-step"><span>Level 2 (Primary):</span> <span>100 Joules</span></div>
+                    <div class="energy-step"><span>Level 3 (Secondary):</span> <span>10 Joules</span></div>
+                    <div class="energy-step"><span>Level 4 (Tertiary):</span> <span class="highlight">1 Joule</span></div>
+                </div>
+            </div>
+
+            <div class="info-block">
+                <h3>🚫 Limits to Length <span class="timestamp">1:42</span></h3>
+                <p>Because of the massive energy loss described in the 10% rule, food chains typically have <strong>no more than four or five levels</strong>. There simply isn't enough energy left to support a fifth or sixth level population.</p>
+            </div>
+        </div>
+
+        <!-- Special Roles -->
+        <h2 class="section-title">Special Ecological Roles</h2>
+        <div class="grid">
+            <div class="card" style="border-top-color: #2b6cb0;">
+                <div class="card-header">
+                    <span class="card-title">Apex Predators</span>
+                    <span class="timestamp">2:36</span>
+                </div>
+                <ul>
+                    <li>Carnivores at the very top of the food chain.</li>
+                    <li>They have <strong>no natural predators</strong> themselves.</li>
+                </ul>
+            </div>
+
+            <div class="card" style="border-top-color: #2b6cb0;">
+                <div class="card-header">
+                    <span class="card-title">Omnivores</span>
+                    <span class="timestamp">2:49</span>
+                </div>
+                <ul>
+                    <li>Organisms (like bears) that eat both producers and animals.</li>
+                    <li>Generally placed in <strong>Trophic Level 3</strong>, though their placement is complex.</li>
+                </ul>
+            </div>
+
+            <div class="card" style="border-top-color: #718096;">
+                <div class="card-header">
+                    <span class="card-title">Decomposers</span>
+                    <span class="timestamp">3:17</span>
+                </div>
+                <ul>
+                    <li>Bacteria, fungi, and worms.</li>
+                    <li>They break down dead plant and animal matter.</li>
+                    <li><strong>Crucial Role:</strong> Recycling nutrients back to the environment for producers.</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

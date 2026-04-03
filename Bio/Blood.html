@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood: Transport & Defense | IGCSE Biology</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            /* Haematology Theme */
+            --blood-primary: #dc2626; /* Deep Red */
+            --blood-dark: #991b1b;
+            --plasma: #fef08a; /* Straw Yellow */
+            --wbc: #e2e8f0; /* Off White */
+            --platelet: #a8a29e;
+            --bg: #fff1f2;
+            --surface: #ffffff;
+            --text: #450a0a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Header with Liquid Animation --- */
+        header {
+            background: linear-gradient(135deg, var(--blood-dark), var(--blood-primary));
+            color: white;
+            padding: 4rem 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom-left-radius: 50% 20px;
+            border-bottom-right-radius: 50% 20px;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: floatUp 4s infinite ease-in-out;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100px) scale(1); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-200px) scale(1.5); opacity: 0; }
+        }
+
+        header h1 { font-family: 'Outfit', sans-serif; font-size: 3.5rem; font-weight: 900; margin-bottom: 10px; z-index: 2; position: relative; }
+        header p { font-size: 1.2rem; opacity: 0.9; z-index: 2; position: relative; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+        section {
+            background: var(--surface);
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 15px 35px -5px rgba(220, 38, 38, 0.1);
+            border: 1px solid #fecdd3;
+            transition: transform 0.3s;
+        }
+
+        section:hover { transform: translateY(-5px); }
+
+        h2 { 
+            font-family: 'Outfit', sans-serif; 
+            color: var(--blood-dark); 
+            font-size: 2.2rem; 
+            margin-bottom: 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+
+        /* --- VIRTUAL CENTRIFUGE --- */
+        .centrifuge-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .test-tube {
+            width: 80px;
+            height: 250px;
+            border: 4px solid #cbd5e1;
+            border-top: none;
+            border-radius: 0 0 40px 40px;
+            background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+            position: relative;
+            overflow: hidden;
+            transition: all 1s ease-in-out;
+            box-shadow: inset 5px 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* Layers inside tube */
+        .layer { width: 100%; position: absolute; left: 0; transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .layer-plasma { 
+            top: 0; height: 0%; background: var(--plasma); 
+            display: flex; justify-content: center; align-items: center; font-weight: bold; color: #854d0e; opacity: 0;
+        }
+        .layer-wbc { 
+            top: 55%; height: 0%; background: var(--wbc); 
+            border-top: 1px solid #94a3b8; border-bottom: 1px solid #94a3b8; opacity: 0;
+        }
+        .layer-rbc { 
+            bottom: 0; height: 100%; background: var(--blood-primary); 
+            display: flex; justify-content: center; align-items: center; font-weight: bold; color: white;
+        }
+
+        /* Spinning State */
+        .test-tube.separated .layer-plasma { height: 55%; opacity: 1; }
+        .test-tube.separated .layer-wbc { height: 1%; opacity: 1; } /* Buffy coat */
+        .test-tube.separated .layer-rbc { height: 44%; }
+
+        .spin-btn {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: var(--text); color: white; border: none;
+            font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+        .spin-btn:hover { transform: scale(1.1); background: var(--blood-primary); }
+        .spin-btn.spinning { animation: spin 0.5s linear infinite; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- MICROSCOPE CARDS --- */
+        .cell-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .cell-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #fee2e2;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .cell-visual {
+            width: 100px; height: 100px; margin: 0 auto 15px auto;
+            border-radius: 50%;
+            border: 3px solid #e2e8f0;
+            background: #f8fafc;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* CSS Art for Cells */
+        .art-rbc { width: 60px; height: 60px; background: #ef4444; border-radius: 50%; box-shadow: inset 0 0 15px #7f1d1d; }
+        
+        .art-phag { 
+            width: 70px; height: 65px; background: #e2e8f0; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; 
+            border: 2px solid #94a3b8; position: relative;
+        }
+        .art-phag::after { /* Lobed Nucleus */
+            content: ''; position: absolute; top: 15px; left: 15px; width: 40px; height: 30px; 
+            background: #64748b; border-radius: 20px; clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 60% 60%, 60% 100%, 0% 100%);
+        }
+
+        .art-lymph { 
+            width: 60px; height: 60px; background: #e2e8f0; border-radius: 50%; border: 2px solid #94a3b8; position: relative; 
+        }
+        .art-lymph::after { /* Large Round Nucleus */
+            content: ''; position: absolute; top: 5px; left: 5px; width: 50px; height: 50px; 
+            background: #475569; border-radius: 50%;
+        }
+
+        .art-plat {
+            width: 30px; height: 30px; background: #a8a29e; transform: rotate(45deg);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+        }
+
+        .cell-card:hover .cell-visual { transform: scale(1.1); border-color: var(--blood-primary); transition: 0.3s; }
+        
+        .details-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 10px;
+            opacity: 0; transition: 0.3s;
+        }
+        .cell-card:hover .details-overlay { opacity: 1; }
+
+        /* --- CLOTTING ANIMATION --- */
+        .clot-container {
+            background: #1e293b;
+            height: 150px;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #334155;
+        }
+        
+        .cut {
+            position: absolute; bottom: 0; left: 40%; width: 20%; height: 40px;
+            background: #7f1d1d; /* Open wound */
+            z-index: 1;
+        }
+
+        .mesh {
+            position: absolute; bottom: 0; left: 40%; width: 20%; height: 0;
+            background: repeating-linear-gradient(45deg, #fef3c7, #fef3c7 2px, transparent 2px, transparent 8px);
+            z-index: 2;
+            transition: height 2s ease;
+            border-top: 3px solid #fff;
+        }
+
+        .flow-cell {
+            position: absolute; top: 50%;
+            width: 20px; height: 20px; background: #ef4444; border-radius: 50%;
+            animation: flowRight 3s linear infinite;
+        }
+
+        @keyframes flowRight { 0% { left: -10%; } 100% { left: 110%; } }
+
+        /* --- BUTTONS --- */
+        .btn {
+            background: var(--blood-primary); color: white; padding: 12px 30px;
+            border-radius: 50px; border: none; font-weight: 700; cursor: pointer;
+            transition: 0.3s; margin-top: 15px;
+        }
+        .btn:hover { background: var(--blood-dark); transform: translateY(-2px); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="bubble" style="left: 10%; width: 20px; height: 20px; animation-duration: 3s;"></div>
+        <div class="bubble" style="left: 80%; width: 40px; height: 40px; animation-duration: 5s;"></div>
+        <div class="bubble" style="left: 40%; width: 15px; height: 15px; animation-duration: 7s;"></div>
+        
+        <i class="fa-solid fa-droplet" style="font-size: 3rem; margin-bottom: 10px; animation: pulse 2s infinite;"></i>
+        <h1>Blood Composition</h1>
+        <p>Transport, Defense, and Clotting | IGCSE Biology 0610</p>
+    </header>
+
+    <div class="container">
+
+        <!-- SECTION 1: VIRTUAL CENTRIFUGE -->
+        <section>
+            <h2><i class="fa-solid fa-vial"></i> Blood Composition</h2>
+            <p>Blood is a tissue. If we spin it in a centrifuge, it separates into components by density. Click the button to simulate.</p>
+            
+            <div class="centrifuge-wrapper">
+                <div class="test-tube" id="testTube">
+                    <div class="layer layer-plasma">Plasma (55%)</div>
+                    <div class="layer layer-wbc"></div>
+                    <div class="layer layer-rbc">Cells (45%)</div>
+                </div>
+                <button class="spin-btn" onclick="spinBlood()">SPIN</button>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <p><strong>Plasma:</strong> The liquid part. Transports blood cells, ions, soluble nutrients, hormones, and carbon dioxide.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 2: INTERACTIVE MICROSCOPE -->
+        <section>
+            <h2><i class="fa-solid fa-microscope"></i> Cellular Components</h2>
+            <p>Hover over the cells to reveal their adaptations and functions.</p>
+            
+            <div class="cell-grid">
+                <!-- RBC -->
+                <div class="cell-card">
+                    <div class="cell-visual"><div class="art-rbc"></div></div>
+                    <h3>Red Blood Cell</h3>
+                    <div class="details-overlay">
+                        <h4>Transport Oxygen</h4>
+                        <ul style="text-align: left; font-size: 0.9rem;">
+                            <li><strong>Haemoglobin:</strong> Binds O2.</li>
+                            <li><strong>Biconcave:</strong> High Surface Area.</li>
+                            <li><strong>No Nucleus:</strong> More space for Hb.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Phagocyte -->
+                <div class="cell-card">
+                    <div class="cell-visual"><div class="art-phag"></div></div>
+                    <h3>Phagocyte (WBC)</h3>
+                    <div class="details-overlay">
+                        <h4>Engulf Pathogens</h4>
+                        <ul style="text-align: left; font-size: 0.9rem;">
+                            <li><strong>Lobed Nucleus:</strong> Flexible.</li>
+                            <li><strong>Process:</strong> Phagocytosis (Engulf & Digest).</li>
+                            <li><strong>Non-specific</strong> defense.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Lymphocyte -->
+                <div class="cell-card">
+                    <div class="cell-visual"><div class="art-lymph"></div></div>
+                    <h3>Lymphocyte (WBC)</h3>
+                    <div class="details-overlay">
+                        <h4>Antibodies</h4>
+                        <ul style="text-align: left; font-size: 0.9rem;">
+                            <li><strong>Large Round Nucleus</strong>.</li>
+                            <li>Produces <strong>Antibodies</strong>.</li>
+                            <li>Specific to antigens.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Platelet -->
+                <div class="cell-card">
+                    <div class="cell-visual"><div class="art-plat"></div></div>
+                    <h3>Platelets</h3>
+                    <div class="details-overlay">
+                        <h4>Clotting</h4>
+                        <ul style="text-align: left; font-size: 0.9rem;">
+                            <li>Fragments of cells.</li>
+                            <li>Release chemicals to convert <strong>Fibrinogen to Fibrin</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: CLOTTING SIMULATION -->
+        <section>
+            <h2><i class="fa-solid fa-bandage"></i> Blood Clotting Mechanism</h2>
+            <p>Prevents blood loss and pathogen entry. Click to activate the cascade.</p>
+            
+            <div class="clot-container" id="clotBox">
+                <div class="cut"></div>
+                <div class="mesh" id="fibrinMesh"></div>
+                <!-- Background flow -->
+                <div class="flow-cell" style="animation-delay: 0s; top: 20%;"></div>
+                <div class="flow-cell" style="animation-delay: 1s; top: 60%;"></div>
+                <div class="flow-cell" style="animation-delay: 2s; top: 40%;"></div>
+            </div>
+
+            <button class="btn" onclick="triggerClot()">Trigger Coagulation</button>
+            
+            <div style="margin-top: 15px; background: #fff7ed; padding: 15px; border-radius: 10px; border: 1px solid #fed7aa;">
+                <strong>The Equation:</strong> Soluble Fibrinogen $\rightarrow$ Insoluble Fibrin Mesh (Catalyzed by Thrombin)
+            </div>
+        </section>
+
+        <!-- SECTION 4: QUIZ -->
+        <section>
+            <h2><i class="fa-solid fa-clipboard-question"></i> Quick Check</h2>
+            <div style="background:#fff; padding:20px; border-radius:15px; border:1px solid #e2e8f0;">
+                <p><strong>Q1: Which component transports Carbon Dioxide?</strong></p>
+                <button class="btn" onclick="checkAns(this, false)" style="background:#e2e8f0; color:black; margin:5px;">Red Blood Cell</button>
+                <button class="btn" onclick="checkAns(this, true)" style="background:#e2e8f0; color:black; margin:5px;">Plasma</button>
+                <button class="btn" onclick="checkAns(this, false)" style="background:#e2e8f0; color:black; margin:5px;">Platelet</button>
+                <p id="res1"></p>
+            </div>
+            <br>
+            <div style="background:#fff; padding:20px; border-radius:15px; border:1px solid #e2e8f0;">
+                <p><strong>Q2: Which protein converts to an insoluble mesh during clotting?</strong></p>
+                <button class="btn" onclick="checkAns(this, false)" style="background:#e2e8f0; color:black; margin:5px;">Haemoglobin</button>
+                <button class="btn" onclick="checkAns(this, false)" style="background:#e2e8f0; color:black; margin:5px;">Antibody</button>
+                <button class="btn" onclick="checkAns(this, true)" style="background:#e2e8f0; color:black; margin:5px;">Fibrinogen</button>
+                <p id="res2"></p>
+            </div>
+        </section>
+
+        <button class="btn" onclick="downloadNotes()" style="width: 100%; background: var(--text);">Download Summary PDF</button>
+
+    </div>
+
+    <script>
+        // --- Centrifuge Logic ---
+        function spinBlood() {
+            const tube = document.getElementById('testTube');
+            const btn = document.querySelector('.spin-btn');
+            
+            // Start spin
+            btn.classList.add('spinning');
+            btn.disabled = true;
+            
+            // Reset if already spun
+            tube.classList.remove('separated');
+
+            setTimeout(() => {
+                btn.classList.remove('spinning');
+                tube.classList.add('separated');
+                btn.disabled = false;
+            }, 1500);
+        }
+
+        // --- Clotting Logic ---
+        function triggerClot() {
+            const mesh = document.getElementById('fibrinMesh');
+            mesh.style.height = "0"; // Reset
+            setTimeout(() => {
+                mesh.style.height = "40px"; // Fill cut
+            }, 100);
+        }
+
+        // --- Quiz Logic ---
+        function checkAns(btn, isCorrect) {
+            const p = btn.parentElement.querySelector('p[id^="res"]');
+            if(isCorrect) {
+                btn.style.background = "#86efac";
+                p.innerText = "Correct!";
+                p.style.color = "green";
+            } else {
+                btn.style.background = "#fca5a5";
+                p.innerText = "Try again.";
+                p.style.color = "red";
+            }
+        }
+
+        // --- PDF Download ---
+        function downloadNotes() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(153, 27, 27);
+            doc.text("IGCSE Biology: Blood Notes", 20, 20);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            
+            const content = `
+1. Blood Composition:
+   - Red Blood Cells (45%): Transport Oxygen.
+   - Plasma (55%): Transports CO2, urea, glucose, hormones, heat.
+   - White Blood Cells & Platelets (<1%).
+
+2. Adaptations:
+   - RBC: Biconcave (SA), Haemoglobin (binds O2), No Nucleus.
+   - Phagocyte: Lobed nucleus, engulfs pathogens (Phagocytosis).
+   - Lymphocyte: Large round nucleus, produces Antibodies.
+
+3. Clotting:
+   - Platelets detect damage.
+   - Soluble Fibrinogen is converted to Insoluble Fibrin.
+   - Fibrin forms a mesh to trap RBCs and stop blood loss.
+            `;
+            
+            doc.text(content, 20, 40);
+            doc.save('Blood_Summary.pdf');
+        }
+    </script>
+</body>
+</html>

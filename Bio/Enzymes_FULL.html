@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IG-Bio | Ch 5: Enzymes</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #d97706; /* Amber 600 */
+            --primary-dark: #92400e;
+            --accent: #0ea5e9; /* Sky Blue for contrast */
+            --bg: #fffbeb; /* Very light warm tint */
+            --text: #334155;
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- NAVIGATION BUTTON (Fixed Circular) --- */
+        .menu-toggle {
+            display: none; /* Hidden on desktop */
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: var(--primary); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.4rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.9); }
+
+        /* --- MOBILE OVERLAY --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1999;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: var(--sidebar-w);
+            background: #291b0a; /* Dark Brown/Amber */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            z-index: 2000;
+            border-right: 1px solid #451a03;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand {
+            font-size: 1.5rem; font-weight: 800; color: #fbbf24; margin-bottom: 40px;
+            display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            padding: 16px; margin-bottom: 8px; border-radius: 8px;
+            cursor: pointer; color: #fde68a; font-weight: 600;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4); }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+        .view-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; padding: 0; display: none; opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .view-panel.active { display: block; opacity: 1; }
+
+        /* --- TEXTBOOK STYLING (Academic) --- */
+        .paper {
+            max-width: 950px; margin: 0 auto; background: white;
+            padding: 80px; min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-family: 'Inter', sans-serif; font-size: 3rem; color: var(--primary-dark); margin-bottom: 10px; letter-spacing: -1px; }
+        .meta { color: #64748b; text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        h2 { 
+            font-family: 'Inter', sans-serif; font-size: 1.8rem; color: #1e293b; 
+            margin-top: 60px; margin-bottom: 25px; padding-bottom: 15px; 
+            border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 10px;
+        }
+        
+        h3 { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--primary); margin-top: 35px; margin-bottom: 15px; }
+
+        /* Academic Body Text */
+        p {
+            font-family: 'Crimson Pro', serif; font-size: 1.2rem; line-height: 1.8;
+            color: #334155; margin-bottom: 20px;
+        }
+        li { font-family: 'Crimson Pro', serif; font-size: 1.15rem; line-height: 1.7; margin-bottom: 8px; }
+        
+        /* Concept Boxes */
+        .concept-box {
+            background: #fff7ed; border-left: 5px solid var(--primary);
+            padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;
+        }
+        .concept-box strong { color: var(--primary-dark); font-family: 'Inter', sans-serif; }
+
+        .exam-tip {
+            background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px;
+            padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+        }
+        .exam-tip i { color: var(--accent); font-size: 1.5rem; margin-top: 3px; }
+
+        /* Tables */
+        .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #e2e8f0; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #fffbeb; color: var(--primary-dark); padding: 16px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; border-bottom: 2px solid #fcd34d; }
+        td { padding: 16px; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-family: 'Crimson Pro', serif; font-size: 1.1rem; }
+        tr:last-child td { border-bottom: none; }
+
+        /* --- MIND MAP --- */
+        .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #f1f5f9; }
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #94a3b8; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #94a3b8; width: 0; height: 20px; }
+
+        .node {
+            background: white; border: 1px solid #cbd5e1; padding: 12px 18px; border-radius: 8px;
+            display: inline-block; min-width: 140px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; z-index: 2;
+        }
+        .root-node { background: var(--primary-dark); color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        /* --- QUIZ --- */
+        .quiz-area { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .q-card { background: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; }
+        .q-opt {
+            display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e2e8f0;
+            margin-top: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .q-opt:hover { background: #f1f5f9; border-color: #94a3b8; }
+        .q-let { font-weight: 900; color: #94a3b8; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .q-opt.correct { background: #dcfce7; border-color: #16a34a; }
+        .q-opt.correct .q-let { background: #16a34a; color: white; }
+        .q-opt.wrong { background: #fee2e2; border-color: #dc2626; }
+        .q-opt.wrong .q-let { background: #dc2626; color: white; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
+            aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.active { left: 0; }
+            .paper { padding: 30px 20px; }
+            h1 { font-size: 2.2rem; }
+            .mm-wrapper { justify-content: flex-start; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-puzzle-piece"></i> IG-BIO MASTER</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Textbook Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-sitemap"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-list-check"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #78350f;">
+             <div class="nav-item" onclick="genPDF()" style="color:#fbbf24; border-color:#451a03;">
+                 <i class="fa-solid fa-download"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. DETAILED NOTES -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Biology 0610 • Topic 5</span>
+                <h1>Enzymes</h1>
+                <p>Enzymes are essential biological molecules. Without them, the chemical reactions in our bodies would happen too slowly to sustain life. This chapter covers their structure, mechanism of action, and the factors that affect their activity.</p>
+
+                <h2>1. Definition and Nature</h2>
+                <p><strong>Definition:</strong> Enzymes are proteins that function as <strong>biological catalysts</strong>.</p>
+                <ul>
+                    <li><strong>Catalyst:</strong> A substance that increases the rate of a chemical reaction and is <strong>not changed</strong> by the reaction (it can be used again).</li>
+                    <li><strong>Biological:</strong> Made by living cells (proteins).</li>
+                </ul>
+
+                <h2>2. The "Lock and Key" Mechanism</h2>
+                <p>Enzymes are very specific. One enzyme only works on one specific substrate (reactant). This is due to the shape of the enzyme.</p>
+                
+                <div class="concept-box">
+                    <strong>Key Terms:</strong>
+                    <ul>
+                        <li><strong>Active Site:</strong> A specifically shaped area on the surface of the enzyme.</li>
+                        <li><strong>Substrate:</strong> The molecule that the enzyme reacts with.</li>
+                        <li><strong>Complementary:</strong> The shape of the substrate fits perfectly into the active site (like a key fits a lock).</li>
+                        <li><strong>Enzyme-Substrate Complex:</strong> The temporary structure formed when the substrate binds to the enzyme.</li>
+                        <li><strong>Product:</strong> The molecule(s) produced after the reaction. The product leaves the active site, leaving the enzyme free to work again.</li>
+                    </ul>
+                </div>
+
+                <h2>3. Factors Affecting Enzyme Activity</h2>
+                <p>Enzymes are sensitive molecules. Their efficiency relies on the shape of their active site. If this shape changes, the enzyme stops working.</p>
+
+                <h3>A. Temperature</h3>
+                <p>
+                    1. <strong>Low Temperature:</strong> Reaction is slow. Molecules have low kinetic energy and collide infrequently.<br>
+                    2. <strong>Increasing Temperature:</strong> Rate increases. Kinetic energy increases, leading to more frequent and successful collisions between substrate and active site.<br>
+                    3. <strong>Optimum Temperature:</strong> The temperature at which the enzyme works fastest (usually 37°C in humans).<br>
+                    4. <strong>High Temperature (Above Optimum):</strong> The rate drops rapidly. The high heat energy breaks the bonds holding the enzyme together. The shape of the active site changes. The substrate no longer fits. The enzyme is <strong>Denatured</strong>.
+                </p>
+
+                <h3>B. pH</h3>
+                <p>Most enzymes work best at a specific pH (Optimum pH). For most body enzymes, this is pH 7 (neutral). However:</p>
+                <ul>
+                    <li><strong>Pepsin</strong> (in the stomach) works best at pH 2 (Acidic).</li>
+                    <li><strong>Trypsin</strong> (in the small intestine) works best at pH 8 (Alkaline).</li>
+                </ul>
+                <p>If the pH becomes too acidic or too alkaline (too far from optimum), the enzyme becomes <strong>Denatured</strong>.</p>
+
+                <div class="exam-tip">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Exam Tip:</strong> Never say an enzyme "dies" or is "killed" by heat. Enzymes are molecules, not living organisms. Always use the term <strong>Denatured</strong> and mention that the "active site has changed shape."
+                    </div>
+                </div>
+
+                <h2>4. Common Enzymes</h2>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Enzyme</th><th>Substrate</th><th>Product</th><th>Where Found</th></tr>
+                        <tr><td><strong>Amylase</strong></td><td>Starch</td><td>Maltose (Sugar)</td><td>Saliva, Pancreas</td></tr>
+                        <tr><td><strong>Protease</strong> (e.g., Pepsin)</td><td>Protein</td><td>Amino Acids</td><td>Stomach, Pancreas</td></tr>
+                        <tr><td><strong>Lipase</strong></td><td>Fats (Lipids)</td><td>Fatty Acids + Glycerol</td><td>Pancreas</td></tr>
+                        <tr><td><strong>Catalase</strong></td><td>Hydrogen Peroxide</td><td>Water + Oxygen</td><td>Liver cells (all cells)</td></tr>
+                    </table>
+                </div>
+
+                <h2>5. Commercial Uses of Enzymes</h2>
+                <ul>
+                    <li><strong>Biological Washing Powders:</strong> Contain Proteases and Lipases to digest stains (food, blood, grass) at lower temperatures.</li>
+                    <li><strong>Pectinase:</strong> Used in fruit juice production. It breaks down pectin in cell walls, releasing more juice and making it clearer.</li>
+                    <li><strong>Lactase:</strong> Used to make lactose-free milk for people who are lactose intolerant.</li>
+                </ul>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">ENZYMES</div>
+                            <ul>
+                                <li>
+                                    <div class="node">Nature</div>
+                                    <ul>
+                                        <li><div class="node">Proteins</div></li>
+                                        <li><div class="node">Catalysts</div></li>
+                                        <li><div class="node">Specific</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Mechanism</div>
+                                    <ul>
+                                        <li><div class="node">Lock & Key</div></li>
+                                        <li><div class="node">Active Site</div></li>
+                                        <li><div class="node">Complementary</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Factors</div>
+                                    <ul>
+                                        <li>
+                                            <div class="node">Temp</div>
+                                            <ul>
+                                                <li><div class="node">Kinetic Energy</div></li>
+                                                <li><div class="node">Optimum</div></li>
+                                                <li><div class="node" style="color:red;">Denature</div></li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <div class="node">pH</div>
+                                            <ul>
+                                                <li><div class="node">Shape Change</div></li>
+                                                <li><div class="node">Optimum</div></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Examples</div>
+                                    <ul>
+                                        <li><div class="node">Amylase</div></li>
+                                        <li><div class="node">Protease</div></li>
+                                        <li><div class="node">Lipase</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container"></div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI LOGIC ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // AUTO-CLOSE SIDEBAR ON MOBILE
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Bio_Ch5_Notes.pdf');
+            });
+        }
+
+        // --- 50 QUESTIONS (Chapter 5 Specific) ---
+        const qData = [
+            {q:"What type of molecule are enzymes?", o:["Proteins","Fats","Carbohydrates","Vitamins"], a:0},
+            {q:"What is the main function of enzymes?", o:["Biological Catalysts","Energy Storage","Structure","Transport"], a:0},
+            {q:"What part of the enzyme binds to the substrate?", o:["Active Site","Nucleus","Membrane","Wall"], a:0},
+            {q:"The molecule an enzyme acts on is called?", o:["Substrate","Product","Catalyst","Active Site"], a:0},
+            {q:"The molecules produced are called?", o:["Products","Substrates","Reactants","Active Sites"], a:0},
+            {q:"The mechanism of enzyme action is called?", o:["Lock and Key","Push and Pull","Stop and Go","Open and Close"], a:0},
+            {q:"When an enzyme permanently loses its shape, it is?", o:["Denatured","Killed","Destroyed","Digested"], a:0},
+            {q:"Enzymes lower the?", o:["Activation Energy","Temperature","pH","Pressure"], a:0},
+            {q:"What happens to enzyme rate as temp increases (0-37°C)?", o:["Increases","Decreases","Stays same","Stops"], a:0},
+            {q:"Why does rate increase with temp?", o:["More Kinetic Energy","Less Kinetic Energy","Denaturation","More pH"], a:0},
+            {q:"What happens above optimum temperature?", o:["Denaturation","Faster reaction","Better fit","Nothing"], a:0},
+            {q:"The temperature where enzyme works best is?", o:["Optimum","Maximum","Minimum","Critical"], a:0},
+            {q:"Human body enzymes optimum temp?", o:["37°C","25°C","45°C","100°C"], a:0},
+            {q:"If active site shape changes, the substrate?", o:["Cannot fit","Fits better","Reacts faster","Explodes"], a:0},
+            {q:"Amylase breaks down?", o:["Starch","Protein","Fat","Sugar"], a:0},
+            {q:"Product of Amylase action?", o:["Maltose","Glucose","Amino Acids","Glycerol"], a:0},
+            {q:"Protease breaks down?", o:["Proteins","Carbohydrates","Fats","DNA"], a:0},
+            {q:"Product of Protease action?", o:["Amino Acids","Fatty Acids","Starch","Maltose"], a:0},
+            {q:"Lipase breaks down?", o:["Fats/Lipids","Protein","Starch","Sugar"], a:0},
+            {q:"Products of Lipase action?", o:["Fatty Acids + Glycerol","Amino Acids","Glucose","Maltose"], a:0},
+            {q:"Pepsin is found in?", o:["Stomach","Mouth","Small Intestine","Liver"], a:0},
+            {q:"Optimum pH for Pepsin?", o:["pH 2 (Acidic)","pH 7 (Neutral)","pH 9 (Alkaline)","pH 12"], a:0},
+            {q:"Trypsin is found in?", o:["Small Intestine","Stomach","Mouth","Liver"], a:0},
+            {q:"Optimum pH for Trypsin?", o:["pH 8 (Alkaline)","pH 2 (Acidic)","pH 7 (Neutral)","pH 1"], a:0},
+            {q:"Catalase breaks down?", o:["Hydrogen Peroxide","Water","Oxygen","Starch"], a:0},
+            {q:"Products of Catalase?", o:["Water + Oxygen","Water + Hydrogen","Hydrogen + Oxygen","CO2 + Water"], a:0},
+            {q:"Are enzymes used up in reactions?", o:["No","Yes","Sometimes","Only in stomach"], a:0},
+            {q:"Can one enzyme work on many different substrates?", o:["No, they are specific","Yes","Only at high temp","Only in plants"], a:0},
+            {q:"Enzyme used in fruit juice production?", o:["Pectinase","Amylase","Protease","Lipase"], a:0},
+            {q:"What does Pectinase do?", o:["Breaks cell walls/Clarifies juice","Sweetens juice","Colors juice","Preserves juice"], a:0},
+            {q:"Enzymes in biological washing powder?", o:["Protease and Lipase","Amylase only","Catalase","Pectinase"], a:0},
+            {q:"Why use biological washing powder?", o:["Works at lower temp","Smells better","Is cheaper","Works at boiling"], a:0},
+            {q:"Which enzyme makes lactose-free milk?", o:["Lactase","Lipase","Maltase","Sucrase"], a:0},
+            {q:"Lactose is broken down into?", o:["Glucose + Galactose","Glucose + Fructose","Glucose only","Amino Acids"], a:0},
+            {q:"Denaturation affects which part mainly?", o:["Active Site","Substrate","Product","Nucleus"], a:0},
+            {q:"Can a denatured enzyme be fixed?", o:["No, it is permanent","Yes, by cooling","Yes, by heating","Yes, by pH"], a:0},
+            {q:"Substrate and Active Site shapes are?", o:["Complementary","Identical","Opposite","Random"], a:0},
+            {q:"At 0°C, enzyme activity is?", o:["Low/Inactive","Denatured","High","Optimum"], a:0},
+            {q:"Why is rate low at 0°C?", o:["Low kinetic energy","Enzyme is dead","Denatured","Too much product"], a:0},
+            {q:"Enzyme-Substrate Complex is?", o:["Temporary","Permanent","Product","A cell"], a:0},
+            {q:"Salivary amylase works in the?", o:["Mouth","Stomach","Large Intestine","Blood"], a:0},
+            {q:"Optimum pH for salivary amylase?", o:["pH 7","pH 2","pH 10","pH 4"], a:0},
+            {q:"Does bile contain enzymes?", o:["No","Yes","Only lipase","Only protease"], a:0},
+            {q:"Extracellular enzymes work?", o:["Outside cells","Inside cells","In the nucleus","In mitochondria"], a:0},
+            {q:"Intracellular enzymes work?", o:["Inside cells","Outside cells","In blood","In gut"], a:0},
+            {q:"Which bonds break during denaturation?", o:["Bonds holding protein shape","Ionic bonds only","Covalent bonds","Substrate bonds"], a:0},
+            {q:"Fungi secrete enzymes to?", o:["Digest food outside","Kill bacteria","Build walls","Reproduce"], a:0},
+            {q:"Antibiotics kill bacteria by targeting?", o:["Enzymes/Cell Wall","DNA","Nucleus","Mitochondria"], a:0},
+            {q:"Seed germination requires enzymes to?", o:["Break down food stores","Photosynthesize","Absorb water","Make soil"], a:0},
+            {q:"Most enzymes names end in?", o:["-ase","-ose","-in","-ol"], a:0}
+        ];
+
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const text = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerText.includes(text)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

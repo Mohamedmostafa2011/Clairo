@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effects of Smoking | IGCSE Biology</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            /* Smoky Theme */
+            --smoke-dark: #334155;
+            --smoke-light: #94a3b8;
+            --tar-black: #0f172a;
+            --nicotine-yellow: #d97706;
+            --lung-pink: #fda4af;
+            --danger: #ef4444;
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--smoke-dark);
+            line-height: 1.6;
+        }
+
+        /* --- Header with Smoke Effect --- */
+        header {
+            background: linear-gradient(135deg, #1e293b, #475569);
+            color: white;
+            padding: 4rem 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 800; margin-bottom: 10px; z-index: 2; position: relative; }
+        header p { font-size: 1.2rem; opacity: 0.9; z-index: 2; position: relative; }
+
+        /* Smoke Animation Background */
+        .smoke-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 20%, #1e293b 90%);
+            opacity: 0.6;
+            animation: pulseSmoke 5s infinite alternate;
+        }
+        @keyframes pulseSmoke { from { opacity: 0.4; } to { opacity: 0.7; } }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+        section {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--smoke-dark);
+        }
+
+        h2 { 
+            font-family: 'Outfit', sans-serif; 
+            color: var(--tar-black); 
+            font-size: 2rem; 
+            margin-bottom: 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        /* --- COMPONENT CARDS --- */
+        .chem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .chem-card {
+            background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1;
+            transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .chem-card:hover { transform: translateY(-5px); border-color: var(--nicotine-yellow); }
+        .chem-icon { font-size: 2rem; margin-bottom: 10px; color: var(--nicotine-yellow); }
+        .chem-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 5px; }
+
+        /* --- LUNG SIMULATOR --- */
+        .sim-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #111;
+            padding: 2rem;
+            border-radius: 15px;
+            color: white;
+        }
+
+        .lung-svg {
+            width: 200px;
+            height: 200px;
+            transition: fill 0.5s ease;
+        }
+
+        .slider-container { width: 80%; margin-top: 20px; }
+        input[type=range] { width: 100%; accent-color: var(--smoke-light); }
+        
+        .lung-stats {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        .stat-box { background: #222; padding: 10px; border-radius: 8px; border: 1px solid #444; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--danger); }
+
+        /* --- CILIA ANIMATION --- */
+        .cilia-box {
+            background: #f0fdf4; /* Healthy green tint initially */
+            border: 2px solid #86efac;
+            height: 150px;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: background 0.5s;
+        }
+        
+        .mucus-layer {
+            position: absolute; top: 20px; left: 0; width: 100%; height: 20px;
+            background: rgba(200, 255, 0, 0.4); /* Green slime */
+            z-index: 2;
+            animation: moveMucus 3s linear infinite;
+        }
+
+        .cilia-carpet {
+            display: flex; justify-content: space-around; align-items: flex-end;
+            height: 100%; padding-bottom: 0;
+        }
+
+        .cilium {
+            width: 5px; height: 60px; background: #16a34a;
+            border-radius: 5px 5px 0 0;
+            transform-origin: bottom center;
+            animation: wave 1s ease-in-out infinite;
+        }
+
+        /* Damaged State */
+        .cilia-box.damaged { background: #fef2f2; border-color: #fca5a5; }
+        .cilia-box.damaged .mucus-layer { animation: none; background: rgba(100, 100, 0, 0.6); } /* Thick stuck mucus */
+        .cilia-box.damaged .cilium { animation: none; transform: rotate(10deg); background: #9ca3af; height: 40px; }
+
+        @keyframes wave { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+        @keyframes moveMucus { 0% { left: -10%; } 100% { left: 10%; } }
+
+        /* --- CO SIMULATOR --- */
+        .blood-vessel {
+            background: #7f1d1d; padding: 20px; border-radius: 15px; height: 120px;
+            display: flex; align-items: center; gap: 15px; overflow: hidden; position: relative;
+        }
+        .rbc-cell {
+            width: 60px; height: 60px; background: #ef4444; border-radius: 50%;
+            border: 4px solid #b91c1c; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 0.8rem; position: relative;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+        .molecule {
+            width: 15px; height: 15px; border-radius: 50%; position: absolute;
+        }
+        .oxy { background: #60a5fa; top: 5px; right: 5px; box-shadow: 0 0 5px cyan; }
+        .co { background: #94a3b8; top: 5px; right: 5px; border: 1px solid white; z-index: 5; }
+
+        /* Buttons */
+        .btn {
+            background: var(--smoke-dark); color: white; padding: 10px 25px;
+            border-radius: 50px; border: none; font-weight: 600; cursor: pointer; margin-top: 15px;
+        }
+        .btn:hover { background: var(--tar-black); }
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #b91c1c; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="smoke-overlay"></div>
+        <i class="fa-solid fa-lungs-virus" style="font-size: 3rem; margin-bottom: 10px; z-index:2; position:relative;"></i>
+        <h1>Effects of Smoking</h1>
+        <p>Tar, Nicotine, Carbon Monoxide & Disease | IGCSE Biology 0610</p>
+    </header>
+
+    <div class="container">
+
+        <!-- SECTION 1: THE CHEMICALS -->
+        <section>
+            <h2><i class="fa-solid fa-flask-vial"></i> What's in Smoke?</h2>
+            <p>Tobacco smoke contains over 4,000 chemicals. These are the big three you must know for exams.</p>
+            
+            <div class="chem-grid">
+                <div class="chem-card">
+                    <i class="fa-solid fa-road chem-icon" style="color:#1e293b;"></i>
+                    <div class="chem-title">Tar</div>
+                    <p>A sticky black substance. It coats the alveoli reducing gas exchange and is a <strong>Carcinogen</strong> (causes lung cancer).</p>
+                </div>
+                <div class="chem-card">
+                    <i class="fa-solid fa-bolt chem-icon"></i>
+                    <div class="chem-title">Nicotine</div>
+                    <p>An addictive stimulant. It damages the brain and increases heart rate and blood pressure, leading to hypertension.</p>
+                </div>
+                <div class="chem-card">
+                    <i class="fa-solid fa-cloud chem-icon" style="color:#64748b;"></i>
+                    <div class="chem-title">Carbon Monoxide</div>
+                    <p>A poisonous gas. It binds permanently to haemoglobin, reducing the blood's capacity to carry Oxygen.</p>
+                </div>
+                <div class="chem-card">
+                    <i class="fa-solid fa-wind chem-icon" style="color:#94a3b8;"></i>
+                    <div class="chem-title">Smoke Particles</div>
+                    <p>Tiny carbon particles that irritate the airway, triggering inflammation and excess mucus production.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: LUNG SIMULATOR -->
+        <section>
+            <h2><i class="fa-solid fa-sliders"></i> Interactive Lung Decay Model</h2>
+            <p>Slide to see the cumulative effect of smoking over years on lung tissue color and capacity.</p>
+            
+            <div class="sim-container">
+                <!-- SVG Lung Shape -->
+                <svg class="lung-svg" viewBox="0 0 100 100">
+                    <path id="lungPath" d="M30,20 Q50,5 70,20 T90,50 Q90,80 70,95 Q50,90 50,70 Q50,90 30,95 Q10,80 10,50 T30,20" fill="#fda4af" stroke="white" stroke-width="2" />
+                </svg>
+
+                <div class="slider-container">
+                    <label>Years of Smoking: <span id="yearLabel" style="color:#fda4af">0</span></label>
+                    <input type="range" min="0" max="50" value="0" id="smokeSlider" oninput="updateLungs()">
+                </div>
+
+                <div class="lung-stats">
+                    <div class="stat-box">
+                        <div style="font-size:0.8rem; color:#aaa;">Gas Exchange Surface</div>
+                        <div class="stat-val" id="saVal">100%</div>
+                    </div>
+                    <div class="stat-box">
+                        <div style="font-size:0.8rem; color:#aaa;">Emphysema Risk</div>
+                        <div class="stat-val" id="riskVal">Low</div>
+                    </div>
+                </div>
+                <p id="lungDesc" style="margin-top:15px; font-style:italic;">Healthy, pink tissue. High surface area for diffusion.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: CILIA & GOBLET CELLS -->
+        <section id="notes-area">
+            <h2><i class="fa-solid fa-broom"></i> The Cleaning Mechanism</h2>
+            <p><strong>Healthy:</strong> Goblet cells make mucus to trap dust/bacteria. Cilia sweep it away.<br>
+            <strong>Smoker:</strong> Chemicals paralyze cilia. Mucus builds up. Bacteria breed. This causes <strong>Bronchitis</strong>.</p>
+
+            <div class="cilia-box" id="ciliaBox">
+                <div class="mucus-layer"></div>
+                <div class="cilia-carpet">
+                    <div class="cilium"></div><div class="cilium"></div><div class="cilium"></div>
+                    <div class="cilium"></div><div class="cilium"></div><div class="cilium"></div>
+                    <div class="cilium"></div><div class="cilium"></div><div class="cilium"></div>
+                    <div class="cilium"></div><div class="cilium"></div><div class="cilium"></div>
+                </div>
+            </div>
+            
+            <div style="text-align:center; margin-top:10px;">
+                <button class="btn btn-danger" onclick="toggleSmoke()" id="ciliaBtn">Apply Tobacco Smoke</button>
+            </div>
+        </section>
+
+        <!-- SECTION 4: CARBON MONOXIDE SIM -->
+        <section>
+            <h2><i class="fa-solid fa-mask-face"></i> The Oxygen Thief: Carbon Monoxide</h2>
+            <p>Carbon Monoxide (CO) binds to Haemoglobin 200x stronger than Oxygen. This reduces oxygen transport, straining the heart.</p>
+            
+            <div class="blood-vessel" id="vessel">
+                <div class="rbc-cell" id="rbc1">Hb<div class="molecule oxy"></div></div>
+                <div class="rbc-cell" id="rbc2">Hb<div class="molecule oxy"></div></div>
+                <div class="rbc-cell" id="rbc3">Hb<div class="molecule oxy"></div></div>
+                <div class="rbc-cell" id="rbc4">Hb<div class="molecule oxy"></div></div>
+            </div>
+
+            <div style="text-align:center; margin-top:15px;">
+                <button class="btn" onclick="inhaleSmoke()" style="background:#334155;">Inhale Cigarette Smoke</button>
+                <button class="btn" onclick="freshAir()" style="background:#10b981;">Breathe Fresh Air</button>
+            </div>
+            <p id="coStatus" style="text-align:center; margin-top:10px; font-weight:bold;">Status: 100% Oxygen Capacity</p>
+        </section>
+
+        <!-- SECTION 5: NOTES & DOWNLOAD -->
+        <section>
+            <h2><i class="fa-solid fa-file-medical"></i> Summary Notes</h2>
+            <ul>
+                <li><strong>COPD (Chronic Obstructive Pulmonary Disease):</strong> A combination of Bronchitis and Emphysema.</li>
+                <li><strong>Emphysema:</strong> The walls of the alveoli break down. This reduces the Surface Area for gas exchange. The patient becomes breathless easily.</li>
+                <li><strong>Lung Cancer:</strong> Uncontrolled division of cells forming a tumor, caused by carcinogens in Tar.</li>
+                <li><strong>Coronary Heart Disease:</strong> Smoking narrows coronary arteries (Nicotine) and reduces oxygen (CO), increasing risk of heart attack.</li>
+            </ul>
+            <button class="btn" onclick="downloadPDF()">Download Notes PDF</button>
+        </section>
+
+    </div>
+
+    <script>
+        // --- 1. LUNG SIMULATOR LOGIC ---
+        function updateLungs() {
+            const val = document.getElementById('smokeSlider').value;
+            const lungPath = document.getElementById('lungPath');
+            const yearLabel = document.getElementById('yearLabel');
+            const saVal = document.getElementById('saVal');
+            const riskVal = document.getElementById('riskVal');
+            const lungDesc = document.getElementById('lungDesc');
+
+            yearLabel.innerText = val;
+
+            // Color Interpolation: Pink (#fda4af) to Black (#0f172a)
+            // Simplified logic: Darken the pink
+            let darkness = 253 - (val * 4.5); // 253 down to ~28
+            let color = `rgb(${darkness}, ${darkness * 0.6}, ${darkness * 0.7})`; // Keep a reddish tint fading to grey
+            
+            if(val > 40) color = "#1e293b"; // Force black/slate at end
+
+            lungPath.style.fill = color;
+
+            // Update Stats
+            const sa = 100 - (val * 1.5);
+            saVal.innerText = Math.max(25, sa).toFixed(0) + "%";
+
+            if(val < 10) {
+                riskVal.innerText = "Low";
+                riskVal.style.color = "green";
+                lungDesc.innerText = "Healthy lungs. Efficient gas exchange.";
+            } else if (val < 30) {
+                riskVal.innerText = "Moderate";
+                riskVal.style.color = "orange";
+                lungDesc.innerText = "Tar accumulation. Cilia damaged. Smoker's cough.";
+            } else {
+                riskVal.innerText = "CRITICAL";
+                riskVal.style.color = "red";
+                lungDesc.innerText = "Severe Emphysema. Alveoli walls broken down. Cancer risk high.";
+            }
+        }
+
+        // --- 2. CILIA ANIMATION LOGIC ---
+        let isParalyzed = false;
+        function toggleSmoke() {
+            const box = document.getElementById('ciliaBox');
+            const btn = document.getElementById('ciliaBtn');
+            
+            isParalyzed = !isParalyzed;
+
+            if(isParalyzed) {
+                box.classList.add('damaged');
+                btn.innerText = "Stop Smoking (Recover)";
+                btn.style.background = "#10b981";
+            } else {
+                box.classList.remove('damaged');
+                btn.innerText = "Apply Tobacco Smoke";
+                btn.style.background = "#ef4444";
+            }
+        }
+
+        // --- 3. CO SIMULATION LOGIC ---
+        function inhaleSmoke() {
+            // Replace blue dots with grey dots
+            document.querySelectorAll('.molecule').forEach(mol => {
+                mol.classList.remove('oxy');
+                mol.classList.add('co');
+            });
+            // Darken RBCs
+            document.querySelectorAll('.rbc-cell').forEach(cell => {
+                cell.style.background = "#7f1d1d"; // Darker red
+                cell.innerHTML = "HbCO<div class='molecule co'></div>";
+            });
+            
+            document.getElementById('coStatus').innerText = "Status: Hypoxia (Oxygen Starvation)";
+            document.getElementById('coStatus').style.color = "red";
+        }
+
+        function freshAir() {
+            // Restore
+            document.querySelectorAll('.molecule').forEach(mol => {
+                mol.classList.remove('co');
+                mol.classList.add('oxy');
+            });
+            document.querySelectorAll('.rbc-cell').forEach(cell => {
+                cell.style.background = "#ef4444"; 
+                cell.innerHTML = "HbO2<div class='molecule oxy'></div>";
+            });
+
+            document.getElementById('coStatus').innerText = "Status: 100% Oxygen Capacity";
+            document.getElementById('coStatus').style.color = "green";
+        }
+
+        // --- 4. PDF DOWNLOAD ---
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(22);
+            doc.setTextColor(51, 65, 85);
+            doc.text("Biology 0610: Effects of Smoking", 20, 20);
+            
+            doc.setFontSize(12);
+            doc.setTextColor(0,0,0);
+            
+            const notes = `
+1. Chemical Components:
+   - Tar: Carcinogenic (cancer-causing), sticks to airways.
+   - Nicotine: Addictive stimulant, increases heart rate & blood pressure.
+   - Carbon Monoxide: Binds to haemoglobin, reducing oxygen transport.
+   - Smoke Particles: Irritate airway, causing coughing.
+
+2. Lung Diseases:
+   - Bronchitis: Cilia are paralyzed, mucus builds up, bacteria breed.
+   - Emphysema: Alveoli walls break down, reducing surface area for diffusion. 
+     Causes breathlessness.
+   - Lung Cancer: Uncontrolled cell division due to tar.
+
+3. Heart Disease:
+   - Smoking hardens arteries (atherosclerosis).
+   - Increases risk of blockage (thrombosis) and heart attacks.
+            `;
+            
+            doc.text(notes, 20, 40);
+            doc.save('Smoking_Effects_Notes.pdf');
+        }
+    </script>
+</body>
+</html>

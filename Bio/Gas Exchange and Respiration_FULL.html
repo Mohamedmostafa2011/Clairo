@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IG-Bio | Ch 11: Gas Exchange & Respiration</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* Theme: Indigo / Sky Blue for Air & Breathing */
+            --primary: #4338ca; /* Indigo 700 */
+            --primary-dark: #312e81; /* Indigo 900 */
+            --accent: #0ea5e9; /* Sky Blue */
+            --bg: #e0e7ff; /* Very light indigo tint */
+            --text: #334155;
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- NAVIGATION BUTTON (Fixed Circular) --- */
+        .menu-toggle {
+            display: none; /* Hidden on desktop */
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: var(--primary); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.4rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.9); }
+
+        /* --- MOBILE OVERLAY --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1999;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: var(--sidebar-w);
+            background: #1e1b4b; /* Very Dark Indigo */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            z-index: 2000;
+            border-right: 1px solid #312e81;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand {
+            font-size: 1.5rem; font-weight: 800; color: #818cf8; margin-bottom: 40px;
+            display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            padding: 16px; margin-bottom: 8px; border-radius: 8px;
+            cursor: pointer; color: #c7d2fe; font-weight: 600;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(67, 56, 202, 0.4); }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+        .view-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; padding: 0; display: none; opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .view-panel.active { display: block; opacity: 1; }
+
+        /* --- TEXTBOOK STYLING --- */
+        .paper {
+            max-width: 950px; margin: 0 auto; background: white;
+            padding: 80px; min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-family: 'Inter', sans-serif; font-size: 3rem; color: var(--primary-dark); margin-bottom: 10px; letter-spacing: -1px; }
+        .meta { color: #4f46e5; text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        h2 { 
+            font-family: 'Inter', sans-serif; font-size: 1.8rem; color: #1e1b4b; 
+            margin-top: 60px; margin-bottom: 25px; padding-bottom: 15px; 
+            border-bottom: 2px solid #c7d2fe; display: flex; align-items: center; gap: 10px;
+        }
+        
+        h3 { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--primary); margin-top: 35px; margin-bottom: 15px; }
+
+        p {
+            font-family: 'Crimson Pro', serif; font-size: 1.2rem; line-height: 1.8;
+            color: #334155; margin-bottom: 20px;
+        }
+        li { font-family: 'Crimson Pro', serif; font-size: 1.15rem; line-height: 1.7; margin-bottom: 8px; margin-left: 20px; }
+        
+        /* Concept Boxes */
+        .concept-box {
+            background: #e0f2fe; border-left: 5px solid var(--accent);
+            padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;
+        }
+        .concept-box strong { color: var(--primary-dark); font-family: 'Inter', sans-serif; }
+
+        .exam-tip {
+            background: #fff1f2; border: 1px solid #fda4af; border-radius: 8px;
+            padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+        }
+        .exam-tip i { color: #e11d48; font-size: 1.5rem; margin-top: 3px; }
+        .exam-tip strong { color: #be123c; }
+
+        /* Tables */
+        .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #c7d2fe; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #eef2ff; color: var(--primary-dark); padding: 16px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; border-bottom: 2px solid #a5b4fc; }
+        td { padding: 16px; border-bottom: 1px solid #c7d2fe; vertical-align: top; font-family: 'Crimson Pro', serif; font-size: 1.1rem; }
+        tr:last-child td { border-bottom: none; }
+
+        /* --- MIND MAP --- */
+        .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #f5f3ff; }
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #a5b4fc; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #a5b4fc; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #a5b4fc; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #a5b4fc; width: 0; height: 20px; }
+
+        .node {
+            background: white; border: 1px solid #818cf8; padding: 12px 18px; border-radius: 8px;
+            display: inline-block; min-width: 140px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; z-index: 2;
+        }
+        .root-node { background: var(--primary); color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: none; }
+
+        /* --- QUIZ --- */
+        .quiz-area { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .q-card { background: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #c7d2fe; }
+        .q-opt {
+            display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e2e8f0;
+            margin-top: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .q-opt:hover { background: #e0e7ff; border-color: #818cf8; }
+        .q-let { font-weight: 900; color: #94a3b8; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .q-opt.correct { background: #dcfce7; border-color: #16a34a; }
+        .q-opt.correct .q-let { background: #16a34a; color: white; }
+        .q-opt.wrong { background: #fee2e2; border-color: #ef4444; }
+        .q-opt.wrong .q-let { background: #ef4444; color: white; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
+            aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.active { left: 0; }
+            .paper { padding: 30px 20px; }
+            h1 { font-size: 2.2rem; }
+            .mm-wrapper { justify-content: flex-start; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-lungs"></i> IG-BIO AIR</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Full Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-sitemap"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-list-check"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #312e81;">
+             <div class="nav-item" onclick="genPDF()" style="color:#818cf8; border-color:#312e81;">
+                 <i class="fa-solid fa-file-pdf"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. DETAILED NOTES -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Biology 0610 • Chapter 11</span>
+                <h1>Gas Exchange & Respiration</h1>
+                <p>This chapter differentiates between <strong>Gas Exchange</strong> (physical movement of air and diffusion of gases) and <strong>Respiration</strong> (chemical breakdown of nutrients for energy).</p>
+
+                <h2>1. The Human Gas Exchange System</h2>
+                <p>Air enters via the nose/mouth and travels down to the lungs. The path is: Trachea &rarr; Bronchi &rarr; Bronchioles &rarr; Alveoli.</p>
+                
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Part</th><th>Structure & Function</th></tr>
+                        <tr><td><strong>Trachea (Windpipe)</strong></td><td>Tube connecting throat to lungs. Contains <strong>C-shaped rings of cartilage</strong> to keep it open (prevent collapse during inhalation).</td></tr>
+                        <tr><td><strong>Bronchi</strong></td><td>The trachea splits into two bronchi (one for each lung).</td></tr>
+                        <tr><td><strong>Bronchioles</strong></td><td>Smaller branches of the bronchi that end at the alveoli.</td></tr>
+                        <tr><td><strong>Alveoli</strong></td><td>Tiny air sacs where <strong>Gas Exchange</strong> occurs.</td></tr>
+                        <tr><td><strong>Rib Cage</strong></td><td>Bone structure protecting the lungs.</td></tr>
+                        <tr><td><strong>Intercostal Muscles</strong></td><td>Muscles between ribs involved in ventilation.</td></tr>
+                        <tr><td><strong>Diaphragm</strong></td><td>Sheet of muscle and tissue at the bottom of the thorax.</td></tr>
+                        <tr><td><strong>Goblet Cells & Cilia</strong></td><td>Goblet cells make mucus (traps dust/bacteria). Cilia (hairs) beat to move mucus up and out.</td></tr>
+                    </table>
+                </div>
+
+                <h2>2. Ventilation (Breathing)</h2>
+                <div class="concept-box">
+                    <strong>Pressure & Volume:</strong> Gas moves from High Pressure to Low Pressure. To breathe in, we must lower the pressure inside the lungs by increasing the volume.
+                </div>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Action</th><th>Inspiration (Breathing In)</th><th>Expiration (Breathing Out)</th></tr>
+                        <tr><td><strong>Ext. Intercostal Muscles</strong></td><td>Contract</td><td>Relax</td></tr>
+                        <tr><td><strong>Rib Cage</strong></td><td>Moves Up and Out</td><td>Moves Down and In</td></tr>
+                        <tr><td><strong>Diaphragm</strong></td><td>Contracts (Flattens)</td><td>Relaxes (Dome shape)</td></tr>
+                        <tr><td><strong>Thorax Volume</strong></td><td>Increases</td><td>Decreases</td></tr>
+                        <tr><td><strong>Pressure</strong></td><td>Decreases (below atmospheric)</td><td>Increases (above atmospheric)</td></tr>
+                        <tr><td><strong>Air Movement</strong></td><td>Rushes IN</td><td>Rushes OUT</td></tr>
+                    </table>
+                </div>
+
+                <h2>3. Gas Exchange at the Alveoli</h2>
+                <p>Oxygen diffuses from Alveoli &rarr; Blood. Carbon Dioxide diffuses from Blood &rarr; Alveoli. This happens by <strong>Diffusion</strong>.</p>
+                <p><strong>Adaptations of Alveoli:</strong></p>
+                <ul>
+                    <li><strong>Large Surface Area:</strong> Millions of alveoli increase the rate of diffusion.</li>
+                    <li><strong>Thin Walls:</strong> Only one cell thick (short diffusion distance).</li>
+                    <li><strong>Good Blood Supply:</strong> Surrounded by capillaries to maintain a high concentration gradient.</li>
+                    <li><strong>Moist Lining:</strong> Gases dissolve in liquid to diffuse efficiently.</li>
+                </ul>
+
+                <h2>4. Respiration</h2>
+                <div class="exam-tip">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Exam Warning:</strong><br>
+                        Do not confuse "Respiration" with "Breathing". Respiration is a chemical reaction in cells (mitochondria) to release energy. Breathing is just moving air.
+                    </div>
+                </div>
+
+                <h3>A. Aerobic Respiration</h3>
+                <p>Breakdown of glucose <strong>using oxygen</strong>. Releases a large amount of energy.</p>
+                <ul>
+                    <li><strong>Word Equation:</strong> Glucose + Oxygen &rarr; Carbon Dioxide + Water + Energy</li>
+                    <li><strong>Chemical Equation:</strong> C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6O<sub>2</sub> &rarr; 6CO<sub>2</sub> + 6H<sub>2</sub>O</li>
+                </ul>
+
+                <h3>B. Anaerobic Respiration</h3>
+                <p>Breakdown of glucose <strong>without oxygen</strong>. Releases much less energy.</p>
+                
+                <p><strong>1. In Muscles (Humans):</strong></p>
+                <ul>
+                    <li>Glucose &rarr; Lactic Acid + Energy</li>
+                    <li><strong>Oxygen Debt:</strong> Lactic acid builds up in muscles causing fatigue. After exercise, you breathe fast (pant) to get extra oxygen to break down this lactic acid in the liver.</li>
+                </ul>
+
+                <p><strong>2. In Yeast (Fermentation):</strong></p>
+                <ul>
+                    <li>Glucose &rarr; Alcohol (Ethanol) + Carbon Dioxide + Energy</li>
+                    <li>Used in brewing (alcohol) and baking (CO2 makes bread rise).</li>
+                </ul>
+
+                <h2>5. Composition of Air</h2>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Gas</th><th>Inspired Air</th><th>Expired Air</th><th>Reason</th></tr>
+                        <tr><td><strong>Oxygen</strong></td><td>21%</td><td>16%</td><td>Used in respiration.</td></tr>
+                        <tr><td><strong>Carbon Dioxide</strong></td><td>0.04%</td><td>4%</td><td>Produced in respiration.</td></tr>
+                        <tr><td><strong>Nitrogen</strong></td><td>78%</td><td>78%</td><td>Not used by the body.</td></tr>
+                        <tr><td><strong>Water Vapour</strong></td><td>Variable</td><td>Saturated</td><td>Evaporates from alveoli.</td></tr>
+                    </table>
+                </div>
+
+                <h2>6. Smoking and Health</h2>
+                <p>Tobacco smoke contains harmful chemicals:</p>
+                <ul>
+                    <li><strong>Tar:</strong> Causes cancer (carcinogen). Damages cilia, causing mucus buildup &rarr; Smoker's Cough &rarr; Bronchitis.</li>
+                    <li><strong>Nicotine:</strong> Addictive. Increases heart rate and blood pressure.</li>
+                    <li><strong>Carbon Monoxide (CO):</strong> Binds to haemoglobin permanently, reducing oxygen carrying capacity.</li>
+                    <li><strong>Emphysema:</strong> Smoke damages alveoli walls, reducing surface area. Causes severe breathlessness.</li>
+                </ul>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">GAS EXCHANGE</div>
+                            <ul>
+                                <li>
+                                    <div class="node">Anatomy</div>
+                                    <ul>
+                                        <li><div class="node">Trachea/Bronchi</div></li>
+                                        <li><div class="node">Alveoli (Exchange)</div></li>
+                                        <li><div class="node">Diaphragm</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Mechanism</div>
+                                    <ul>
+                                        <li><div class="node">Inhale (Vol Up, P Down)</div></li>
+                                        <li><div class="node">Exhale (Vol Down, P Up)</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Respiration</div>
+                                    <ul>
+                                        <li><div class="node">Aerobic (O2 used)</div></li>
+                                        <li><div class="node">Anaerobic (Lactic Acid)</div></li>
+                                        <li><div class="node">Yeast (Alcohol+CO2)</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Issues</div>
+                                    <ul>
+                                        <li><div class="node">Smoking (Tar/CO)</div></li>
+                                        <li><div class="node">Oxygen Debt</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container">
+                <!-- Questions injected via JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI LOGIC ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Bio_Ch11_GasExchange.pdf');
+            });
+        }
+
+        // --- 50 QUESTIONS (Gas Exchange & Respiration) ---
+        const qData = [
+            {q:"Where does gas exchange take place in humans?", o:["Trachea","Bronchi","Alveoli","Nose"], a:2},
+            {q:"What prevents the trachea from collapsing?", o:["Muscle","Bone","C-shaped Cartilage","Ligaments"], a:2},
+            {q:"Which muscle is found at the bottom of the thorax?", o:["Intercostal","Bicep","Diaphragm","Heart"], a:2},
+            {q:"During inhalation, the diaphragm...", o:["Relaxes and domes","Contracts and flattens","Relaxes and flattens","Contracts and domes"], a:1},
+            {q:"During exhalation, the external intercostal muscles...", o:["Contract","Relax","Expand","Vibrate"], a:1},
+            {q:"During inhalation, the volume of the thorax...", o:["Decreases","Increases","Stays same","Fluctuates"], a:1},
+            {q:"During inhalation, the pressure in the lungs...", o:["Increases","Decreases","Equals atmospheric","Doubles"], a:1},
+            {q:"Air moves from ____ pressure to ____ pressure.", o:["Low to High","High to Low","Zero to High","High to High"], a:1},
+            {q:"Alveoli have walls that are ____ thick.", o:["One cell","Two cells","Ten cells","Thick muscle"], a:0},
+            {q:"Which gas diffuses from the alveoli into the blood?", o:["Carbon Dioxide","Nitrogen","Oxygen","Argon"], a:2},
+            {q:"Which gas diffuses from the blood into the alveoli?", o:["Oxygen","Glucose","Carbon Dioxide","Carbon Monoxide"], a:2},
+            {q:"What is the percentage of Oxygen in inspired air?", o:["16%","78%","21%","0.04%"], a:2},
+            {q:"What is the percentage of Oxygen in expired air?", o:["21%","16%","4%","78%"], a:1},
+            {q:"What is the percentage of CO2 in expired air?", o:["0.04%","21%","4%","16%"], a:2},
+            {q:"Why does expired air contain more water vapour?", o:["It rains in the lungs","It evaporates from moist alveoli surfaces","Blood is water","Saliva mixes in"], a:1},
+            {q:"What is the word equation for aerobic respiration?", o:["Glucose + Oxygen -> CO2 + Water","Glucose -> Lactic Acid","CO2 + Water -> Glucose","Glucose -> Alcohol"], a:0},
+            {q:"Where does aerobic respiration happen in the cell?", o:["Nucleus","Ribosome","Mitochondria","Cell wall"], a:2},
+            {q:"What is the chemical formula for Glucose?", o:["CO2","H2O","C6H12O6","NaCl"], a:2},
+            {q:"Anaerobic respiration in humans produces?", o:["Alcohol","Lactic Acid","CO2 and Water","Oxygen"], a:1},
+            {q:"Anaerobic respiration releases ____ energy than aerobic.", o:["More","Less","Same","No"], a:1},
+            {q:"What builds up in muscles causing fatigue?", o:["Glucose","Oxygen","Lactic Acid","Urea"], a:2},
+            {q:"What is 'Oxygen Debt'?", o:["Owing money for air","Extra oxygen needed to break down lactic acid","Breathing too fast","Holding breath"], a:1},
+            {q:"Anaerobic respiration in yeast produces?", o:["Lactic Acid","Alcohol (Ethanol) + CO2","Oxygen + Glucose","Water"], a:1},
+            {q:"Yeast fermentation is used to make?", o:["Bread and Alcohol","Yogurt","Cheese","Plastic"], a:0},
+            {q:"What chemical in smoke causes cancer?", o:["Nicotine","Tar","Carbon Monoxide","Oxygen"], a:1},
+            {q:"What chemical in smoke is addictive?", o:["Tar","Carbon Monoxide","Nicotine","Smoke particles"], a:2},
+            {q:"Carbon Monoxide is dangerous because it?", o:["Causes cancer","Binds to haemoglobin preventing oxygen transport","Digests lungs","Is addictive"], a:1},
+            {q:"Emphysema is caused by?", o:["Destruction of alveoli walls","Mucus buildup","Bacteria","Genetic mutation"], a:0},
+            {q:"What do goblet cells produce?", o:["Cilia","Mucus","Saliva","Blood"], a:1},
+            {q:"What is the function of cilia?", o:["Trap dust","Move mucus up and out","Exchange gases","Absorb food"], a:1},
+            {q:"How does smoking affect cilia?", o:["Makes them grow","Paralyses/Destroys them","Cleans them","No effect"], a:1},
+            {q:"What is the test for Carbon Dioxide?", o:["Iodine turns blue/black","Limewater turns cloudy","Benedict's turns red","Litmus turns blue"], a:1},
+            {q:"Which component of blood transports Oxygen?", o:["Plasma","White blood cells","Red blood cells","Platelets"], a:2},
+            {q:"What happens to breathing rate during exercise?", o:["Decreases","Increases","Stops","Stays same"], a:1},
+            {q:"Why does breathing rate increase during exercise?", o:["To cool down","To remove CO2 and get O2 for respiration","To talk louder","To drink water"], a:1},
+            {q:"The process of releasing energy from food is called?", o:["Breathing","Digestion","Respiration","Excretion"], a:2},
+            {q:"Which cells protect the airway from dust?", o:["Red blood cells","Goblet and Ciliated cells","Nerve cells","Muscle cells"], a:1},
+            {q:"Expired air contains ____ Nitrogen than inspired air.", o:["More","Less","The same amount of","No"], a:2},
+            {q:"Which is a difference between inhaled and exhaled air?", o:["Exhaled has more O2","Exhaled has more CO2","Inhaled is warmer","Inhaled has more water"], a:1},
+            {q:"The passage leading from the mouth to the lungs is the?", o:["Oesophagus","Trachea","Aorta","Ureter"], a:1},
+            {q:"Bronchioles branch off from the?", o:["Trachea","Bronchi","Alveoli","Ribs"], a:1},
+            {q:"Gas exchange happens by which process?", o:["Active Transport","Osmosis","Diffusion","Digestion"], a:2},
+            {q:"Alveoli have a ____ surface area.", o:["Small","Large","Tiny","Flat"], a:1},
+            {q:"What surrounds the alveoli?", o:["Bone","Muscle","Capillaries","Skin"], a:2},
+            {q:"Lactic acid is broken down in the?", o:["Kidney","Heart","Liver","Stomach"], a:2},
+            {q:"During exercise, the depth of breathing?", o:["Increases","Decreases","Stays same","Becomes shallow"], a:0},
+            {q:"Which substance blocks arteries (linked to smoking)?", o:["Tar","Fatty deposits (plaque)","Mucus","Cilia"], a:1},
+            {q:"Bronchitis is caused by?", o:["Infection/Inflammation due to mucus buildup","Alveoli breaking","Heart failure","Lack of iron"], a:0},
+            {q:"Balanced equation for aerobic respiration is?", o:["C6H12O6 + 6O2 -> 6CO2 + 6H2O","C6H12O6 -> 2C2H5OH + 2CO2","6CO2 + 6H2O -> C6H12O6 + 6O2","H2 + O2 -> H2O"], a:0},
+            {q:"Which organism carries out fermentation?", o:["Virus","Bacteria","Yeast","Human"], a:2}
+        ];
+
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            // Shuffle options
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem; color:#334155;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const text = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerText.includes(text)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IG-Bio | Ch 6: Plant Nutrition</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* Theme: Green / Emerald for Plant Biology */
+            --primary: #15803d; /* Emerald 700 */
+            --primary-dark: #052e16; /* Emerald 950 */
+            --accent: #d97706; /* Amber (for sunlight/energy accents) */
+            --bg: #f0fdf4; /* Light Green tint */
+            --text: #334155;
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            transition: opacity ease-in 0.2s;
+        }
+
+        /* --- NAVIGATION BUTTON (Fixed Circular) --- */
+        .menu-toggle {
+            display: none; /* Hidden on desktop */
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: var(--primary); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.4rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.9); }
+
+        /* --- MOBILE OVERLAY --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1999;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: var(--sidebar-w);
+            background: #022c22; /* Very dark green */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            z-index: 2000;
+            border-right: 1px solid #064e3b;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand {
+            font-size: 1.5rem; font-weight: 800; color: #4ade80; margin-bottom: 40px;
+            display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            padding: 16px; margin-bottom: 8px; border-radius: 8px;
+            cursor: pointer; color: #a7f3d0; font-weight: 600;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(21, 128, 61, 0.4); }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+        .view-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; padding: 0; display: none; opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .view-panel.active { display: block; opacity: 1; }
+
+        /* --- TEXTBOOK STYLING --- */
+        .paper {
+            max-width: 950px; margin: 0 auto; background: white;
+            padding: 80px; min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-family: 'Inter', sans-serif; font-size: 3rem; color: var(--primary-dark); margin-bottom: 10px; letter-spacing: -1px; }
+        .meta { color: #64748b; text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        h2 { 
+            font-family: 'Inter', sans-serif; font-size: 1.8rem; color: #1e293b; 
+            margin-top: 60px; margin-bottom: 25px; padding-bottom: 15px; 
+            border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 10px;
+        }
+        
+        h3 { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--primary); margin-top: 35px; margin-bottom: 15px; }
+
+        p {
+            font-family: 'Crimson Pro', serif; font-size: 1.2rem; line-height: 1.8;
+            color: #334155; margin-bottom: 20px;
+        }
+        li { font-family: 'Crimson Pro', serif; font-size: 1.15rem; line-height: 1.7; margin-bottom: 8px; margin-left: 20px; }
+        
+        /* Concept Boxes */
+        .concept-box {
+            background: #dcfce7; border-left: 5px solid var(--primary);
+            padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;
+        }
+        .concept-box strong { color: var(--primary-dark); font-family: 'Inter', sans-serif; }
+
+        .exam-tip {
+            background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;
+            padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+        }
+        .exam-tip i { color: var(--accent); font-size: 1.5rem; margin-top: 3px; }
+        .exam-tip strong { color: #92400e; }
+
+        /* Tables */
+        .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #e2e8f0; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #f0fdf4; color: var(--primary-dark); padding: 16px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; border-bottom: 2px solid #86efac; }
+        td { padding: 16px; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-family: 'Crimson Pro', serif; font-size: 1.1rem; }
+        tr:last-child td { border-bottom: none; }
+
+        /* --- MIND MAP --- */
+        .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #f8fafc; }
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #94a3b8; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #94a3b8; width: 0; height: 20px; }
+
+        .node {
+            background: white; border: 1px solid #cbd5e1; padding: 12px 18px; border-radius: 8px;
+            display: inline-block; min-width: 140px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; z-index: 2;
+        }
+        .root-node { background: var(--primary-dark); color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        /* --- QUIZ --- */
+        .quiz-area { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .q-card { background: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; }
+        .q-opt {
+            display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e2e8f0;
+            margin-top: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .q-opt:hover { background: #f1f5f9; border-color: #94a3b8; }
+        .q-let { font-weight: 900; color: #94a3b8; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .q-opt.correct { background: #dcfce7; border-color: var(--primary); }
+        .q-opt.correct .q-let { background: var(--primary); color: white; }
+        .q-opt.wrong { background: #fee2e2; border-color: #ef4444; }
+        .q-opt.wrong .q-let { background: #ef4444; color: white; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
+            aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.active { left: 0; }
+            .paper { padding: 30px 20px; }
+            h1 { font-size: 2.2rem; }
+            .mm-wrapper { justify-content: flex-start; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-leaf"></i> IG-BIO PLANTS</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Full Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-sitemap"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-list-check"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #064e3b;">
+             <div class="nav-item" onclick="genPDF()" style="color:#4ade80; border-color:#064e3b;">
+                 <i class="fa-solid fa-file-pdf"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. DETAILED NOTES -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Biology 0610 • Chapter 6</span>
+                <h1>Plant Nutrition</h1>
+                <p>Plants are autotrophs; they make their own organic nutrients (carbohydrates) from simple inorganic raw materials (carbon dioxide and water) using light energy. This chapter covers photosynthesis, leaf anatomy, and environmental factors.</p>
+
+                <h2>1. Photosynthesis</h2>
+                
+                <div class="concept-box">
+                    <strong>Definition:</strong><br>
+                    Photosynthesis is the process by which plants manufacture <strong>carbohydrates</strong> from raw materials using energy from light.
+                </div>
+
+                <h3>The Equations</h3>
+                <p>You must memorize both the word and chemical equations.</p>
+                <ul>
+                    <li><strong>Word Equation:</strong><br>Carbon Dioxide + Water &rarr; (light + chlorophyll) &rarr; Glucose + Oxygen</li>
+                    <li><strong>Balanced Chemical Equation:</strong><br>6CO<sub>2</sub> + 6H<sub>2</sub>O &rarr; C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6O<sub>2</sub></li>
+                </ul>
+                <p><strong>Chlorophyll</strong> is the green pigment in chloroplasts that absorbs light energy. This energy is used to convert CO<sub>2</sub> and H<sub>2</sub>O into glucose. Oxygen is released as a by-product.</p>
+
+                <h3>Use of Products</h3>
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Product</th><th>Fate / Use</th></tr>
+                        <tr><td><strong>Glucose</strong></td><td>Used for respiration (energy), converted to sucrose for transport, or converted to cellulose for cell walls.</td></tr>
+                        <tr><td><strong>Starch</strong></td><td>Glucose is converted to starch for <strong>storage</strong>. Starch is insoluble, so it does not affect the water potential (osmosis) of the cell.</td></tr>
+                        <tr><td><strong>Amino Acids</strong></td><td>Glucose + Nitrates &rarr; Amino Acids &rarr; Proteins (for growth).</td></tr>
+                        <tr><td><strong>Oxygen</strong></td><td>Used in respiration or excreted via stomata.</td></tr>
+                    </table>
+                </div>
+
+                <h2>2. Leaf Structure & Adaptations</h2>
+                <p>Leaves are adapted to maximize photosynthesis (absorbing light and gas exchange).</p>
+                
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Structure</th><th>Adaptation/Function</th></tr>
+                        <tr><td><strong>Waxy Cuticle</strong></td><td>Waterproof layer on top; prevents water loss (evaporation) but allows light through.</td></tr>
+                        <tr><td><strong>Upper Epidermis</strong></td><td>Transparent cells (no chloroplasts) to let light pass to the palisade layer.</td></tr>
+                        <tr><td><strong>Palisade Mesophyll</strong></td><td>Packed with <strong>many chloroplasts</strong>. Located near the top to absorb maximum light. Main site of photosynthesis.</td></tr>
+                        <tr><td><strong>Spongy Mesophyll</strong></td><td>Loose cells with air spaces to allow <strong>gas exchange</strong> (CO<sub>2</sub> in, O<sub>2</sub> out). Contains fewer chloroplasts.</td></tr>
+                        <tr><td><strong>Vascular Bundle</strong></td><td>Contains Xylem (transports water/minerals) and Phloem (transports sugars/amino acids).</td></tr>
+                        <tr><td><strong>Stomata</strong></td><td>Pores on the underside of the leaf for gas diffusion.</td></tr>
+                        <tr><td><strong>Guard Cells</strong></td><td>Control the opening and closing of stomata.</td></tr>
+                    </table>
+                </div>
+
+                <h2>3. Mineral Nutrition</h2>
+                <p>Plants need ions for healthy growth. The two most important for IGCSE are:</p>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Mineral Ion</th><th>Function</th><th>Deficiency Symptom</th></tr>
+                        <tr><td><strong>Nitrate Ions</strong></td><td>Required to make <strong>amino acids</strong> (for proteins).</td><td>Stunted growth; weak stem.</td></tr>
+                        <tr><td><strong>Magnesium Ions</strong></td><td>Required to make <strong>chlorophyll</strong>.</td><td>Yellowing between veins (Chlorosis).</td></tr>
+                    </table>
+                </div>
+
+                <h2>4. Limiting Factors</h2>
+                <div class="concept-box">
+                    <strong>Definition: Limiting Factor</strong><br>
+                    Something present in the environment in such short supply that it restricts life processes.
+                </div>
+                <p>The rate of photosynthesis can be limited by:</p>
+                <ol>
+                    <li><strong>Light Intensity:</strong> As light increases, rate increases until it plateaus (another factor becomes limiting).</li>
+                    <li><strong>Carbon Dioxide Concentration:</strong> As CO<sub>2</sub> increases, rate increases until it plateaus.</li>
+                    <li><strong>Temperature:</strong> Photosynthesis uses enzymes. Rate increases with temperature up to an optimum, then drops rapidly as enzymes <strong>denature</strong>.</li>
+                </ol>
+
+                <div class="exam-tip">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Exam Warning: Glasshouses</strong><br>
+                        In glasshouses (greenhouses), farmers control these factors to maximize yield. They use artificial lights, burn gas to add CO<sub>2</sub>, and use heaters/ventilation to maintain optimum temperature.
+                    </div>
+                </div>
+
+                <h2>5. Practical Experiments</h2>
+                
+                <h3>A. Testing a Leaf for Starch</h3>
+                <p>This proves photosynthesis has occurred.</p>
+                <ol>
+                    <li><strong>Boil leaf in water:</strong> Kills the leaf, stops enzymes, breaks cell membranes.</li>
+                    <li><strong>Boil in ethanol:</strong> Removes chlorophyll (decolorizes leaf). <em>Safety: Turn off Bunsen burner (ethanol is flammable).</em></li>
+                    <li><strong>Dip in hot water:</strong> Softens the brittle leaf.</li>
+                    <li><strong>Add Iodine Solution:</strong> 
+                        <ul>
+                            <li>Positive result (Starch present): Blue-Black.</li>
+                            <li>Negative result: Orange-Brown.</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h3>B. Requirement Tests</h3>
+                <ul>
+                    <li><strong>Light:</strong> Cover part of a leaf with foil. Destarch plant first. Expose to light. Test for starch. Only exposed part turns blue-black.</li>
+                    <li><strong>Chlorophyll:</strong> Use a <strong>variegated leaf</strong> (white and green patches). Only green parts turn blue-black.</li>
+                    <li><strong>CO<sub>2</sub>:</strong> Enclose leaf in a flask with <strong>Soda Lime</strong> (absorbs CO<sub>2</sub>). Leaf will produce no starch.</li>
+                </ul>
+
+                <h3>C. Rate of Photosynthesis (Pondweed)</h3>
+                <p>Count bubbles of oxygen produced by aquatic plants (e.g., Elodea) over time.</p>
+                <ul>
+                    <li><strong>Independent Variable:</strong> Distance of lamp (Light Intensity).</li>
+                    <li><strong>Dependent Variable:</strong> Number of bubbles per minute (Rate).</li>
+                    <li><strong>Control Variables:</strong> Temperature (use water bath), CO<sub>2</sub> (add sodium hydrogencarbonate).</li>
+                </ul>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">PLANT NUTRITION</div>
+                            <ul>
+                                <li>
+                                    <div class="node">Photosynthesis</div>
+                                    <ul>
+                                        <li><div class="node">6CO2 + 6H2O</div></li>
+                                        <li><div class="node">Chlorophyll / Light</div></li>
+                                        <li><div class="node">Glucose + O2</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Leaf Structure</div>
+                                    <ul>
+                                        <li><div class="node">Palisade (Light)</div></li>
+                                        <li><div class="node">Spongy (Gas)</div></li>
+                                        <li><div class="node">Stomata/Guard</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Factors</div>
+                                    <ul>
+                                        <li><div class="node">Light Intensity</div></li>
+                                        <li><div class="node">CO2 Conc.</div></li>
+                                        <li><div class="node">Temp (Enzymes)</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Experiments</div>
+                                    <ul>
+                                        <li><div class="node">Starch (Iodine)</div></li>
+                                        <li><div class="node">Limiting Factors</div></li>
+                                        <li><div class="node">Minerals (Mg/N)</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container">
+                <!-- Questions injected via JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI LOGIC ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Bio_Ch6_PlantNutrition.pdf');
+            });
+        }
+
+        // --- 50 QUESTIONS (Plant Nutrition) ---
+        const qData = [
+            {q:"What are the raw materials for photosynthesis?", o:["CO2 and Water","Glucose and Oxygen","Starch and Water","Amino acids"], a:0},
+            {q:"What is the main by-product of photosynthesis?", o:["Carbon Dioxide","Nitrogen","Oxygen","Glucose"], a:2},
+            {q:"Which pigment absorbs light energy?", o:["Haemoglobin","Chlorophyll","Melanin","Keratin"], a:1},
+            {q:"Where is chlorophyll found?", o:["Nucleus","Cytoplasm","Chloroplasts","Cell wall"], a:2},
+            {q:"What is the chemical formula for glucose?", o:["C6H12O6","CO2","H2O","C12H22O11"], a:0},
+            {q:"Magnesium is needed to make?", o:["Cell walls","Chlorophyll","Protein","DNA"], a:1},
+            {q:"Nitrate ions are needed to make?", o:["Starch","Fats","Amino acids","Glucose"], a:2},
+            {q:"Deficiency of Magnesium causes?", o:["Red leaves","Stunted growth","Chlorosis (yellowing)","Wilting"], a:2},
+            {q:"Deficiency of Nitrate causes?", o:["Stunted growth","Yellow leaves","Large roots","More flowers"], a:0},
+            {q:"Glucose is stored in leaves as?", o:["Sugar","Starch","Glycogen","Fats"], a:1},
+            {q:"Why is starch a good storage molecule?", o:["It is soluble","It is insoluble","It is sweet","It is small"], a:1},
+            {q:"Which layer of the leaf has the most chloroplasts?", o:["Upper Epidermis","Palisade Mesophyll","Spongy Mesophyll","Lower Epidermis"], a:1},
+            {q:"What is the function of the waxy cuticle?", o:["Absorb light","Prevent water loss","Gas exchange","Transport sugar"], a:1},
+            {q:"Which cells control the opening of stomata?", o:["Palisade cells","Guard cells","Epidermal cells","Xylem"], a:1},
+            {q:"Stomata are usually found on the?", o:["Upper surface","Lower surface","Leaf edges","Stem"], a:1},
+            {q:"What gas enters the leaf for photosynthesis?", o:["Oxygen","Nitrogen","Carbon Dioxide","Argon"], a:2},
+            {q:"What gas leaves the leaf during the day?", o:["Carbon Dioxide","Hydrogen","Oxygen","Methane"], a:2},
+            {q:"The transport tissue for water is?", o:["Phloem","Xylem","Cortex","Pith"], a:1},
+            {q:"The transport tissue for sucrose/amino acids is?", o:["Xylem","Phloem","Epidermis","Cuticle"], a:1},
+            {q:"What color does Iodine turn in the presence of starch?", o:["Orange-Brown","Blue-Black","Purple","Red"], a:1},
+            {q:"Why do we boil the leaf in ethanol?", o:["To kill it","To remove chlorophyll","To soften it","To cook starch"], a:1},
+            {q:"Why turn off the Bunsen burner when using ethanol?", o:["Ethanol is toxic","Ethanol is flammable","To save gas","It evaporates too fast"], a:1},
+            {q:"What does Soda Lime absorb?", o:["Oxygen","Water","Carbon Dioxide","Light"], a:2},
+            {q:"A variegated leaf has?", o:["No chloroplasts","Green and white parts","Only red parts","Thorns"], a:1},
+            {q:"In a destarched variegated leaf, which part turns blue-black?", o:["The white part","The green part","Both parts","Neither part"], a:1},
+            {q:"How do you destarch a plant?", o:["Place in dark for 48hrs","Boil it","Put in sunlight","Remove soil"], a:0},
+            {q:"Which is a limiting factor of photosynthesis?", o:["Oxygen level","Soil pH","Light intensity","Wind speed"], a:2},
+            {q:"As temperature increases beyond optimum, photosynthesis drops because?", o:["Enzymes denature","Stomata close","Water boils","CO2 runs out"], a:0},
+            {q:"What happens to the rate if light intensity increases indefinitely?", o:["Keeps increasing","Plateaus (levels off)","Decreases","Stops"], a:1},
+            {q:"The air spaces in the spongy mesophyll allow?", o:["Light absorption","Gas diffusion","Water storage","Support"], a:1},
+            {q:"The upper epidermis is transparent to?", o:["Let gas in","Let light through","Stop water","Protect cells"], a:1},
+            {q:"The chemical equation for photosynthesis requires how many CO2 molecules?", o:["6","12","1","2"], a:0},
+            {q:"Plants are known as?", o:["Heterotrophs","Autotrophs","Saprotrophs","Decomposers"], a:1},
+            {q:"Which creates a barrier against evaporation?", o:["Stomata","Cuticle","Xylem","Phloem"], a:1},
+            {q:"Oxygen produced comes from the splitting of?", o:["CO2","Glucose","Water","Nitrates"], a:2},
+            {q:"Sodium hydrogencarbonate is added to water to provide?", o:["Oxygen","Carbon Dioxide","Magnesium","Light"], a:1},
+            {q:"Counting bubbles from pondweed measures?", o:["Respiration rate","Photosynthesis rate","Growth rate","Transpiration"], a:1},
+            {q:"The main independent variable in the pondweed lab is?", o:["Distance of lamp","Temperature","Type of plant","Water volume"], a:0},
+            {q:"What color is Iodine solution originally?", o:["Blue-Black","Orange-Brown","Clear","Pink"], a:1},
+            {q:"Why dip the leaf in hot water after ethanol?", o:["To kill it","To soften it","To remove starch","To dry it"], a:1},
+            {q:"Glucose contains which elements?", o:["C, H, O","C, H, O, N","C, O, N","H, O, N"], a:0},
+            {q:"Amino acids contain which extra element compared to glucose?", o:["Magnesium","Nitrogen","Iron","Calcium"], a:1},
+            {q:"Where does the energy for photosynthesis come from?", o:["Heat","Chemicals","Sunlight","Soil"], a:2},
+            {q:"Cell walls are made of?", o:["Starch","Glycogen","Cellulose","Protein"], a:2},
+            {q:"Sucrose is used for?", o:["Storage","Transport","Cell walls","Enzymes"], a:1},
+            {q:"Glasshouses allow control of?", o:["Genes","Limiting factors","Gravity","Time"], a:1},
+            {q:"If a plant has no CO2, the iodine test will be?", o:["Blue-Black","Orange-Brown","Purple","Green"], a:1},
+            {q:"Xylem vessels are?", o:["Living cells","Dead hollow tubes","Full of cytoplasm","On the outside"], a:1},
+            {q:"Phloem transports food in which direction?", o:["Up only","Down only","Up and Down","Sideways only"], a:2},
+            {q:"Most photosynthesis happens in the?", o:["Stem","Roots","Leaves","Flowers"], a:2}
+        ];
+
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            // Shuffle options
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem; color:#334155;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const text = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerText.includes(text)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

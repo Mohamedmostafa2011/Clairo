@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon - Liquid Glass</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&display=swap');
+
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #050505;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: 'Rajdhani', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        /* --- Background Fluid Blobs --- */
+        .ambient-light {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            filter: blur(80px);
+            opacity: 0.6;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--neon-purple);
+            top: 20%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--neon-blue);
+            bottom: 20%;
+            right: 20%;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            width: 200px;
+            height: 200px;
+            background: blue;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 8s infinite alternate;
+        }
+
+        /* --- The Watery Glass Card --- */
+        .glass-container {
+            position: relative;
+            z-index: 10;
+            width: 500px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+            
+            /* Glassmorphism Core */
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            
+            /* The Water Distortion Effect reference */
+            /* We apply the filter to a pseudo element or the border to simulate wetness */
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .glass-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            transform: rotate(45deg);
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        /* Liquid overlay applied via SVG filter below */
+        .liquid-surface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            filter: url(#water); /* Links to SVG */
+            opacity: 0.5;
+            background: rgba(255, 255, 255, 0.05);
+            pointer-events: none;
+        }
+
+        /* --- Content --- */
+        .content {
+            z-index: 2;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            line-height: 1;
+            /* Techno Text Gradient */
+            background: linear-gradient(90deg, #fff, var(--neon-blue), #fff);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+
+        p {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .loader {
+            width: 40px;
+            height: 2px;
+            background: var(--neon-purple);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loader::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background: var(--neon-blue);
+            animation: loading 1s infinite ease-in-out;
+        }
+
+        /* --- Animations --- */
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -50px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5;}
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8;}
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        @keyframes loading {
+            0% { left: -50%; }
+            100% { left: 100%; }
+        }
+
+        /* Hide the SVG structure used for the filter */
+        .svg-filters {
+            position: absolute;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Blobs -->
+    <div class="ambient-light">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Main Glass Card -->
+    <div class="glass-container" id="card">
+        <!-- This div gets the distortion filter to look like water surface -->
+        <div class="liquid-surface"></div>
+        
+        <div class="content">
+            <h1>Coming<br>Soon</h1>
+            <p>SYSTEM RELOAD <span class="loader"></span></p>
+        </div>
+    </div>
+
+    <!-- SVG Filters for the Water Effect -->
+    <svg class="svg-filters">
+        <defs>
+            <filter id="water">
+                <!-- Turbulence creates the noise -->
+                <feTurbulence 
+                    type="fractalNoise" 
+                    baseFrequency="0.01 0.01" 
+                    numOctaves="2" 
+                    result="noise" 
+                    seed="1"
+                >
+                    <!-- Animate the turbulence to simulate flow -->
+                    <animate 
+                        attributeName="baseFrequency" 
+                        dur="30s" 
+                        values="0.01 0.01;0.02 0.03;0.01 0.01" 
+                        repeatCount="indefinite" 
+                    />
+                </feTurbulence>
+                
+                <!-- DisplacementMap uses the noise to distort the image -->
+                <feDisplacementMap 
+                    in="SourceGraphic" 
+                    in2="noise" 
+                    scale="30" 
+                    xChannelSelector="R" 
+                    yChannelSelector="G" 
+                />
+            </filter>
+        </defs>
+    </svg>
+
+    <script>
+        // Optional: 3D Tilt Effect on Mouse Move
+        const card = document.getElementById('card');
+        const liquid = document.querySelector('feTurbulence');
+
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        // Add a little techno randomness to the water seed
+        setInterval(() => {
+            const randomSeed = Math.floor(Math.random() * 100);
+            liquid.setAttribute('seed', randomSeed);
+        }, 2000);
+    </script>
+</body>
+</html>

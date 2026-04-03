@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IG-Chem | Chemical Energetics</title>
+
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- PDF Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+    :root {
+        /* Energetics Theme: Fire, Ice, Slate */
+        --primary: #ef4444; /* Heat Red */
+        --primary-dark: #991b1b; /* Dark Red */
+        --secondary: #1e293b; /* Dark Slate */
+        --accent: #3b82f6; /* Cool Blue (Endothermic) */
+        --bg: #f8fafc; /* Very Light Grey */
+        --text: #0f172a;
+        --sidebar-w: 280px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Space Grotesk', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
+        transition: opacity ease-in 0.2s;
+    }
+
+    /* --- NAVIGATION --- */
+    .menu-toggle {
+        display: none;
+        position: fixed; top: 20px; left: 20px; z-index: 3000;
+        background: var(--secondary); color: white; border: none;
+        width: 50px; height: 50px; border-radius: 12px;
+        font-size: 1.4rem; cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        align-items: center; justify-content: center;
+        transition: 0.2s;
+    }
+    .menu-toggle:active { transform: scale(0.95); }
+
+    .overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); z-index: 1999;
+        opacity: 0; visibility: hidden; transition: 0.3s;
+        backdrop-filter: blur(3px);
+    }
+    .overlay.active { opacity: 1; visibility: visible; }
+
+    aside {
+        width: var(--sidebar-w);
+        background: #0f172a; /* Dark Slate */
+        color: #e2e8f0;
+        display: flex; flex-direction: column;
+        padding: 30px 20px;
+        flex-shrink: 0; z-index: 2000;
+        border-right: 4px solid var(--primary);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .brand {
+        font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 40px;
+        display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px;
+    }
+    .brand i { color: var(--primary); }
+
+    .nav-item {
+        padding: 16px; margin-bottom: 8px; border-radius: 8px;
+        cursor: pointer; color: #94a3b8; font-weight: 600;
+        display: flex; align-items: center; gap: 15px; transition: 0.2s;
+        border: 1px solid transparent;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .nav-item.active { 
+        background: var(--primary); color: white; 
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); 
+    }
+
+    /* --- CONTENT AREA --- */
+    main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+    .view-panel {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        overflow-y: auto; padding: 0; display: none; opacity: 0;
+        transition: opacity 0.4s;
+    }
+    .view-panel.active { display: block; opacity: 1; }
+
+    /* --- NOTES STYLING --- */
+    .paper {
+        max-width: 950px; margin: 0 auto; background: white;
+        padding: 80px; min-height: 100vh;
+        box-shadow: 0 0 50px rgba(0,0,0,0.08);
+    }
+
+    h1 { font-size: 2.8rem; color: var(--secondary); margin-bottom: 10px; letter-spacing: -1.5px; line-height: 1.1; }
+    .meta { color: var(--primary); text-transform: uppercase; font-weight: bold; font-size: 0.85rem; letter-spacing: 2px; }
+    
+    h2 { 
+        font-family: 'Space Grotesk', sans-serif; font-size: 1.7rem; color: #334155; 
+        margin-top: 60px; margin-bottom: 25px; padding-bottom: 10px; 
+        border-bottom: 4px solid var(--primary); display: inline-block;
+    }
+    
+    h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; color: var(--primary-dark); margin-top: 35px; margin-bottom: 15px; }
+
+    p {
+        font-family: 'Lora', serif; font-size: 1.15rem; line-height: 1.8;
+        color: #475569; margin-bottom: 20px;
+    }
+    li { font-family: 'Lora', serif; font-size: 1.1rem; line-height: 1.7; margin-bottom: 8px; margin-left: 20px; color: #475569; }
+    
+    /* Concept Box */
+    .concept-box {
+        background: #fef2f2; border: 2px solid var(--primary);
+        padding: 25px; margin: 30px 0; border-radius: 12px;
+        position: relative;
+    }
+    .concept-box.blue {
+        background: #eff6ff; border-color: var(--accent);
+    }
+    .concept-box::before {
+        content: 'CONCEPT'; position: absolute; top: -12px; left: 20px;
+        background: var(--primary); color: white; padding: 2px 10px;
+        font-size: 0.8rem; font-weight: bold; border-radius: 4px;
+    }
+    .concept-box.blue::before { background: var(--accent); }
+
+    .exam-tip {
+        background: #f0fdf4; border-left: 5px solid #22c55e;
+        padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+        border-radius: 0 8px 8px 0;
+    }
+    .exam-tip i { color: #22c55e; font-size: 1.5rem; margin-top: 3px; }
+
+    /* Tables */
+    .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #cbd5e1; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th { background: var(--secondary); color: white; padding: 16px; text-align: left; font-family: 'Space Grotesk', sans-serif; }
+    td { padding: 16px; border-bottom: 1px solid #e2e8f0; font-family: 'Lora', serif; }
+    tr:nth-child(even) { background: #f8fafc; }
+
+    /* Energy Diagrams (CSS drawn) */
+    .diagram-container {
+        display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-around;
+        margin: 30px 0;
+    }
+    .diagram {
+        width: 300px; height: 200px; border-left: 2px solid #334155; border-bottom: 2px solid #334155;
+        position: relative; background: #fff;
+    }
+    .diagram::after { content: 'Reaction Progress ->'; position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; color: #64748b; }
+    .diagram::before { content: 'Energy'; position: absolute; top: 0; left: -25px; transform: rotate(-90deg); transform-origin: top right; font-size: 0.8rem; color: #64748b; }
+    
+    .level-react { position: absolute; left: 10px; width: 80px; height: 3px; background: #334155; }
+    .level-prod { position: absolute; right: 10px; width: 80px; height: 3px; background: #334155; }
+    .curve { position: absolute; left: 90px; width: 120px; height: 100%; fill: none; stroke: var(--primary); stroke-width: 2; }
+    
+    .lbl { position: absolute; font-size: 0.9rem; font-weight: bold; }
+
+    /* Chemical Equations */
+    .chem-eq {
+        font-family: 'Space Grotesk', monospace; background: #1e293b; color: #fbbf24;
+        padding: 15px; border-radius: 8px; text-align: center; font-size: 1.2rem;
+        margin: 20px 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        overflow-x: auto;
+    }
+
+    /* --- MIND MAP --- */
+    .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #e2e8f0; min-height: 100%; }
+    .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+    .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+    .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #64748b; width: 50%; height: 20px; }
+    .tree li::after { right: auto; left: 50%; border-left: 2px solid #64748b; }
+    .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+    .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+    .tree li:last-child::before { border-right: 2px solid #64748b; border-radius: 0 5px 0 0; }
+    .tree li:first-child::after { border-radius: 5px 0 0 0; }
+    .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #64748b; width: 0; height: 20px; }
+
+    .node {
+        background: white; border: 2px solid #94a3b8; padding: 12px 18px; border-radius: 6px;
+        display: inline-block; min-width: 130px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--secondary);
+        box-shadow: 0 4px 0px #cbd5e1; position: relative; z-index: 2; transition: 0.2s;
+    }
+    .node:hover { transform: translateY(-3px); box-shadow: 0 7px 0 #94a3b8; }
+    .root-node { background: var(--secondary); color: white; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    .sub-node { border-color: var(--primary); color: var(--primary-dark); }
+
+    /* --- QUIZ --- */
+    .quiz-area { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    .q-card { background: white; padding: 30px; margin-bottom: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    .q-opt {
+        display: flex; align-items: center; gap: 15px; padding: 15px; border: 2px solid #f1f5f9;
+        margin-top: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-family: 'Space Grotesk', sans-serif;
+    }
+    .q-opt:hover { background: #fff7ed; border-color: var(--primary); }
+    .q-let { 
+        font-weight: 800; color: #64748b; background: #e2e8f0; 
+        width: 35px; height: 35px; border-radius: 8px; 
+        display: flex; align-items: center; justify-content: center; 
+    }
+    
+    .q-opt.correct { background: #dcfce7; border-color: #22c55e; }
+    .q-opt.correct .q-let { background: #22c55e; color: white; }
+    .q-opt.wrong { background: #fee2e2; border-color: #ef4444; }
+    .q-opt.wrong .q-let { background: #ef4444; color: white; }
+
+    /* --- MOBILE --- */
+    @media (max-width: 768px) {
+        .menu-toggle { display: flex; }
+        aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        aside.active { left: 0; }
+        .paper { padding: 30px 20px; }
+        h1 { font-size: 2rem; }
+        .mm-wrapper { justify-content: flex-start; padding: 40px; transform: scale(0.7); transform-origin: top left; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-fire"></i> IG-CHEM ENERGETICS</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Study Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-project-diagram"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-flask"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #334155;">
+             <div class="nav-item" onclick="genPDF()" style="color:var(--accent); border-color:#334155;">
+                 <i class="fa-solid fa-file-pdf"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. NOTES PANEL -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Chemistry 0620 • Chapter 7</span>
+                <h1>Chemical Energetics</h1>
+                <p>Every chemical reaction involves an energy change. This chapter deals with heat energy transfers, bond energies, and the use of fuels.</p>
+
+                <h2>1. Exothermic & Endothermic Reactions</h2>
+                <p>Chemical reactions can be classified by heat transfer with the surroundings.</p>
+                
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Feature</th><th>Exothermic <i class="fa-solid fa-fire" style="color:var(--primary)"></i></th><th>Endothermic <i class="fa-solid fa-snowflake" style="color:var(--accent)"></i></th></tr>
+                        <tr><td><strong>Definition</strong></td><td>Heat energy is <strong>released</strong> to surroundings.</td><td>Heat energy is <strong>absorbed</strong> from surroundings.</td></tr>
+                        <tr><td><strong>Temperature</strong></td><td>Temperature of surroundings <strong>rises</strong>.</td><td>Temperature of surroundings <strong>falls</strong>.</td></tr>
+                        <tr><td><strong>Energy Content</strong></td><td>Products have <strong>less</strong> energy than reactants.</td><td>Products have <strong>more</strong> energy than reactants.</td></tr>
+                        <tr><td><strong>Enthalpy (&Delta;H)</strong></td><td>Negative (-ve)</td><td>Positive (+ve)</td></tr>
+                        <tr><td><strong>Examples</strong></td><td>Combustion, Neutralization, Respiration.</td><td>Thermal Decomposition, Photosynthesis.</td></tr>
+                    </table>
+                </div>
+
+                <h2>2. Energy Level Diagrams</h2>
+                <p>These diagrams show the energy change during a reaction. The "hump" represents the <strong>Activation Energy (E<sub>a</sub>)</strong>—the minimum energy required to start the reaction.</p>
+
+                <div class="diagram-container">
+                    <!-- Exothermic Diagram -->
+                    <div class="diagram">
+                        <div style="position:absolute; top:10px; left:10px; color:var(--primary); font-weight:bold;">EXOTHERMIC</div>
+                        <div class="level-react" style="top:50px;"></div>
+                        <div class="lbl" style="top:30px; left:10px;">Reactants</div>
+                        
+                        <div class="level-prod" style="top:140px;"></div>
+                        <div class="lbl" style="top:120px; right:10px;">Products</div>
+                        
+                        <!-- Curve -->
+                        <svg class="curve" style="top:50px; height:90px;">
+                            <path d="M0,0 Q60,-60 120,90" fill="none" stroke="#ef4444" stroke-width="2"/>
+                        </svg>
+                        
+                        <!-- Arrow -->
+                        <div style="position:absolute; right:50px; top:50px; height:90px; border-right:1px dashed #000;"></div>
+                        <div style="position:absolute; right:40px; top:90px; color:var(--primary);">&Delta;H (-ve)</div>
+                    </div>
+
+                    <!-- Endothermic Diagram -->
+                    <div class="diagram">
+                        <div style="position:absolute; top:10px; left:10px; color:var(--accent); font-weight:bold;">ENDOTHERMIC</div>
+                        <div class="level-react" style="top:140px;"></div>
+                        <div class="lbl" style="top:120px; left:10px;">Reactants</div>
+                        
+                        <div class="level-prod" style="top:50px;"></div>
+                        <div class="lbl" style="top:30px; right:10px;">Products</div>
+                        
+                        <!-- Curve -->
+                        <svg class="curve" style="top:50px; height:90px;">
+                            <path d="M0,90 Q60,-40 120,0" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                        </svg>
+
+                        <!-- Arrow -->
+                        <div style="position:absolute; right:50px; top:50px; height:90px; border-right:1px dashed #000;"></div>
+                        <div style="position:absolute; right:40px; top:90px; color:var(--accent);">&Delta;H (+ve)</div>
+                    </div>
+                </div>
+
+                <h2>3. Bond Energies</h2>
+                <p>A chemical reaction involves two steps: Breaking bonds in reactants and making bonds in products.</p>
+
+                <div class="concept-box">
+                    <strong>The Golden Rules:</strong><br>
+                    1. <strong>Bond Breaking</strong> requires energy &rarr; <strong>Endothermic (+)</strong><br>
+                    2. <strong>Bond Making</strong> releases energy &rarr; <strong>Exothermic (-)</strong><br>
+                    <br>
+                    <div class="chem-eq">
+                        &Delta;H = &Sigma;(Energy to Break Bonds) - &Sigma;(Energy Released Making Bonds)
+                    </div>
+                </div>
+
+                <h3>Example Calculation: Combustion of Hydrogen</h3>
+                <p>Equation: <strong>2H-H + O=O &rarr; 2H-O-H</strong></p>
+                <ul>
+                    <li><strong>Step 1 (Break):</strong> 2 &times; (H-H) + 1 &times; (O=O) = 2(436) + 498 = <strong>1370 kJ (In)</strong></li>
+                    <li><strong>Step 2 (Make):</strong> 4 &times; (O-H) = 4(464) = <strong>1856 kJ (Out)</strong></li>
+                    <li><strong>Step 3 (Total):</strong> 1370 - 1856 = <strong>-486 kJ/mol</strong></li>
+                </ul>
+                <p><em>Note: Since result is negative, reaction is Exothermic.</em></p>
+
+                <h2>4. Fuels & Hydrogen Fuel Cells</h2>
+                <p>A fuel is a substance that releases energy when burned. Commonly used fuels are Coal, Petroleum, and Natural Gas (Methane).</p>
+
+                <h3>Hydrogen Fuel Cell</h3>
+                <p>Uses hydrogen and oxygen to produce electricity directly. It does not burn the hydrogen in the traditional sense.</p>
+
+                <div class="process-box" style="background:#eff6ff; border:2px solid var(--accent); padding:20px; border-radius:10px;">
+                    <strong>Reaction in Fuel Cell:</strong><br>
+                    Hydrogen + Oxygen &rarr; Water<br>
+                    <div class="chem-eq">2H<sub>2</sub> + O<sub>2</sub> &rarr; 2H<sub>2</sub>O</div>
+                </div>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr><th>Advantages of Hydrogen Fuel</th><th>Disadvantages</th></tr>
+                        <tr>
+                            <td>&bull; Product is water (No CO<sub>2</sub>/Pollution).<br>&bull; Renewable if made from water solar/wind.<br>&bull; Releases a lot of energy per kg.</td>
+                            <td>&bull; Hydrogen is difficult to store (gas occupies volume).<br>&bull; Explosive/Flammable.<br>&bull; Currently expensive to produce H<sub>2</sub>.</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="exam-tip">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Exam Watch:</strong> Remember that in a fuel cell, chemical energy is converted to <strong>electrical</strong> energy (and heat), whereas combustion converts chemical to <strong>heat</strong> energy.
+                    </div>
+                </div>
+
+                <h2>5. Radioactive Isotopes (Brief)</h2>
+                <p>Uranium-235 is used as a source of energy in nuclear power stations. It yields energy through <strong>Nuclear Fission</strong>, not chemical combustion.</p>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">ENERGETICS</div>
+                            <ul>
+                                <li>
+                                    <div class="node sub-node">Reactions</div>
+                                    <ul>
+                                        <li>
+                                            <div class="node">Exothermic<br><small>&Delta;H = Negative</small></div>
+                                            <ul>
+                                                <li><div class="node"><small>Heat Released</small></div></li>
+                                                <li><div class="node"><small>Bond Making</small></div></li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <div class="node">Endothermic<br><small>&Delta;H = Positive</small></div>
+                                            <ul>
+                                                <li><div class="node"><small>Heat Absorbed</small></div></li>
+                                                <li><div class="node"><small>Bond Breaking</small></div></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node sub-node">Calculations</div>
+                                    <ul>
+                                        <li>
+                                            <div class="node">Bond Energy</div>
+                                            <ul>
+                                                <li><div class="node"><small>Break - Make</small></div></li>
+                                                <li><div class="node"><small>kJ/mol</small></div></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node sub-node">Fuels</div>
+                                    <ul>
+                                        <li><div class="node">Hydrogen Cell<br><small>H<sub>2</sub>O only product</small></div></li>
+                                        <li><div class="node">Uranium-235<br><small>Nuclear Fission</small></div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container">
+                <!-- Javascript will load questions here -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI FUNCTIONS ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Close menu on mobile
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            
+            // Force desktop width for PDF rendering
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth; // Restore
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Chem_Energetics.pdf');
+            });
+        }
+
+        // --- QUIZ DATA (50 Questions on Chemical Energetics) ---
+        const qData = [
+            {q:"Which term describes a reaction that releases heat?", o:["Exothermic", "Endothermic", "Catalytic", "Neutral"], a:0},
+            {q:"Which term describes a reaction that takes in heat?", o:["Endothermic", "Exothermic", "Combustion", "Oxidation"], a:0},
+            {q:"In an exothermic reaction, the temperature of surroundings...", o:["Increases", "Decreases", "Stays same", "Fluctuates"], a:0},
+            {q:"In an endothermic reaction, the temperature of surroundings...", o:["Decreases", "Increases", "Boils", "Stays same"], a:0},
+            {q:"What is the sign of &Delta;H for an exothermic reaction?", o:["Negative", "Positive", "Zero", "Neutral"], a:0},
+            {q:"What is the sign of &Delta;H for an endothermic reaction?", o:["Positive", "Negative", "Zero", "Infinite"], a:0},
+            {q:"Breaking chemical bonds is always...", o:["Endothermic", "Exothermic", "Spontaneous", "Magnetic"], a:0},
+            {q:"Making chemical bonds is always...", o:["Exothermic", "Endothermic", "Cooling", "Impossible"], a:0},
+            {q:"In an exothermic diagram, products are...", o:["Lower energy than reactants", "Higher energy than reactants", "Same energy", "Zero energy"], a:0},
+            {q:"Combustion of Methane is an example of?", o:["Exothermic reaction", "Endothermic reaction", "Evaporation", "Melting"], a:0},
+            {q:"Thermal decomposition of Carbonates is?", o:["Endothermic", "Exothermic", "Freezing", "Condensing"], a:0},
+            {q:"The energy required to start a reaction is called?", o:["Activation Energy", "Bond Energy", "Lattice Energy", "Kinetic Energy"], a:0},
+            {q:"Photosynthesis is an example of?", o:["Endothermic reaction", "Exothermic reaction", "Combustion", "Respiration"], a:0},
+            {q:"Respiration is an example of?", o:["Exothermic reaction", "Endothermic reaction", "Reduction", "Electrolysis"], a:0},
+            {q:"Unit for Bond Energy?", o:["kJ/mol", "Joules", "Newtons", "Volts"], a:0},
+            {q:"Formula to calculate Enthalpy change?", o:["Bond Breaking - Bond Making", "Bond Making - Bond Breaking", "Products + Reactants", "Mass x Velocity"], a:0},
+            {q:"If &Delta;H = -50 kJ/mol, the reaction is?", o:["Exothermic", "Endothermic", "Reversible", "Balanced"], a:0},
+            {q:"What is the only product of a Hydrogen Fuel Cell?", o:["Water", "Carbon Dioxide", "Carbon Monoxide", "Methane"], a:0},
+            {q:"Equation for Hydrogen burning?", o:["2H<sub>2</sub> + O<sub>2</sub> &rarr; 2H<sub>2</sub>O", "H + O &rarr; OH", "H<sub>2</sub> + CO<sub>2</sub> &rarr; H<sub>2</sub>O", "H<sub>2</sub> &rarr; 2H"], a:0},
+            {q:"Advantage of Fuel Cells?", o:["No pollution", "Cheap to build", "Easy to store H<sub>2</sub>", "Uses petrol"], a:0},
+            {q:"Disadvantage of Hydrogen as fuel?", o:["Difficult to store/transport", "Produces CO<sub>2</sub>", "Low energy per kg", "Turns to ice"], a:0},
+            {q:"Uranium-235 produces energy via?", o:["Nuclear Fission", "Nuclear Fusion", "Combustion", "Decomposition"], a:0},
+            {q:"Is Uranium a fossil fuel?", o:["No, it's nuclear", "Yes", "It is renewable", "It is a gas"], a:0},
+            {q:"In a battery, chemical energy turns into?", o:["Electrical energy", "Heat energy", "Light energy", "Sound energy"], a:0},
+            {q:"When a bond breaks, energy is?", o:["Absorbed", "Released", "Destroyed", "Created"], a:0},
+            {q:"Neutralization (Acid + Alkali) is usually?", o:["Exothermic", "Endothermic", "Neither", "Cold"], a:0},
+            {q:"Dissolving Ammonium Nitrate in water (Ice pack) is?", o:["Endothermic", "Exothermic", "Explosive", "Combustion"], a:0},
+            {q:"Why is bond making exothermic?", o:["Energy is released when atoms stabilize", "Energy is needed", "Atoms repel", "Electrons are lost"], a:0},
+            {q:"If bond breaking energy = 1000 and bond making = 1200, &Delta;H is?", o:["-200", "+200", "+2200", "-2200"], a:0},
+            {q:"If bond breaking energy = 800 and bond making = 500, &Delta;H is?", o:["+300", "-300", "+1300", "-1300"], a:0},
+            {q:"Which has a higher activation energy?", o:["Usually endothermic reactions", "Exothermic", "They are same", "Combustion"], a:0},
+            {q:"A catalyst works by?", o:["Lowering activation energy", "Increasing temperature", "Increasing pressure", "Adding energy"], a:0},
+            {q:"Does a catalyst change &Delta;H?", o:["No", "Yes, increases it", "Yes, decreases it", "Makes it zero"], a:0},
+            {q:"Symbol for Enthalpy Change?", o:["&Delta;H", "&Delta;T", "E", "Q"], a:0},
+            {q:"What represents energy of reactants on a diagram?", o:["The left-hand horizontal line", "The peak", "The right line", "The arrow"], a:0},
+            {q:"In an endothermic diagram, the arrow for &Delta;H points?", o:["Upwards", "Downwards", "Left", "Right"], a:0},
+            {q:"Bond energy of C-H is approx 413. This energy is needed to?", o:["Break 1 mole of C-H bonds", "Make 1 mole", "Burn C-H", "Melt C-H"], a:0},
+            {q:"Natural gas is mostly?", o:["Methane", "Hydrogen", "Butane", "Propane"], a:0},
+            {q:"Complete combustion of hydrocarbons produces?", o:["CO<sub>2</sub> + H<sub>2</sub>O", "CO + H<sub>2</sub>O", "C + H<sub>2</sub>", "CO<sub>2</sub> only"], a:0},
+            {q:"Source of Hydrogen for fuel cells?", o:["Electrolysis of water / Methane", "Mining", "Air", "Trees"], a:0},
+            {q:"Is bond breaking 'MEXO' or 'BENDO'?", o:["BENDO (Breaking Endo)", "MEXO", "Neither", "Both"], a:0},
+            {q:"Which releases more energy per gram?", o:["Hydrogen", "Petrol", "Coal", "Wood"], a:0},
+            {q:"Main safety risk with Hydrogen?", o:["Highly flammable/explosive", "Toxic", "Radioactive", "Corrosive"], a:0},
+            {q:"Bond energy calculations use states of matter that are?", o:["Gaseous", "Liquid", "Solid", "Aqueous"], a:0},
+            {q:"Why do we use polystyrene cups in calorimetry?", o:["Insulator / reduces heat loss", "Transparent", "Cheap", "Conductor"], a:0},
+            {q:"Reaction: N<sub>2</sub> + 3H<sub>2</sub> &rarr; 2NH<sub>3</sub> (&Delta;H=-92). Is it exo or endo?", o:["Exothermic", "Endothermic", "Neither", "Fast"], a:0},
+            {q:"If a reaction gets cold, &Delta;H is?", o:["Positive", "Negative", "Zero", "Unknown"], a:0},
+            {q:"In the Sun, energy is produced by?", o:["Nuclear Fusion", "Fission", "Combustion", "Exothermic"], a:0},
+            {q:"Fuel cells operate at?", o:["Lower temps than combustion engines", "Higher temps", "Freezing point", "Pressure point"], a:0},
+            {q:"Overall energy change equals?", o:["Final Energy - Initial Energy", "Initial - Final", "Activation Energy", "Bond Energy"], a:0}
+        ];
+
+        // --- RENDER QUIZ ---
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            // Shuffle options logic
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            // Use innerHTML to render subscripts/superscripts
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem; color:#334155;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                // Highlight correct answer
+                const correctTxt = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerHTML.includes(correctTxt)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>THE SALT ALCHEMIST | Chapter 12 Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #050505;
+            --titration: #00f2ff; /* Cyan */
+            --excess: #ffaa00; /* Gold */
+            --precip: #d900ff; /* Purple */
+            --text: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            touch-action: none; /* Prevents scrolling */
+        }
+
+        /* --- BACKGROUND FX --- */
+        #bg-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; opacity: 0.4;
+        }
+
+        /* --- HUD --- */
+        .hud {
+            position: absolute; top: 0; width: 100%; padding: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 10; pointer-events: none;
+        }
+
+        .score-board {
+            font-family: 'Cinzel', serif;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .score-lbl { font-size: 0.8rem; color: #888; letter-spacing: 2px; }
+        .score-val { font-size: 2rem; font-weight: 900; color: white; }
+
+        .lives { display: flex; gap: 5px; }
+        .life { color: #ff0044; font-size: 1.5rem; filter: drop-shadow(0 0 5px #ff0044); transition: 0.3s; }
+        .life.lost { color: #333; filter: none; transform: scale(0.8); }
+
+        /* --- GAME AREA --- */
+        .game-stage {
+            position: relative;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 40px;
+            z-index: 2;
+        }
+
+        /* --- THE CARD (DRAGGABLE) --- */
+        .card-container {
+            position: absolute;
+            top: 25%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px; height: 180px;
+            perspective: 1000px;
+            cursor: grab;
+            z-index: 50;
+        }
+
+        .salt-card {
+            width: 100%; height: 100%;
+            background: rgba(20, 20, 25, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.1s;
+        }
+        
+        .salt-icon { font-size: 2.5rem; margin-bottom: 10px; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.5); }
+        .salt-name { font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 5px; }
+        .salt-clue { font-size: 0.8rem; color: #aaa; font-style: italic; }
+
+        /* --- TRANSMUTATION CIRCLES (DROP ZONES) --- */
+        .zones-wrapper {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .zone {
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255,255,255,0.3);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .zone::before {
+            content: ''; position: absolute; inset: 0; border-radius: 50%;
+            opacity: 0; transition: 0.3s; z-index: -1;
+        }
+
+        /* Specific Zone Styles */
+        .zone.titration { border-color: var(--titration); color: var(--titration); }
+        .zone.titration.active { box-shadow: 0 0 30px var(--titration); background: rgba(0, 242, 255, 0.1); transform: scale(1.1); border-style: solid; }
+        
+        .zone.excess { border-color: var(--excess); color: var(--excess); }
+        .zone.excess.active { box-shadow: 0 0 30px var(--excess); background: rgba(255, 170, 0, 0.1); transform: scale(1.1); border-style: solid; }
+
+        .zone.precip { border-color: var(--precip); color: var(--precip); }
+        .zone.precip.active { box-shadow: 0 0 30px var(--precip); background: rgba(217, 0, 255, 0.1); transform: scale(1.1); border-style: solid; }
+
+        .zone-icon { font-size: 1.8rem; margin-bottom: 5px; }
+        .zone-label { font-family: 'Cinzel', serif; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .zone-sub { font-size: 0.5rem; opacity: 0.7; margin-top: 2px; }
+
+        /* --- OVERLAYS --- */
+        .overlay {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .title {
+            font-family: 'Cinzel', serif; font-size: 3rem;
+            background: linear-gradient(to right, var(--titration), var(--precip));
+            -webkit-background-clip: text; color: transparent;
+            margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+        }
+
+        .btn-start {
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            font-family: 'Cinzel', serif; font-size: 1.2rem;
+            cursor: pointer; transition: 0.2s;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        .btn-start:hover { background: white; color: black; box-shadow: 0 0 40px rgba(255,255,255,0.5); }
+
+        .guide-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px;
+            width: 100%; max-width: 600px;
+        }
+        .guide-item {
+            border: 1px solid #333; padding: 15px; border-radius: 8px; font-size: 0.8rem;
+        }
+        .g-head { font-weight: bold; margin-bottom: 5px; display: block; }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- HUD -->
+    <div class="hud">
+        <div class="score-board">
+            <div class="score-lbl">ALCHEMY SCORE</div>
+            <div class="score-val" id="score">0</div>
+        </div>
+        <div class="lives" id="lives">
+            <i class="fa-solid fa-heart life"></i>
+            <i class="fa-solid fa-heart life"></i>
+            <i class="fa-solid fa-heart life"></i>
+        </div>
+    </div>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="overlay">
+        <h1 class="title">The Salt Alchemist</h1>
+        <p style="color:#aaa; max-width: 500px;">Master the Art of Crystallization. Drag the salt request to the correct transmutation circle based on solubility.</p>
+        
+        <div class="guide-grid">
+            <div class="guide-item" style="border-color: var(--titration)">
+                <span class="g-head" style="color:var(--titration)">TITRATION</span>
+                Soluble Salt from <strong>Group 1</strong> or <strong>Ammonium</strong> reactants.
+            </div>
+            <div class="guide-item" style="border-color: var(--excess)">
+                <span class="g-head" style="color:var(--excess)">EXCESS METHOD</span>
+                Soluble Salt from <strong>Insoluble Base</strong> (Oxide/Carbonate).
+            </div>
+            <div class="guide-item" style="border-color: var(--precip)">
+                <span class="g-head" style="color:var(--precip)">PRECIPITATION</span>
+                <strong>Insoluble Salt</strong> from two soluble reactants.
+            </div>
+        </div>
+
+        <button class="btn-start" onclick="startGame()">BEGIN RITUAL</button>
+    </div>
+
+    <!-- GAME OVER SCREEN -->
+    <div id="game-over" class="overlay" style="display:none;">
+        <h1 class="title" style="color: #ff0044; background: none;">Transmutation Failed</h1>
+        <p>Your alchemy lab has exploded.</p>
+        <div style="margin: 20px 0; font-size: 2rem;" id="final-score">0</div>
+        <button class="btn-start" onclick="location.reload()">TRY AGAIN</button>
+    </div>
+
+    <!-- GAME STAGE -->
+    <div class="game-stage">
+        
+        <!-- THE DRAGGABLE CARD -->
+        <div class="card-container" id="card-container">
+            <div class="salt-card">
+                <i class="fa-solid fa-gem salt-icon" id="card-icon"></i>
+                <div class="salt-name" id="card-name">Loading...</div>
+                <div class="salt-clue" id="card-clue">...</div>
+            </div>
+        </div>
+
+        <!-- ZONES -->
+        <div class="zones-wrapper">
+            <div class="zone titration" id="zone-titration" data-method="titration">
+                <i class="fa-solid fa-flask zone-icon"></i>
+                <div class="zone-label">Titration</div>
+                <div class="zone-sub">Soluble (Grp 1/NH₄)</div>
+            </div>
+            <div class="zone excess" id="zone-excess" data-method="excess">
+                <i class="fa-solid fa-fire zone-icon"></i>
+                <div class="zone-label">Excess Solid</div>
+                <div class="zone-sub">Soluble (Others)</div>
+            </div>
+            <div class="zone precip" id="zone-precip" data-method="precipitation">
+                <i class="fa-solid fa-snowflake zone-icon"></i>
+                <div class="zone-label">Precipitation</div>
+                <div class="zone-sub">Insoluble Salt</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GAME DATA (The Chemistry) ---
+        const salts = [
+            { name: "Copper(II) Sulfate", method: "excess", clue: "Blue crystals. Reactant is CuO (Insoluble)." },
+            { name: "Sodium Chloride", method: "titration", clue: "Common Salt. Group 1 Metal." },
+            { name: "Barium Sulfate", method: "precipitation", clue: "White Precipitate. Insoluble." },
+            { name: "Silver Chloride", method: "precipitation", clue: "Insoluble Halide." },
+            { name: "Ammonium Nitrate", method: "titration", clue: "Used in fertilizer. Soluble Reactants." },
+            { name: "Zinc Sulfate", method: "excess", clue: "From Zinc metal and Acid." },
+            { name: "Lead(II) Iodide", method: "precipitation", clue: "Bright Yellow Precipitate." },
+            { name: "Potassium Nitrate", method: "titration", clue: "Group 1 Nitrate." },
+            { name: "Magnesium Chloride", method: "excess", clue: "From Magnesium ribbon." },
+            { name: "Calcium Carbonate", method: "precipitation", clue: "Limestone. Insoluble." },
+            { name: "Sodium Sulfate", method: "titration", clue: "Soluble Group 1 Salt." },
+            { name: "Iron(II) Sulfate", method: "excess", clue: "Green crystals. From excess Iron." }
+        ];
+
+        let currentSalt = null;
+        let score = 0;
+        let lives = 3;
+        let isDragging = false;
+
+        // --- SETUP DRAG & DROP ---
+        const card = document.getElementById('card-container');
+        const zones = document.querySelectorAll('.zone');
+        let startX, startY, initialX, initialY;
+
+        // Mouse Events
+        card.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        // Touch Events
+        card.addEventListener('touchstart', dragStart);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchend', dragEnd);
+
+        function dragStart(e) {
+            if (lives <= 0) return;
+            isDragging = true;
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            startX = clientX;
+            startY = clientY;
+            
+            // Get current transform values or default to center
+            const style = window.getComputedStyle(card);
+            const matrix = new WebKitCSSMatrix(style.transform);
+            initialX = matrix.m41;
+            initialY = matrix.m42;
+            
+            card.style.transition = 'none';
+            card.style.transform = `translate(${initialX}px, ${initialY}px) scale(1.05)`;
+            card.querySelector('.salt-card').style.boxShadow = '0 20px 50px rgba(0,0,0,0.8)';
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            card.style.transform = `translate(${initialX + dx}px, ${initialY + dy}px) scale(1.05) rotate(${dx * 0.05}deg)`;
+
+            // Highlight Zones
+            const cardRect = card.getBoundingClientRect();
+            const cardCenter = { x: cardRect.left + cardRect.width/2, y: cardRect.top + cardRect.height/2 };
+
+            zones.forEach(zone => {
+                const rect = zone.getBoundingClientRect();
+                // Simple collision detection
+                if (cardCenter.x >= rect.left && cardCenter.x <= rect.right &&
+                    cardCenter.y >= rect.top && cardCenter.y <= rect.bottom) {
+                    zone.classList.add('active');
+                } else {
+                    zone.classList.remove('active');
+                }
+            });
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            card.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            card.querySelector('.salt-card').style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+
+            // Check Collision
+            let droppedZone = null;
+            zones.forEach(zone => {
+                if (zone.classList.contains('active')) {
+                    droppedZone = zone;
+                    zone.classList.remove('active');
+                }
+            });
+
+            if (droppedZone) {
+                checkAnswer(droppedZone.dataset.method);
+            } else {
+                // Return to center
+                card.style.transform = 'translate(-50%, -50%)';
+            }
+        }
+
+        // --- GAME LOGIC ---
+
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            score = 0;
+            lives = 3;
+            updateLives();
+            document.getElementById('score').innerText = score;
+            spawnSalt();
+        }
+
+        function spawnSalt() {
+            // Pick random salt
+            currentSalt = salts[Math.floor(Math.random() * salts.length)];
+            
+            // Reset Card Position
+            card.style.transition = 'none';
+            card.style.transform = 'translate(-50%, -50%) scale(0)'; // Pop in effect
+            
+            // Update UI
+            setTimeout(() => {
+                document.getElementById('card-name').innerText = currentSalt.name;
+                document.getElementById('card-clue').innerText = currentSalt.clue;
+                card.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                card.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 50);
+        }
+
+        function checkAnswer(method) {
+            if (method === currentSalt.method) {
+                // CORRECT
+                score += 100;
+                document.getElementById('score').innerText = score;
+                createParticles(window.innerWidth/2, window.innerHeight/2, '#00ff88');
+                spawnSalt();
+            } else {
+                // WRONG
+                lives--;
+                updateLives();
+                card.style.transform = 'translate(-50%, -50%)';
+                // Shake effect
+                card.animate([
+                    { transform: 'translate(-50%, -50%) translate(10px, 0)' },
+                    { transform: 'translate(-50%, -50%) translate(-10px, 0)' },
+                    { transform: 'translate(-50%, -50%) translate(0, 0)' }
+                ], { duration: 300, iterations: 1 });
+                
+                if (lives <= 0) {
+                    gameOver();
+                }
+            }
+        }
+
+        function updateLives() {
+            const hearts = document.querySelectorAll('.life');
+            hearts.forEach((h, i) => {
+                if (i < lives) h.classList.remove('lost');
+                else h.classList.add('lost');
+            });
+        }
+
+        function gameOver() {
+            document.getElementById('game-over').style.display = 'flex';
+            document.getElementById('final-score').innerText = score;
+        }
+
+        // --- PARTICLE EFFECTS ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 10 - 5;
+                this.speedY = Math.random() * 10 - 5;
+                this.color = color;
+                this.life = 1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= 0.02;
+            }
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function createParticles(x, y, color) {
+            for(let i=0; i<30; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background ambient particles
+            if (Math.random() < 0.1) {
+                particles.push(new Particle(Math.random()*canvas.width, Math.random()*canvas.height, 'rgba(255,255,255,0.1)'));
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+    </script>
+</body>
+</html>

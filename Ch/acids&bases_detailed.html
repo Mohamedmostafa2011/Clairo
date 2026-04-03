@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastering Acids & Bases | The Blueprint</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --accent: #8b5cf6;
+            --acid: #ef4444;
+            --base: #3b82f6;
+            --metal: #64748b;
+            --carbonate: #f59e0b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Header & Hero --- */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* --- Sections --- */
+        section {
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: var(--text);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Step 1: Classification Grid --- */
+        .grid-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .type-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border-top: 5px solid transparent;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        /* Color Coding */
+        .type-card.acid { border-color: var(--acid); }
+        .type-card.base { border-color: var(--base); }
+        .type-card.metal { border-color: var(--metal); }
+        .type-card.carbonate { border-color: var(--carbonate); }
+
+        .type-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+        .type-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
+        
+        .chem-detail {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            display: none; /* Hidden by default */
+        }
+        
+        .type-card:hover .chem-detail { display: block; animation: slideDown 0.3s ease; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Step 2 & 3: The Interactive Rules --- */
+        .rules-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-light);
+        }
+
+        .tab-btn.active {
+            background: var(--text);
+            color: white;
+        }
+
+        .rule-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .rule-content.active { display: block; }
+
+        .mnemonic {
+            font-size: 3rem;
+            font-weight: 900;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(to right, var(--primary), var(--accent));
+            margin-bottom: 1rem;
+        }
+
+        .equation-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 10px 10px 0;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .explanation-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media(max-width: 768px) {
+            .explanation-grid { grid-template-columns: 1fr; }
+        }
+
+        /* --- Deep Dive Accordion --- */
+        details {
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        summary::after { content: '+'; font-size: 1.5rem; font-weight: 300; }
+        details[open] summary::after { content: '-'; }
+
+        .details-content {
+            padding: 1.2rem;
+            padding-top: 0;
+            border-top: 1px solid #f1f5f9;
+            color: var(--text-light);
+        }
+
+        /* --- Interactive Generator --- */
+        .generator-box {
+            background: var(--text);
+            color: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .select-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        select {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
+        }
+        
+        select option { color: black; }
+
+        .result-display {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: 2px dashed rgba(255,255,255,0.3);
+        }
+
+        /* --- Utility --- */
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            margin-right: 5px;
+        }
+        .bg-red { background: var(--acid); }
+        .bg-blue { background: var(--base); }
+        .bg-yellow { background: var(--carbonate); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Chemistry Logic 🧠</h1>
+            <p class="subtitle">Stop guessing reactions. Start classifying substances. <br>The reaction type is determined automatically by the reactants.</p>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- STEP 1 -->
+        <section id="step1">
+            <h2><span class="badge">Step 1</span> What TYPE is the substance?</h2>
+            <p style="margin-bottom: 20px; color: var(--text-light);">Before thinking of equations, you must classify the chemicals. Hover over cards for details.</p>
+            
+            <div class="grid-types">
+                <!-- Acid -->
+                <div class="type-card acid">
+                    <span class="type-icon">🧪</span>
+                    <div class="type-title">Acid</div>
+                    <div>Source of <b>H⁺</b> ions</div>
+                    <div class="chem-detail">
+                        Starts with H (HCl, H₂SO₄) or ends in -COOH.<br>
+                        <b>Proton Donor.</b>
+                    </div>
+                </div>
+
+                <!-- Base -->
+                <div class="type-card base">
+                    <span class="type-icon">🧼</span>
+                    <div class="type-title">Base / Alkali</div>
+                    <div>Source of <b>OH⁻</b> or Oxide</div>
+                    <div class="chem-detail">
+                        Metal Oxides (CuO), Hydroxides (NaOH), Ammonia (NH₃).<br>
+                        <b>Proton Acceptor.</b>
+                    </div>
+                </div>
+
+                <!-- Metal -->
+                <div class="type-card metal">
+                    <span class="type-icon">🔩</span>
+                    <div class="type-title">Metal</div>
+                    <div>Pure Element</div>
+                    <div class="chem-detail">
+                        Mg, Zn, Fe, Ca.<br>
+                        Has free electrons. Wants to lose electrons to form positive ions.
+                    </div>
+                </div>
+
+                <!-- Carbonate -->
+                <div class="type-card carbonate">
+                    <span class="type-icon">🫧</span>
+                    <div class="type-title">Carbonate</div>
+                    <div>Contains <b>CO₃²⁻</b></div>
+                    <div class="chem-detail">
+                        CaCO₃, Na₂CO₃.<br>
+                        Unstable in acid. Always releases CO₂ gas.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 2 & 3 -->
+        <section id="step2">
+            <h2><span class="badge">Step 2 & 3</span> The Golden Rules</h2>
+            <p style="margin-bottom: 20px;">If there is an ACID involved, choose the correct rule based on the partner.</p>
+
+            <div class="rules-container">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openRule('mash')">Acid + Metal</button>
+                    <button class="tab-btn" onclick="openRule('baws')">Acid + Base</button>
+                    <button class="tab-btn" onclick="openRule('cawcs')">Acid + Carbonate</button>
+                </div>
+
+                <!-- MASH -->
+                <div id="mash" class="rule-content active">
+                    <div class="mnemonic">MASH</div>
+                    <h3>Metal + Acid ➝ Salt + Hydrogen</h3>
+                    
+                    <div class="equation-box">
+                        Mg(s) + 2HCl(aq) ➝ MgCl₂(aq) + H₂(g)
+                    </div>
+
+                    <div class="explanation-grid">
+                        <div>
+                            <h4>Why? 🧠</h4>
+                            <p>Acids contain H⁺ ions. Metals are usually more reactive than hydrogen. The metal "kicks out" the hydrogen to take its place in the salt.</p>
+                        </div>
+                        <div>
+                            <h4>The Mechanism ⚙️</h4>
+                            <p><b>Redox Reaction:</b> The metal loses electrons (oxidation), and the H⁺ ions gain electrons (reduction) to become H₂ gas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAWS -->
+                <div id="baws" class="rule-content">
+                    <div class="mnemonic">BAWS</div>
+                    <h3>Base + Acid ➝ Water + Salt</h3>
+                    
+                    <div class="equation-box">
+                        NaOH(aq) + HCl(aq) ➝ NaCl(aq) + H₂O(l)
+                    </div>
+
+                    <div class="explanation-grid">
+                        <div>
+                            <h4>Why? 🧠</h4>
+                            <p>This is <b>Neutralisation</b>. The Acid is a Proton Donor (H⁺). The Base is a Proton Acceptor (OH⁻ or O²⁻). They cancel each other out.</p>
+                        </div>
+                        <div>
+                            <h4>The Mechanism ⚙️</h4>
+                            <p>The net ionic equation is always:<br>
+                            <b>H⁺(aq) + OH⁻(aq) ➝ H₂O(l)</b><br>
+                            The salt is just the "spectator ions" left over.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAWCS -->
+                <div id="cawcs" class="rule-content">
+                    <div class="mnemonic">CAWCS</div>
+                    <h3>Carbonate + Acid ➝ Water + CO₂ + Salt</h3>
+                    
+                    <div class="equation-box">
+                        CaCO₃(s) + 2HCl(aq) ➝ CaCl₂(aq) + H₂O(l) + CO₂(g)
+                    </div>
+
+                    <div class="explanation-grid">
+                        <div>
+                            <h4>Why? 🧠</h4>
+                            <p>Carbonate ions (CO₃²⁻) react with H⁺ to form Carbonic Acid (H₂CO₃). This is very unstable and immediately breaks apart.</p>
+                        </div>
+                        <div>
+                            <h4>The Mechanism ⚙️</h4>
+                            <p>1. 2H⁺ + CO₃²⁻ ➝ H₂CO₃<br>
+                            2. H₂CO₃ ➝ H₂O + CO₂<br>
+                            <b>Observation:</b> You will always see effervescence (fizzing/bubbles).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deep Dive / NO ACID -->
+        <section id="step4">
+            <h2><span class="badge">Step 4</span> What if there is NO Acid?</h2>
+            <p>If there's no acid, don't use MASH/BAWS. Look at the oxides.</p>
+
+            <details>
+                <summary>Non-Metal Oxides (Acidic)</summary>
+                <div class="details-content">
+                    <p>Oxides like CO₂, SO₂, NO₂ are <b>Acidic</b>.</p>
+                    <p>They react with Bases to form salts.</p>
+                    <p><i>Example: CO₂ + Ca(OH)₂ ➝ CaCO₃ + H₂O</i> (Limewater test)</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Metal Oxides (Basic)</summary>
+                <div class="details-content">
+                    <p>Oxides like CuO, MgO, CaO are <b>Basic</b>.</p>
+                    <p>They react with Acids (BAWS rule).</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Amphoteric Oxides (The tricky ones)</summary>
+                <div class="details-content">
+                    <p><b>Aluminum Oxide (Al₂O₃)</b> and <b>Zinc Oxide (ZnO)</b> are special.</p>
+                    <p>They can act as BOTH an acid and a base.</p>
+                    <ul>
+                        <li>With HCl (acid) they act like a base.</li>
+                        <li>With NaOH (base) they act like an acid (forming aluminates/zincates).</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Why doesn't dry HCl gas act like an acid?</summary>
+                <div class="details-content">
+                    <p><b>Dissociation is key.</b></p>
+                    <p>Acids are covalent molecules (HCl). They only split into ions (H⁺ and Cl⁻) when water pulls them apart. Without water, there are no H⁺ ions, so no acidic properties.</p>
+                </div>
+            </details>
+        </section>
+
+        <!-- Interactive Generator -->
+        <section id="generator">
+            <div class="generator-box">
+                <h2>🧪 Reaction Predictor</h2>
+                <p>Select reactants to see the logic applied dynamically.</p>
+
+                <div class="select-group">
+                    <select id="reactant1">
+                        <option value="HCl">Hydrochloric Acid</option>
+                        <option value="H2SO4">Sulfuric Acid</option>
+                        <option value="HNO3">Nitric Acid</option>
+                    </select>
+                    <span style="font-size: 2rem; align-self: center;">+</span>
+                    <select id="reactant2">
+                        <option value="Mg">Magnesium (Metal)</option>
+                        <option value="NaOH">Sodium Hydroxide (Base)</option>
+                        <option value="CaCO3">Calcium Carbonate</option>
+                        <option value="CuO">Copper Oxide (Base)</option>
+                    </select>
+                </div>
+
+                <div id="result" class="result-display">
+                    Select reactants to calculate...
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Tab Logic
+        function openRule(ruleId) {
+            // Hide all content
+            const contents = document.querySelectorAll('.rule-content');
+            contents.forEach(c => c.classList.remove('active'));
+            
+            // Deactivate buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            // Show selected
+            document.getElementById(ruleId).classList.add('active');
+            
+            // Highlight button
+            const activeBtn = Array.from(buttons).find(b => b.getAttribute('onclick').includes(ruleId));
+            if(activeBtn) activeBtn.classList.add('active');
+        }
+
+        // Reaction Logic
+        const r1Select = document.getElementById('reactant1');
+        const r2Select = document.getElementById('reactant2');
+        const resultDisplay = document.getElementById('result');
+
+        function predictReaction() {
+            const r1 = r1Select.value;
+            const r2 = r2Select.value;
+            let output = "";
+            let rule = "";
+
+            // Determine type of R2
+            let type = "";
+            if(r2 === 'Mg') type = 'metal';
+            if(r2 === 'NaOH' || r2 === 'CuO') type = 'base';
+            if(r2 === 'CaCO3') type = 'carbonate';
+
+            // Determine Salt Name
+            let saltPrefix = "";
+            if(r2.includes('Mg')) saltPrefix = "Magnesium";
+            if(r2.includes('Na')) saltPrefix = "Sodium";
+            if(r2.includes('Ca')) saltPrefix = "Calcium";
+            if(r2.includes('Cu')) saltPrefix = "Copper";
+
+            let saltSuffix = "";
+            if(r1 === 'HCl') saltSuffix = "Chloride";
+            if(r1 === 'H2SO4') saltSuffix = "Sulfate";
+            if(r1 === 'HNO3') saltSuffix = "Nitrate";
+
+            const salt = `${saltPrefix} ${saltSuffix}`;
+
+            // Logic Tree
+            if (type === 'metal') {
+                output = `${salt} + Hydrogen 💨`;
+                rule = "(MASH Rule)";
+            } else if (type === 'base') {
+                output = `${salt} + Water 💧`;
+                rule = "(BAWS Rule)";
+            } else if (type === 'carbonate') {
+                output = `${salt} + Water 💧 + Carbon Dioxide 🫧`;
+                rule = "(CAWCS Rule)";
+            }
+
+            resultDisplay.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <span>${output}</span>
+                    <span style="font-size:0.8rem; opacity:0.7;">${rule}</span>
+                </div>
+            `;
+        }
+
+        r1Select.addEventListener('change', predictReaction);
+        r2Select.addEventListener('change', predictReaction);
+
+        // Initial Run
+        predictReaction();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IG-Chem | Unit 18: Intro to Organic Chem</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* Theme: Carbon Slate & Bio-Green */
+            --primary: #059669; /* Emerald 600 */
+            --primary-dark: #064e3b; /* Emerald 900 */
+            --accent-blue: #2563eb; /* Blue 600 */
+            --accent-dark: #1e293b; /* Slate 800 */
+            --bg: #f0fdf4; /* Emerald 50 */
+            --text: #1e293b;
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- NAVIGATION BUTTON --- */
+        .menu-toggle {
+            display: none;
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: var(--primary); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.4rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.9); }
+
+        /* --- MOBILE OVERLAY --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1999;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: var(--sidebar-w);
+            background: #111827; /* Gray 900 */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            z-index: 2000;
+            border-right: 1px solid #374151;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand {
+            font-size: 1.3rem; font-weight: 800; color: #34d399; margin-bottom: 40px;
+            display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            padding: 16px; margin-bottom: 8px; border-radius: 8px;
+            cursor: pointer; color: #9ca3af; font-weight: 600;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4); }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; position: relative; overflow: hidden; width: 100%; }
+
+        .view-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; padding: 0; display: none; opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .view-panel.active { display: block; opacity: 1; }
+
+        /* --- TEXTBOOK STYLING --- */
+        .paper {
+            max-width: 950px; margin: 0 auto; background: white;
+            padding: 80px; min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-family: 'Inter', sans-serif; font-size: 2.8rem; color: var(--accent-dark); margin-bottom: 10px; letter-spacing: -1px; line-height: 1.1; }
+        .meta { color: var(--primary); text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        h2 { 
+            font-family: 'Inter', sans-serif; font-size: 1.8rem; color: #1e293b; 
+            margin-top: 60px; margin-bottom: 25px; padding-bottom: 15px; 
+            border-bottom: 2px solid #ecfdf5; display: flex; align-items: center; gap: 10px;
+        }
+        
+        h3 { font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--primary-dark); margin-top: 35px; margin-bottom: 15px; font-weight: 800; }
+        
+        p {
+            font-family: 'Crimson Pro', serif; font-size: 1.2rem; line-height: 1.8;
+            color: #334155; margin-bottom: 20px;
+        }
+        li { font-family: 'Crimson Pro', serif; font-size: 1.15rem; line-height: 1.7; margin-bottom: 8px; }
+        
+        /* Concept Boxes */
+        .concept-box {
+            background: #f0fdf4; border-left: 5px solid var(--primary);
+            padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;
+        }
+        .concept-box strong { color: var(--primary-dark); font-family: 'Inter', sans-serif; display:block; margin-bottom: 10px; }
+
+        .exam-tip {
+            background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px;
+            padding: 20px; margin: 30px 0; display: flex; gap: 15px; align-items: flex-start;
+        }
+        .exam-tip i { color: #2563eb; font-size: 1.5rem; margin-top: 3px; }
+        .exam-tip strong { color: #1e40af; font-family: 'Inter', sans-serif; }
+
+        /* Tables */
+        .t-wrap { overflow-x: auto; margin: 30px 0; border: 1px solid #e2e8f0; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #d1fae5; color: var(--primary-dark); padding: 16px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; border-bottom: 2px solid #6ee7b7; }
+        td { padding: 16px; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-family: 'Crimson Pro', serif; font-size: 1.1rem; }
+        tr:last-child td { border-bottom: none; }
+
+        /* Chemistry Specifics */
+        .chem-eq { 
+            font-family: 'Inter', monospace; 
+            background: #f1f5f9; 
+            padding: 15px; 
+            border-left: 4px solid #64748b; 
+            display: block; 
+            margin: 15px 0; 
+            color: #334155; 
+            font-weight: 600;
+        }
+        .molecule { font-weight: bold; color: var(--accent-blue); }
+        
+        /* Mnemonic Box */
+        .mnemonic {
+            background: #fffbeb; border: 2px dashed #f59e0b; padding: 20px;
+            border-radius: 12px; margin: 20px 0; position: relative;
+        }
+        .mnemonic::before {
+            content: 'MEMORISE THIS'; position: absolute; top: -12px; left: 20px;
+            background: #f59e0b; color: white; font-size: 0.7rem; padding: 2px 8px;
+            border-radius: 4px; font-family: 'Inter', sans-serif; font-weight: 800;
+        }
+        .big-letter { font-size: 1.5rem; font-weight: 900; color: #b45309; margin-right: 5px; }
+
+        /* --- MIND MAP --- */
+        .mm-wrapper { padding: 80px; display: inline-flex; min-width: 100%; justify-content: center; background: #f0fdf4; }
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #94a3b8; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; } .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #94a3b8; width: 0; height: 20px; }
+
+        .node {
+            background: white; border: 1px solid #cbd5e1; padding: 12px 18px; border-radius: 8px;
+            display: inline-block; min-width: 140px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--accent-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; z-index: 2;
+        }
+        .root-node { background: var(--accent-dark); color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: none; }
+
+        /* --- QUIZ --- */
+        .quiz-area { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .q-card { background: white; padding: 30px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; }
+        .q-opt {
+            display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e2e8f0;
+            margin-top: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .q-opt:hover { background: #f0fdf4; border-color: var(--primary); }
+        .q-let { font-weight: 900; color: #94a3b8; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .q-opt.correct { background: #dcfce7; border-color: #16a34a; }
+        .q-opt.correct .q-let { background: #16a34a; color: white; }
+        .q-opt.wrong { background: #fee2e2; border-color: #dc2626; }
+        .q-opt.wrong .q-let { background: #dc2626; color: white; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
+            aside { position: fixed; top: 0; left: -100%; height: 100%; width: 85%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.active { left: 0; }
+            .paper { padding: 30px 20px; }
+            h1 { font-size: 2.2rem; }
+            .mm-wrapper { justify-content: flex-start; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENU BUTTON -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="brand"><i class="fa-solid fa-flask"></i> IG-CHEM TOPIC 18</div>
+        
+        <div class="nav-item active" onclick="switchTab('notes', this)">
+            <i class="fa-solid fa-book-open"></i> Detailed Notes
+        </div>
+        <div class="nav-item" onclick="switchTab('mindmap', this)">
+            <i class="fa-solid fa-sitemap"></i> Mind Map
+        </div>
+        <div class="nav-item" onclick="switchTab('quiz', this)">
+            <i class="fa-solid fa-list-check"></i> 50 Qs Quiz
+        </div>
+        
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid #374151;">
+             <div class="nav-item" onclick="genPDF()" style="color:#34d399; border-color:#374151;">
+                 <i class="fa-solid fa-download"></i> Save as PDF
+             </div>
+        </div>
+    </aside>
+
+    <main>
+        
+        <!-- 1. DETAILED NOTES -->
+        <div id="notes" class="view-panel active">
+            <div class="paper" id="pdf-source">
+                <span class="meta">IGCSE Chemistry 0620 • Topic 18</span>
+                <h1>Intro to Organic Chemistry</h1>
+                <p>Organic chemistry is the study of carbon-based compounds. Carbon is unique because it can form four covalent bonds, allowing it to create long chains and rings, forming millions of different compounds.</p>
+
+                <h2>1. Naming Organic Compounds</h2>
+                <p>The name of an organic molecule tells you two things: how many carbon atoms it has (the prefix) and what family it belongs to (the suffix).</p>
+                
+                <h3>A. The Prefixes (Number of Carbons)</h3>
+                <p>You must memorise the prefixes for the first four carbon chains.</p>
+
+                <div class="mnemonic">
+                    <span class="big-letter">M</span>onkeys <span class="big-letter">E</span>at <span class="big-letter">P</span>eeled <span class="big-letter">B</span>ananas
+                    <br><strong>Meth-</strong> (1 Carbon)
+                    <br><strong>Eth-</strong> (2 Carbons)
+                    <br><strong>Prop-</strong> (3 Carbons)
+                    <br><strong>But-</strong> (4 Carbons)
+                </div>
+
+                <h3>B. The Suffixes (Homologous Series)</h3>
+                <ul>
+                    <li><strong>-ane</strong>: Alkane (C-C single bonds) e.g., Ethane</li>
+                    <li><strong>-ene</strong>: Alkene (C=C double bond) e.g., Ethene</li>
+                    <li><strong>-ol</strong>: Alcohol (-OH group) e.g., Ethanol</li>
+                    <li><strong>-oic acid</strong>: Carboxylic Acid (-COOH group) e.g., Ethanoic Acid</li>
+                </ul>
+
+                <h2>2. Homologous Series</h2>
+                <p>A homologous series is a "family" of organic compounds that have the same functional group.</p>
+                
+                <div class="concept-box">
+                    <strong>Characteristics of a Homologous Series</strong>
+                    <ul>
+                        <li>Same <strong>General Formula</strong>.</li>
+                        <li>Same <strong>Functional Group</strong> (the part that reacts).</li>
+                        <li>Similar <strong>Chemical Properties</strong> (they react in the same way).</li>
+                        <li>Trend in <strong>Physical Properties</strong> (e.g., boiling point increases as chain length increases).</li>
+                    </ul>
+                </div>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr>
+                            <th>Family</th>
+                            <th>Functional Group</th>
+                            <th>General Formula</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr>
+                            <td>Alkanes</td>
+                            <td>None (Single bonds)</td>
+                            <td><span class="molecule">CₙH₂ₙ₊₂</span></td>
+                            <td>Methane (CH₄)</td>
+                        </tr>
+                        <tr>
+                            <td>Alkenes</td>
+                            <td>C=C Double Bond</td>
+                            <td><span class="molecule">CₙH₂ₙ</span></td>
+                            <td>Ethene (C₂H₄)</td>
+                        </tr>
+                        <tr>
+                            <td>Alcohols</td>
+                            <td>-OH (Hydroxyl)</td>
+                            <td><span class="molecule">CₙH₂ₙ₊₁OH</span></td>
+                            <td>Ethanol (C₂H₅OH)</td>
+                        </tr>
+                        <tr>
+                            <td>Carboxylic Acids</td>
+                            <td>-COOH</td>
+                            <td><span class="molecule">CₙH₂ₙ₊₁COOH</span></td>
+                            <td>Ethanoic Acid (CH₃COOH)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h2>3. Structural Isomerism</h2>
+                <p>Isomers are molecules with the <strong>same molecular formula</strong> but a <strong>different structural formula</strong>.</p>
+                
+                <div class="exam-tip">
+                    <i class="fa-solid fa-puzzle-piece"></i>
+                    <div>
+                        <strong>Example: C₄H₁₀ (Butane)</strong><br>
+                        1. <strong>Straight chain:</strong> All 4 carbons in a row (Butane).<br>
+                        2. <strong>Branched chain:</strong> 3 carbons in a row, with 1 carbon branching off the middle (2-methylpropane).<br>
+                        <br>
+                        <em>Tip: Make sure you can draw both "straight" and "branched" chains.</em>
+                    </div>
+                </div>
+
+                <h2>4. Fuels & Fractional Distillation</h2>
+                <p>Petroleum (Crude Oil) is a mixture of hydrocarbons. It is not useful until separated into fractions based on boiling points.</p>
+
+                <h3>How it works:</h3>
+                <ul>
+                    <li>Crude oil is heated and vaporised.</li>
+                    <li>It enters a fractionating column (Hot at bottom, Cool at top).</li>
+                    <li>Vapors rise and condense at different heights depending on their boiling point.</li>
+                    <li>Small molecules (low boiling point) rise to the top. Large molecules (high boiling point) stay at the bottom.</li>
+                </ul>
+
+                <div class="t-wrap">
+                    <table>
+                        <tr>
+                            <th>Fraction Name</th>
+                            <th>Use</th>
+                            <th>Molecule Size</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Refinery Gas</strong></td>
+                            <td>Heating and cooking (Bottled gas)</td>
+                            <td>Smallest (Top)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gasoline (Petrol)</strong></td>
+                            <td>Fuel for cars</td>
+                            <td>Small</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Naphtha</strong></td>
+                            <td>Making chemicals (Feedstock)</td>
+                            <td>Medium</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kerosene</strong></td>
+                            <td>Jet fuel (Aircraft)</td>
+                            <td>Medium</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Diesel</strong></td>
+                            <td>Fuel for trucks/trains (Diesel engines)</td>
+                            <td>Large</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fuel Oil</strong></td>
+                            <td>Fuel for ships and home heating</td>
+                            <td>Large</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bitumen</strong></td>
+                            <td>Surfacing roads and roofs</td>
+                            <td>Largest (Bottom)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h2>5. Saturated vs Unsaturated</h2>
+                
+                <div class="concept-box">
+                    <strong>Saturated (Alkanes)</strong>
+                    <p>Contains only single C-C bonds. Has the maximum number of hydrogens possible.</p>
+                </div>
+
+                <div class="concept-box">
+                    <strong>Unsaturated (Alkenes)</strong>
+                    <p>Contains at least one C=C double bond. Can accept more atoms (addition reactions).</p>
+                </div>
+
+                <h3>The Bromine Water Test</h3>
+                <p>This is the definitive test to distinguish Alkanes from Alkenes.</p>
+                <ul>
+                    <li><strong>Add Bromine Water (Orange)</strong> to the substance.</li>
+                    <li><strong>Alkane:</strong> No change (Solution stays Orange).</li>
+                    <li><strong>Alkene:</strong> Solution turns <strong>Colorless</strong> (Decolourised).</li>
+                </ul>
+
+                <div style="height:100px;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MIND MAP -->
+        <div id="mindmap" class="view-panel">
+            <div class="mm-wrapper">
+                <div class="tree">
+                    <ul>
+                        <li>
+                            <div class="node root-node">ORGANIC CHEM</div>
+                            <ul>
+                                <li>
+                                    <div class="node">Naming</div>
+                                    <ul>
+                                        <li><div class="node">Meth (1)</div></li>
+                                        <li><div class="node">Eth (2)</div></li>
+                                        <li><div class="node">Prop (3)</div></li>
+                                        <li><div class="node">But (4)</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Families</div>
+                                    <ul>
+                                        <li><div class="node">Alkanes<br><small>CₙH₂ₙ₊₂</small></div></li>
+                                        <li><div class="node">Alkenes<br><small>CₙH₂ₙ</small></div></li>
+                                        <li><div class="node">Alcohols<br><small>-OH</small></div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="node">Petroleum</div>
+                                    <ul>
+                                        <li><div class="node">Refinery Gas<br><small>Cooking</small></div></li>
+                                        <li><div class="node">Gasoline<br><small>Cars</small></div></li>
+                                        <li><div class="node">Bitumen<br><small>Roads</small></div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ -->
+        <div id="quiz" class="view-panel">
+            <div class="quiz-area" id="q-container"></div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- UI LOGIC ---
+        function toggleMenu() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if(sb.style.left === '0px') {
+                sb.style.left = '-100%';
+                ov.classList.remove('active');
+            } else {
+                sb.style.left = '0px';
+                ov.classList.add('active');
+            }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').style.left = '-100%';
+                document.getElementById('overlay').classList.remove('active');
+            }
+        }
+
+        function genPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdf-source');
+            const origWidth = element.style.width;
+            element.style.width = '900px'; 
+            
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                element.style.width = origWidth;
+                const img = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const w = 210; const h = 297;
+                const imgH = canvas.height * w / canvas.width;
+                let hLeft = imgH; let pos = 0;
+
+                pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                hLeft -= h;
+                while (hLeft >= 0) {
+                    pos = hLeft - imgH;
+                    pdf.addPage();
+                    pdf.addImage(img, 'PNG', 0, pos, w, imgH);
+                    hLeft -= h;
+                }
+                pdf.save('IG_Chem_Organic_Notes.pdf');
+            });
+        }
+
+        // --- 50 CHEMISTRY QUESTIONS (ORGANIC) ---
+        const qData = [
+            {q:"Organic chemistry is the study of compounds containing...", o:["Carbon","Oxygen","Nitrogen","Iron"], a:0},
+            {q:"How many covalent bonds does Carbon form?", o:["4","2","3","1"], a:0},
+            {q:"Which prefix means 1 carbon atom?", o:["Meth-","Eth-","Prop-","But-"], a:0},
+            {q:"Which prefix means 2 carbon atoms?", o:["Eth-","Meth-","Prop-","But-"], a:0},
+            {q:"Which prefix means 3 carbon atoms?", o:["Prop-","Eth-","Meth-","But-"], a:0},
+            {q:"Which prefix means 4 carbon atoms?", o:["But-","Prop-","Oct-","Pent-"], a:0},
+            {q:"What is a hydrocarbon?", o:["Compound of H and C only","Compound of H, C and O","Compound of Water and Carbon","A mixture of fuels"], a:0},
+            {q:"The general formula for Alkanes is...", o:["CₙH₂ₙ₊₂","CₙH₂ₙ","CₙH₂ₙ₊₁OH","CₙH₂ₙ₋₂"], a:0},
+            {q:"The general formula for Alkenes is...", o:["CₙH₂ₙ","CₙH₂ₙ₊₂","CₙH₂ₙ₊₁","CₙH₂ₙO₂"], a:0},
+            {q:"What is the formula for Methane?", o:["CH₄","C₂H₆","CH₃","C₄H₁₀"], a:0},
+            {q:"What is the formula for Ethane?", o:["C₂H₆","CH₄","C₂H₄","C₃H₈"], a:0},
+            {q:"What is the formula for Propane?", o:["C₃H₈","C₃H₆","C₄H₁₀","C₂H₆"], a:0},
+            {q:"What is the formula for Butane?", o:["C₄H₁₀","C₄H₈","C₅H₁₂","C₃H₈"], a:0},
+            {q:"What is the formula for Ethene?", o:["C₂H₄","C₂H₆","CH₄","C₃H₆"], a:0},
+            {q:"What is the formula for Propene?", o:["C₃H₆","C₃H₈","C₂H₄","C₄H₈"], a:0},
+            {q:"Saturated hydrocarbons contain...", o:["Only single bonds","Double bonds","Triple bonds","Oxygen"], a:0},
+            {q:"Unsaturated hydrocarbons contain...", o:["At least one double bond","Only single bonds","Only hydrogen","No carbon"], a:0},
+            {q:"Alkanes are...", o:["Saturated","Unsaturated","Polymers","Inorganic"], a:0},
+            {q:"Alkenes are...", o:["Unsaturated","Saturated","Acids","Salts"], a:0},
+            {q:"Test to distinguish alkane from alkene?", o:["Bromine Water","Litmus Paper","Lime Water","Splint test"], a:0},
+            {q:"Result of Bromine Water with an Alkene?", o:["Orange to Colorless","Remays Orange","Turns Blue","Turns Cloudy"], a:0},
+            {q:"Result of Bromine Water with an Alkane?", o:["Remains Orange","Turns Colorless","Explodes","Turns Red"], a:0},
+            {q:"What is a Homologous Series?", o:["Family with same functional group","Family with same physical properties","Isomers","Mixture of elements"], a:0},
+            {q:"Members of a homologous series have the same...", o:["Chemical Properties","Physical Properties","Boiling Point","Mass"], a:0},
+            {q:"Members of a homologous series show a trend in...", o:["Physical Properties","Chemical Properties","Functional Group","General Formula"], a:0},
+            {q:"Isomers have the same molecular formula but different...", o:["Structural formula","Chemical formula","Atom count","Mass"], a:0},
+            {q:"Can Methane have an isomer?", o:["No","Yes","Sometimes","Only at high temp"], a:0},
+            {q:"The functional group of Alcohols is...", o:["-OH","-COOH","-C=C-","-NH₂"], a:0},
+            {q:"The functional group of Carboxylic Acids is...", o:["-COOH","-OH","-COO-","-Cl"], a:0},
+            {q:"Ethanol formula is...", o:["C₂H₅OH","CH₃OH","C₂H₆","C₂H₄OH"], a:0},
+            {q:"Ethanoic Acid formula is...", o:["CH₃COOH","HCOOH","C₂H₅COOH","CH₃OH"], a:0},
+            {q:"Petroleum (Crude Oil) is a mixture of...", o:["Hydrocarbons","Acids","Alcohols","Salts"], a:0},
+            {q:"Process to separate Crude Oil?", o:["Fractional Distillation","Filtration","Evaporation","Chromatography"], a:0},
+            {q:"Separation in fractional distillation is based on...", o:["Boiling Point","Density","Color","Reactivity"], a:0},
+            {q:"Where is the column hottest?", o:["Bottom","Top","Middle","Outside"], a:0},
+            {q:"Which fraction has the smallest molecules?", o:["Refinery Gas","Diesel","Bitumen","Kerosene"], a:0},
+            {q:"Which fraction has the highest boiling point?", o:["Bitumen","Petrol","Naphtha","Refinery Gas"], a:0},
+            {q:"Use of Refinery Gas?", o:["Heating/Cooking","Roads","Cars","Planes"], a:0},
+            {q:"Use of Gasoline?", o:["Fuel for cars","Fuel for ships","Road surfacing","Making chemicals"], a:0},
+            {q:"Use of Naphtha?", o:["Chemical Feedstock","Jet fuel","Diesel engines","Lubrication"], a:0},
+            {q:"Use of Kerosene?", o:["Jet Fuel","Car Fuel","Roads","Cooking"], a:0},
+            {q:"Use of Diesel?", o:["Trucks/Trains","Cars","Lighters","Roads"], a:0},
+            {q:"Use of Bitumen?", o:["Road surfacing","Jet fuel","Heating","Making plastic"], a:0},
+            {q:"As carbon chain length increases, boiling point...", o:["Increases","Decreases","Stays same","Fluctuates"], a:0},
+            {q:"As carbon chain length increases, viscosity (thickness)...", o:["Increases","Decreases","Stays same","Disappears"], a:0},
+            {q:"As carbon chain length increases, flammability...", o:["Decreases","Increases","Stays same","Becomes zero"], a:0},
+            {q:"Combustion of hydrocarbons produces...", o:["CO₂ + H₂O","CO₂ + H₂","CO + H₂","C + H₂O"], a:0},
+            {q:"Incomplete combustion produces toxic...", o:["Carbon Monoxide","Carbon Dioxide","Hydrogen","Nitrogen"], a:0},
+            {q:"Cracking is used to...", o:["Break large molecules into smaller ones","Join small molecules","Separate oil","Make plastic"], a:0},
+            {q:"Cracking always produces an alkane and an...", o:["Alkene","Alcohol","Acid","Water"], a:0}
+        ];
+
+        const qDiv = document.getElementById('q-container');
+        const lets = ['A','B','C','D'];
+
+        qData.forEach((q, idx) => {
+            let opts = q.o.map((txt, i) => ({txt, i}));
+            opts.sort(() => Math.random() - 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <h3 style="margin:0 0 15px 0; font-size:1.1rem;">${idx+1}. ${q.q}</h3>
+                ${opts.map((o, k) => `
+                    <div class="q-opt" onclick="check(${idx}, ${o.i}, this)">
+                        <div class="q-let">${lets[k]}</div>
+                        <div>${o.txt}</div>
+                    </div>
+                `).join('')}
+            `;
+            qDiv.appendChild(card);
+        });
+
+        function check(qIdx, oIdx, el) {
+            const parent = el.parentElement;
+            if(parent.classList.contains('locked')) return;
+            parent.classList.add('locked');
+
+            if(oIdx === qData[qIdx].a) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                const text = qData[qIdx].o[qData[qIdx].a];
+                for(let child of parent.children) {
+                    if(child.innerText.includes(text)) child.classList.add('correct');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

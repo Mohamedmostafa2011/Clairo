@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specialised Cells | IGCSE Biology</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            /* Cellular Neon Theme */
+            --bio-teal: #0d9488; /* Teal-600 */
+            --bio-dark: #134e4a;
+            --nucleus-purple: #7c3aed;
+            --energy-yellow: #facc15;
+            --plant-green: #65a30d;
+            --bg: #f0fdfa;
+            --surface: #ffffff;
+            --text: #0f172a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* --- Header --- */
+        header {
+            background: linear-gradient(135deg, #0f172a, var(--bio-dark));
+            color: white;
+            padding: 4rem 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+        }
+
+        /* Background Grid Animation */
+        .grid-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.5;
+        }
+
+        header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 3.5rem; font-weight: 700; margin-bottom: 10px; position: relative; }
+        header p { font-size: 1.2rem; opacity: 0.9; position: relative; font-family: 'Outfit', sans-serif; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+        section {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px -10px rgba(13, 148, 136, 0.15);
+            border: 1px solid #ccfbf1;
+        }
+
+        h2 { 
+            color: var(--bio-dark); 
+            font-size: 2rem; 
+            margin-bottom: 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* --- INTERACTIVE CELL CARDS (FLIP EFFECT) --- */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            height: 350px;
+            perspective: 1000px; /* 3D effect */
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .flip-card-front { background-color: #fff; }
+        .flip-card-back { 
+            background: linear-gradient(135deg, var(--bio-teal), var(--bio-dark)); 
+            color: white; 
+            transform: rotateY(180deg);
+        }
+
+        /* CSS Art Icons */
+        .icon-container {
+            width: 100px; height: 100px; background: #f1f5f9; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; font-size: 3rem; color: var(--bio-teal);
+        }
+
+        .tag {
+            background: #e0f2fe; color: #0369a1; padding: 5px 15px; 
+            border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-top: 10px;
+        }
+
+        .flip-card-back ul { text-align: left; font-size: 0.9rem; padding-left: 20px; }
+        .flip-card-back li { margin-bottom: 8px; }
+
+        /* --- BLUEPRINT ANALYZER --- */
+        .blueprint-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 2rem;
+            color: white;
+        }
+
+        .viewer {
+            flex: 1;
+            min-width: 300px;
+            background: #0f172a;
+            border-radius: 10px;
+            height: 300px;
+            position: relative;
+            border: 2px dashed #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .controls {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .control-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #334155;
+            border: none;
+            color: white;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .control-btn:hover, .control-btn.active {
+            background: var(--bio-teal);
+            padding-left: 25px; /* Slide effect */
+        }
+
+        /* Dynamic Cell Art via CSS */
+        .art-root {
+            width: 60px; height: 100px; background: transparent; 
+            border: 4px solid #84cc16; border-bottom: none;
+            position: relative;
+        }
+        .art-root::after { /* Extension */
+            content: ''; position: absolute; top: 20px; right: -80px; 
+            width: 80px; height: 20px; background: transparent;
+            border: 4px solid #84cc16; border-left: none; border-radius: 0 10px 10px 0;
+        }
+        
+        .art-sperm {
+            width: 40px; height: 25px; background: #fff; border-radius: 50% 20% 20% 50%;
+            position: relative; animation: swim 1s infinite alternate;
+        }
+        .art-sperm::after { /* Tail */
+            content: ''; position: absolute; right: -60px; top: 10px;
+            width: 60px; height: 4px; background: #fff;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--bio-teal);
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes swim { from { transform: translateX(-10px); } to { transform: translateX(10px); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- QUIZ --- */
+        .quiz-container { background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .quiz-btn {
+            background: white; border: 1px solid #cbd5e1; padding: 10px 20px; 
+            margin: 5px; border-radius: 5px; cursor: pointer; width: 100%; text-align: left;
+        }
+        .quiz-btn:hover { background: #e0f2fe; }
+
+        /* Button */
+        .btn {
+            background: var(--bio-teal); color: white; padding: 12px 30px;
+            border-radius: 50px; border: none; font-weight: 700; cursor: pointer;
+            transition: 0.3s; margin-top: 15px; display: block; width: 100%;
+        }
+        .btn:hover { background: var(--bio-dark); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="grid-bg"></div>
+        <h1>Specialised Cells</h1>
+        <p>Adaptation <i class="fa-solid fa-arrow-right" style="font-size:0.8rem; margin:0 5px;"></i> Function</p>
+    </header>
+
+    <div class="container">
+
+        <!-- SECTION 1: CARD GALLERY -->
+        <section>
+            <h2><i class="fa-solid fa-layer-group"></i> The Cell Gallery</h2>
+            <p>Hover (or tap) over a card to reveal how the cell is adapted for its specific job.</p>
+            
+            <div class="card-grid">
+                
+                <!-- 1. Ciliated Cell -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon-container"><i class="fa-solid fa-wind"></i></div>
+                            <h3>Ciliated Cell</h3>
+                            <span class="tag">Animal</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <h3>Function: Protection</h3>
+                            <ul>
+                                <li>Found in Trachea & Bronchi.</li>
+                                <li>Has tiny hair-like projections (<strong>Cilia</strong>).</li>
+                                <li>Beats rhythmically to move mucus (containing dust/bacteria) away from lungs.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Root Hair Cell -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon-container"><i class="fa-solid fa-plant-wilt"></i></div>
+                            <h3>Root Hair Cell</h3>
+                            <span class="tag" style="color:#3f6212; background:#ecfccb;">Plant</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <h3>Function: Absorption</h3>
+                            <ul>
+                                <li>Long extension increases <strong>Surface Area</strong>.</li>
+                                <li>Absorbs Water (Osmosis) and Mineral Ions (Active Transport).</li>
+                                <li>No chloroplasts (underground).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Palisade Cell -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon-container"><i class="fa-solid fa-sun"></i></div>
+                            <h3>Palisade Cell</h3>
+                            <span class="tag" style="color:#3f6212; background:#ecfccb;">Plant</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <h3>Function: Photosynthesis</h3>
+                            <ul>
+                                <li>Found in the upper part of the leaf.</li>
+                                <li>Packed with <strong>Chloroplasts</strong> containing chlorophyll.</li>
+                                <li>Column-shaped to fit many near the surface.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Red Blood Cell -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon-container" style="color:#ef4444;"><i class="fa-solid fa-circle-notch"></i></div>
+                            <h3>Red Blood Cell</h3>
+                            <span class="tag">Animal</span>
+                        </div>
+                        <div class="flip-card-back" style="background: linear-gradient(135deg, #ef4444, #991b1b);">
+                            <h3>Function: O2 Transport</h3>
+                            <ul>
+                                <li><strong>Biconcave Shape:</strong> Increases Surface Area.</li>
+                                <li><strong>No Nucleus:</strong> More space for Haemoglobin.</li>
+                                <li>Contains Haemoglobin to bind Oxygen.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Nerve Cell -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon-container" style="color:#facc15;"><i class="fa-solid fa-bolt"></i></div>
+                            <h3>Nerve Cell (Neurone)</h3>
+                            <span class="tag">Animal</span>
+                        </div>
+                        <div class="flip-card-back" style="background: linear-gradient(135deg, #facc15, #854d0e); color:black;">
+                            <h3>Function: Conduction</h3>
+                            <ul>
+                                <li><strong>Long Axon:</strong> Carry impulses long distances.</li>
+                                <li><strong>Myelin Sheath:</strong> Insulates electrical signal.</li>
+                                <li>Branched ends to connect to other nerves.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Sperm Cell -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon-container"><i class="fa-solid fa-sperm"></i></div>
+                            <h3>Sperm Cell</h3>
+                            <span class="tag">Animal (Gamete)</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <h3>Function: Reproduction</h3>
+                            <ul>
+                                <li><strong>Flagellum (Tail):</strong> To swim to the egg.</li>
+                                <li><strong>Mitochondria:</strong> Provide energy for swimming.</li>
+                                <li><strong>Acrosome:</strong> Enzymes to digest egg coating.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 2: BLUEPRINT ANALYZER -->
+        <section>
+            <h2><i class="fa-solid fa-microchip"></i> Adaptation Analyzer</h2>
+            <p>Select a cell to analyze its "Blueprint" and see why it is built that way.</p>
+            
+            <div class="blueprint-container">
+                <div class="controls">
+                    <button class="control-btn" onclick="showBlueprint('root')"><i class="fa-solid fa-plant-wilt"></i> Root Hair Cell</button>
+                    <button class="control-btn" onclick="showBlueprint('sperm')"><i class="fa-solid fa-sperm"></i> Sperm Cell</button>
+                    <button class="control-btn" onclick="showBlueprint('rbc')"><i class="fa-solid fa-circle-notch"></i> Red Blood Cell</button>
+                </div>
+                
+                <div class="viewer" id="viewerDisplay">
+                    <p style="color:#94a3b8;">Select a cell to view blueprint</p>
+                </div>
+            </div>
+            
+            <div class="info-box" id="infoBox">
+                <h3 id="infoTitle">Title</h3>
+                <p id="infoText">Details...</p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: QUIZ -->
+        <section>
+            <h2><i class="fa-solid fa-clipboard-check"></i> Quick Check</h2>
+            <div class="quiz-container">
+                <p><strong>1. Why do Red Blood Cells lack a nucleus?</strong></p>
+                <button class="quiz-btn" onclick="check(this, true)">To contain more haemoglobin</button>
+                <button class="quiz-btn" onclick="check(this, false)">To reduce weight</button>
+                <button class="quiz-btn" onclick="check(this, false)">To divide faster</button>
+            </div>
+            <br>
+            <div class="quiz-container">
+                <p><strong>2. Which cell contains many mitochondria to release energy for movement?</strong></p>
+                <button class="quiz-btn" onclick="check(this, false)">Palisade Cell</button>
+                <button class="quiz-btn" onclick="check(this, true)">Sperm Cell</button>
+                <button class="quiz-btn" onclick="check(this, false)">Root Hair Cell</button>
+            </div>
+        </section>
+
+        <button class="btn" onclick="downloadPDF()">Download Revision Notes PDF</button>
+
+    </div>
+
+    <script>
+        // --- BLUEPRINT LOGIC ---
+        function showBlueprint(type) {
+            const viewer = document.getElementById('viewerDisplay');
+            const box = document.getElementById('infoBox');
+            const title = document.getElementById('infoTitle');
+            const text = document.getElementById('infoText');
+            
+            box.style.display = "block";
+
+            if(type === 'root') {
+                viewer.innerHTML = `
+                    <div style="color:#84cc16; text-align:center;">
+                        <i class="fa-solid fa-plant-wilt" style="font-size:5rem;"></i>
+                        <div style="margin-top:10px; border-top:2px dashed white; width:100px; margin:10px auto;"></div>
+                        <p>Large Surface Area</p>
+                    </div>`;
+                title.innerText = "Root Hair Cell Strategy";
+                text.innerHTML = "<strong>Adaptation:</strong> The long extension ('hair') projects into the soil.<br><strong>Reason:</strong> This maximizes the surface area for Osmosis (water) and Active Transport (ions).";
+            } 
+            else if(type === 'sperm') {
+                viewer.innerHTML = `
+                    <div style="color:white; text-align:center;">
+                        <i class="fa-solid fa-sperm" style="font-size:5rem; animation: swim 0.5s infinite alternate;"></i>
+                        <p>Streamlined</p>
+                    </div>`;
+                title.innerText = "Sperm Cell Strategy";
+                text.innerHTML = "<strong>Adaptation:</strong> Tail (Flagellum) and Neck packed with Mitochondria.<br><strong>Reason:</strong> The tail provides propulsion, while mitochondria release the high energy (ATP) needed for swimming.";
+            }
+            else if(type === 'rbc') {
+                viewer.innerHTML = `
+                    <div style="color:#ef4444; text-align:center;">
+                        <i class="fa-solid fa-circle-notch" style="font-size:5rem;"></i>
+                        <p>Biconcave</p>
+                    </div>`;
+                title.innerText = "Red Blood Cell Strategy";
+                text.innerHTML = "<strong>Adaptation:</strong> Biconcave shape and no nucleus.<br><strong>Reason:</strong> Biconcave shape increases SA:Vol ratio for faster diffusion of Oxygen. No nucleus means more room for Haemoglobin.";
+            }
+        }
+
+        // --- QUIZ LOGIC ---
+        function check(btn, isCorrect) {
+            if(isCorrect) {
+                btn.style.background = "#86efac";
+                btn.style.borderColor = "#16a34a";
+                btn.innerHTML += " ✅";
+            } else {
+                btn.style.background = "#fda4af";
+                btn.style.borderColor = "#ef4444";
+                btn.innerHTML += " ❌";
+            }
+        }
+
+        // --- PDF DOWNLOAD ---
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(13, 148, 136);
+            doc.text("IGCSE Biology: Specialised Cells", 20, 20);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            
+            const notes = `
+1. Ciliated Cell:
+   - Location: Trachea/Bronchi.
+   - Function: Move mucus (with dust/bacteria) upwards.
+   - Feature: Cilia (hair-like extensions).
+
+2. Root Hair Cell:
+   - Location: Plant Roots.
+   - Function: Absorb water and minerals.
+   - Feature: Long protrusion (Surface Area). No chloroplasts.
+
+3. Palisade Mesophyll:
+   - Location: Upper leaf.
+   - Function: Photosynthesis.
+   - Feature: Packed with chloroplasts.
+
+4. Red Blood Cell:
+   - Function: Transport Oxygen.
+   - Feature: Biconcave, Haemoglobin, No Nucleus.
+
+5. Sperm Cell:
+   - Function: Reproduction.
+   - Feature: Flagellum (swim), Acrosome (enzymes), Mitochondria (energy).
+
+6. Nerve Cell:
+   - Function: Transmit electrical impulses.
+   - Feature: Long axon, Myelin sheath (insulation).
+            `;
+            
+            doc.text(notes, 20, 40);
+            doc.save('Specialised_Cells_Notes.pdf');
+        }
+    </script>
+</body>
+</html>

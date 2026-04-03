@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaGlass Video Player</title>
+    <style>
+        :root {
+            /* Theme Variables */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            --neon-blue: #00f2ff;
+            --deep-water: #004e92;
+            --text-glow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to bottom, #000428, #004e92);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            user-select: none;
+        }
+
+        /* --- Background Animation --- */
+        .water-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bubble {
+            position: absolute;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            border-radius: 50%;
+            filter: blur(4px);
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(120vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
+        }
+
+        /* --- Main Player Container --- */
+        .player-frame {
+            position: relative;
+            z-index: 10;
+            width: 80vw;
+            max-width: 1000px;
+            aspect-ratio: 16/9;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: box-shadow 0.3s;
+        }
+
+        /* The Video Element */
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* or 'contain' depending on preference */
+            outline: none;
+        }
+
+        /* --- Custom Controls Overlay --- */
+        .controls-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 20px 20px 15px 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .player-frame:hover .controls-overlay,
+        .player-frame.paused .controls-overlay {
+            opacity: 1;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--neon-blue);
+            width: 0%;
+            box-shadow: 0 0 10px var(--neon-blue);
+            transition: width 0.1s linear;
+        }
+        .progress-hover {
+            position: absolute;
+            top: 0; bottom: 0;
+            background: rgba(255,255,255,0.3);
+            width: 0;
+            pointer-events: none;
+        }
+
+        /* Control Buttons Row */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .left-controls, .right-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            transform: scale(1.1);
+        }
+        svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .time-display {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 1px;
+        }
+
+        /* Big Center Play Button */
+        .center-play {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Show center button when paused */
+        .player-frame.paused .center-play {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .player-frame:not(.paused) .center-play {
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+
+        .center-play:hover {
+            background: var(--neon-blue);
+            box-shadow: 0 0 30px var(--neon-blue);
+            border-color: transparent;
+        }
+        .center-play svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+            margin-left: 4px; /* Optical center adjustment */
+        }
+
+        /* Volume Slider */
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 0;
+            overflow: hidden;
+            transition: width 0.3s;
+        }
+        .volume-wrapper:hover .volume-container {
+            width: 80px;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            margin-top: -4px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background -->
+    <div class="water-bg" id="bg-effects"></div>
+
+    <!-- Video Player Card -->
+    <div class="player-frame paused" id="player-container">
+        
+        <video id="main-video" preload="metadata">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Big Center Play Button -->
+        <div class="center-play" id="center-play-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+
+        <!-- Glass Controls Bar -->
+        <div class="controls-overlay">
+            
+            <!-- Timeline -->
+            <div class="progress-container" id="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+                <div class="progress-hover" id="progress-hover"></div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="controls-row">
+                <div class="left-controls">
+                    <button class="btn" id="play-btn">
+                        <!-- Play Icon -->
+                        <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <!-- Pause Icon (Hidden by default via JS logic) -->
+                        <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </button>
+
+                    <div class="volume-wrapper" style="display:flex; align-items:center;">
+                        <button class="btn" id="mute-btn">
+                            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                        </button>
+                        <div class="volume-container">
+                            <input type="range" min="0" max="1" step="0.1" value="1" id="volume-slider">
+                        </div>
+                    </div>
+
+                    <div class="time-display">
+                        <span id="current-time">00:00</span> / <span id="duration">00:00</span>
+                    </div>
+                </div>
+
+                <div class="right-controls">
+                    <button class="btn" id="fullscreen-btn">
+                        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ------------------------------------------------------------------
+         * ADMIN CONFIGURATION
+         * Replace this URL with your VIDEO source.
+         * ------------------------------------------------------------------
+         */
+        const VIDEO_URL = "https://huggingface.co/datasets/MidoSTM11/Ig-Bio/resolve/main/Rules_of_the_Ecosystem.mp4"; 
+        
+        // --- Setup ---
+        const video = document.getElementById('main-video');
+        const container = document.getElementById('player-container');
+        const playBtn = document.getElementById('play-btn');
+        const centerPlayBtn = document.getElementById('center-play-btn');
+        const progressContainer = document.getElementById('progress-bar');
+        const progressFill = document.getElementById('progress-fill');
+        const currentTimeEl = document.getElementById('current-time');
+        const durationEl = document.getElementById('duration');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const volumeSlider = document.getElementById('volume-slider');
+        const icons = {
+            play: playBtn.querySelector('.icon-play'),
+            pause: playBtn.querySelector('.icon-pause')
+        };
+
+        // --- Init Background ---
+        const bg = document.getElementById('bg-effects');
+        for(let i=0; i<20; i++){
+            let b = document.createElement('div');
+            b.className = 'bubble';
+            let size = Math.random() * 60 + 20;
+            b.style.width = size + 'px';
+            b.style.height = size + 'px';
+            b.style.left = Math.random() * 100 + '%';
+            b.style.animationDuration = (Math.random() * 10 + 5) + 's';
+            b.style.animationDelay = (Math.random() * 5) + 's';
+            bg.appendChild(b);
+        }
+
+        // --- Load Video ---
+        video.src = VIDEO_URL;
+
+        // --- Logic ---
+
+        function togglePlay() {
+            if (video.paused || video.ended) {
+                video.play();
+                updatePlayIcon(true);
+            } else {
+                video.pause();
+                updatePlayIcon(false);
+            }
+        }
+
+        function updatePlayIcon(isPlaying) {
+            if(isPlaying) {
+                icons.play.style.display = 'none';
+                icons.pause.style.display = 'block';
+                container.classList.remove('paused');
+            } else {
+                icons.play.style.display = 'block';
+                icons.pause.style.display = 'none';
+                container.classList.add('paused');
+            }
+        }
+
+        // Format time (MM:SS)
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+        }
+
+        // --- Event Listeners ---
+
+        // Play Toggles
+        playBtn.addEventListener('click', togglePlay);
+        centerPlayBtn.addEventListener('click', togglePlay);
+        video.addEventListener('click', togglePlay);
+
+        // Update Progress & Time
+        video.addEventListener('timeupdate', () => {
+            const percent = (video.currentTime / video.duration) * 100;
+            progressFill.style.width = `${percent}%`;
+            currentTimeEl.textContent = formatTime(video.currentTime);
+        });
+
+        // Load Duration
+        video.addEventListener('loadedmetadata', () => {
+            durationEl.textContent = formatTime(video.duration);
+        });
+
+        // Click on Progress Bar to Seek
+        progressContainer.addEventListener('click', (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            video.currentTime = pos * video.duration;
+        });
+
+        // Volume
+        volumeSlider.addEventListener('input', (e) => {
+            video.volume = e.target.value;
+        });
+
+        // Fullscreen
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if(container.requestFullscreen) container.requestFullscreen();
+            } else {
+                if(document.exitFullscreen) document.exitFullscreen();
+            }
+        });
+
+        // Reset on End
+        video.addEventListener('ended', () => {
+            updatePlayIcon(false);
+            video.currentTime = 0;
+        });
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if(e.code === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            }
+        });
+
+    </script>
+</body>
+</html>

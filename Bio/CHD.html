@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHD | Coronary Heart Disease Deep Dive</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --heart-red: #ef4444;
+            --blood-dark: #7f1d1d;
+            --plaque-yellow: #fcd34d;
+            --artery-pink: #ffe4e6;
+            --bg: #fff1f2;
+            --text: #4c0519;
+            --surface: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* --- Header --- */
+        header {
+            background: linear-gradient(135deg, var(--blood-dark), var(--heart-red));
+            color: white;
+            padding: 4rem 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header h1 { font-size: 3rem; font-weight: 800; margin-bottom: 10px; }
+        header p { font-family: 'Lora', serif; font-size: 1.2rem; opacity: 0.9; }
+
+        /* Pulse Animation for Header Icon */
+        .fa-heart-pulse { animation: heartbeat 1.5s infinite; color: #ff8fa3; font-size: 3rem; margin-bottom: 1rem; }
+        @keyframes heartbeat { 0% { transform: scale(1); } 15% { transform: scale(1.2); } 30% { transform: scale(1); } 45% { transform: scale(1.1); } 60% { transform: scale(1); } }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+        section {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 25px -5px rgba(127, 29, 29, 0.1);
+            border: 1px solid #fda4af;
+        }
+
+        h2 { color: var(--blood-dark); font-size: 2rem; margin-bottom: 1.5rem; border-left: 5px solid var(--heart-red); padding-left: 15px; }
+
+        /* --- INTERACTIVE ARTERY SIMULATOR --- */
+        .simulator-box {
+            background: #1a1a1a;
+            border-radius: 15px;
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .artery-container {
+            width: 100%;
+            height: 150px;
+            background: #e57373; /* Muscle wall */
+            border-radius: 75px; /* Tube shape */
+            position: relative;
+            overflow: hidden;
+            margin: 2rem 0;
+            border: 4px solid #7f1d1d;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .lumen {
+            background: #450a0a; /* Dark red inside */
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Flow from left */
+            padding: 0 10px;
+        }
+
+        /* Plaque Buildup */
+        .plaque-top, .plaque-bottom {
+            background: var(--plaque-yellow);
+            width: 100%;
+            height: 0%; /* Controlled by slider */
+            position: absolute;
+            left: 0;
+            transition: height 0.2s ease;
+            z-index: 2;
+            border-right: 100px solid transparent; /* Tapered effect visuals handled by JS logic mostly, keep simple CSS */
+        }
+        .plaque-top { top: 0; border-bottom: 2px solid #b45309; }
+        .plaque-bottom { bottom: 0; border-top: 2px solid #b45309; }
+
+        /* Blood Cells Animation */
+        .blood-stream {
+            width: 100%;
+            height: 40px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 20px;
+            animation: flow 2s linear infinite;
+        }
+
+        .rbc {
+            min-width: 30px;
+            height: 30px;
+            background: #ef4444;
+            border-radius: 50%;
+            box-shadow: inset -3px -3px 5px rgba(0,0,0,0.3);
+            border: 2px solid #b91c1c;
+        }
+
+        @keyframes flow { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+        input[type="range"] {
+            width: 80%;
+            margin: 10px 0;
+            accent-color: var(--plaque-yellow);
+        }
+
+        .status-text { font-size: 1.2rem; font-weight: bold; margin-top: 10px; color: #fca5a5; }
+
+        /* --- RISK CALCULATOR --- */
+        .risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        
+        .risk-checkbox {
+            display: none;
+        }
+        
+        .risk-label {
+            display: block;
+            padding: 15px;
+            background: #fff1f2;
+            border: 2px solid #fecdd3;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .risk-checkbox:checked + .risk-label {
+            background: var(--heart-red);
+            color: white;
+            border-color: var(--blood-dark);
+            transform: scale(1.05);
+        }
+
+        .risk-meter {
+            margin-top: 20px;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .risk-fill { height: 100%; width: 0%; background: #10b981; transition: 0.5s; }
+
+        /* --- TREATMENT TABS --- */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 10px 20px;
+            background: #fecdd3;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--blood-dark);
+        }
+        .tab-btn.active { background: var(--blood-dark); color: white; }
+        
+        .tab-content { display: none; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Standard Buttons */
+        .btn {
+            background: var(--blood-dark); color: white; padding: 10px 20px; border-radius: 50px;
+            text-decoration: none; font-weight: bold; display: inline-block; cursor: pointer; border: none;
+        }
+        .btn:hover { background: var(--heart-red); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <i class="fa-solid fa-heart-pulse"></i>
+        <h1>Coronary Heart Disease</h1>
+        <p>Causes, Mechanisms, and Treatments | IGCSE Biology 0610</p>
+    </header>
+
+    <div class="container">
+
+        <!-- SECTION 1: INTERACTIVE SIMULATOR -->
+        <section>
+            <h2><i class="fa-solid fa-sliders"></i> The Mechanism: Atherosclerosis</h2>
+            <p>Coronary arteries supply the heart muscle with oxygen and glucose. <strong>Atheroma</strong> (plaque) is the buildup of cholesterol and fatty deposits in the artery wall. Use the slider to see what happens over time.</p>
+            
+            <div class="simulator-box">
+                <h3>Artery Cross-Section Simulation</h3>
+                <div class="artery-container">
+                    <div class="lumen">
+                        <div class="plaque-top" id="plaqueTop"></div>
+                        <div class="blood-stream" id="bloodStream">
+                            <div class="rbc"></div><div class="rbc"></div><div class="rbc"></div>
+                            <div class="rbc"></div><div class="rbc"></div><div class="rbc"></div>
+                        </div>
+                        <div class="plaque-bottom" id="plaqueBottom"></div>
+                    </div>
+                </div>
+                
+                <label>Years of Poor Diet / Smoking:</label><br>
+                <input type="range" min="0" max="90" value="0" id="plaqueSlider" oninput="updateSimulator()">
+                <div class="status-text" id="simStatus">Healthy Artery - Good Blood Flow</div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: DETAILED NOTES -->
+        <section id="notes-area">
+            <h2><i class="fa-solid fa-book-medical"></i> Detailed Notes</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <h3>1. The Cause</h3>
+                <p>Coronary Heart Disease (CHD) occurs when the coronary arteries become blocked by a build-up of fatty substances (including cholesterol). This deposit is called <strong>Plaque</strong> or <strong>Atheroma</strong>.</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3>2. The Effect (The Sequence)</h3>
+                <ol style="margin-left: 20px;">
+                    <li><strong>Narrowing:</strong> The plaque narrows the lumen of the artery.</li>
+                    <li><strong>Restriction:</strong> Blood flow to the heart muscle is restricted.</li>
+                    <li><strong>Deprivation:</strong> The heart muscle cells receive less <strong>Oxygen</strong> and <strong>Glucose</strong>.</li>
+                    <li><strong>Respiration:</strong> Cells cannot respire aerobically. They switch to anaerobic respiration.</li>
+                    <li><strong>Toxicity:</strong> Lactic acid builds up, causing pain (Angina).</li>
+                    <li><strong>Failure:</strong> If flow stops completely (Thrombosis/Clot), cells die. This is a <strong>Heart Attack</strong> (Cardiac Arrest).</li>
+                </ol>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3>3. Risk Factors</h3>
+                <ul>
+                    <li><strong>Diet:</strong> Excess saturated fats leads to high cholesterol.</li>
+                    <li><strong>Smoking:</strong> Nicotine damages artery walls; CO reduces oxygen capacity.</li>
+                    <li><strong>Stress:</strong> Raises blood pressure.</li>
+                    <li><strong>Genetic Predisposition:</strong> Inherited tendency.</li>
+                    <li><strong>Age/Gender:</strong> Risk increases with age; Males are historically at higher risk.</li>
+                </ul>
+            </div>
+            
+            <button class="btn" onclick="downloadPDF()">Download Notes PDF</button>
+        </section>
+
+        <!-- SECTION 3: RISK CALCULATOR -->
+        <section>
+            <h2><i class="fa-solid fa-calculator"></i> Risk Factor Calculator</h2>
+            <p>Select the lifestyle factors below to see the theoretical risk impact.</p>
+            
+            <div class="risk-grid">
+                <div>
+                    <input type="checkbox" class="risk-checkbox" id="r1" onchange="calcRisk()">
+                    <label for="r1" class="risk-label"><i class="fa-solid fa-burger"></i> High Fat Diet</label>
+                </div>
+                <div>
+                    <input type="checkbox" class="risk-checkbox" id="r2" onchange="calcRisk()">
+                    <label for="r2" class="risk-label"><i class="fa-solid fa-smoking"></i> Smoker</label>
+                </div>
+                <div>
+                    <input type="checkbox" class="risk-checkbox" id="r3" onchange="calcRisk()">
+                    <label for="r3" class="risk-label"><i class="fa-solid fa-couch"></i> No Exercise</label>
+                </div>
+                <div>
+                    <input type="checkbox" class="risk-checkbox" id="r4" onchange="calcRisk()">
+                    <label for="r4" class="risk-label"><i class="fa-solid fa-bolt"></i> High Stress</label>
+                </div>
+                <div>
+                    <input type="checkbox" class="risk-checkbox" id="r5" onchange="calcRisk()">
+                    <label for="r5" class="risk-label"><i class="fa-solid fa-dna"></i> Family History</label>
+                </div>
+            </div>
+
+            <div class="risk-meter">
+                <div class="risk-fill" id="riskFill"></div>
+            </div>
+            <p style="text-align: center; margin-top: 10px; font-weight: bold;" id="riskText">Current Risk: Low</p>
+        </section>
+
+        <!-- SECTION 4: TREATMENTS -->
+        <section>
+            <h2><i class="fa-solid fa-user-doctor"></i> Treatments & Prevention</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="openTab('aspirin')">Drug Treatment</button>
+                <button class="tab-btn" onclick="openTab('stent')">Stent (Angioplasty)</button>
+                <button class="tab-btn" onclick="openTab('bypass')">Bypass Surgery</button>
+            </div>
+
+            <div id="aspirin" class="tab-content active">
+                <h3>Drug Treatment: Aspirin</h3>
+                <p>Aspirin is a blood thinner. It prevents the formation of blood clots (Thrombosis) in the narrowed arteries, reducing the risk of a heart attack.</p>
+            </div>
+
+            <div id="stent" class="tab-content">
+                <h3>Surgical: Stent (Angioplasty)</h3>
+                <p>A tiny balloon is inserted into the collapsed artery and inflated to open it. A mesh tube (Stent) is left inside to keep the artery open and restore blood flow.</p>
+            </div>
+
+            <div id="bypass" class="tab-content">
+                <h3>Surgical: Coronary Bypass</h3>
+                <p>Used when arteries are severely blocked. A blood vessel is taken from another part of the body (e.g., leg) and grafted onto the heart to create a new path for blood to flow *around* the blockage.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 5: QUIZ -->
+        <section>
+            <h2><i class="fa-solid fa-question"></i> Knowledge Check</h2>
+            <div style="background:#fff1f2; padding:20px; border-radius:10px; border:1px solid #fda4af;">
+                <p><strong>Q1: What is the main substance that forms plaque in arteries?</strong></p>
+                <button class="btn" onclick="checkAnswer(this, false)" style="background:white; color:black; border:1px solid #ccc; margin:5px;">Calcium</button>
+                <button class="btn" onclick="checkAnswer(this, true)" style="background:white; color:black; border:1px solid #ccc; margin:5px;">Cholesterol</button>
+                <button class="btn" onclick="checkAnswer(this, false)" style="background:white; color:black; border:1px solid #ccc; margin:5px;">Glucose</button>
+                <p id="q1-result" style="margin-top:10px;"></p>
+            </div>
+            <br>
+            <div style="background:#fff1f2; padding:20px; border-radius:10px; border:1px solid #fda4af;">
+                <p><strong>Q2: Which treatment involves a metal mesh tube?</strong></p>
+                <button class="btn" onclick="checkAnswer(this, false)" style="background:white; color:black; border:1px solid #ccc; margin:5px;">Bypass</button>
+                <button class="btn" onclick="checkAnswer(this, false)" style="background:white; color:black; border:1px solid #ccc; margin:5px;">Aspirin</button>
+                <button class="btn" onclick="checkAnswer(this, true)" style="background:white; color:black; border:1px solid #ccc; margin:5px;">Stent</button>
+                <p id="q2-result" style="margin-top:10px;"></p>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- 1. ARTERY SIMULATOR LOGIC ---
+        function updateSimulator() {
+            const val = document.getElementById('plaqueSlider').value;
+            const top = document.getElementById('plaqueTop');
+            const bottom = document.getElementById('plaqueBottom');
+            const blood = document.getElementById('bloodStream');
+            const status = document.getElementById('simStatus');
+
+            // Update height of plaque (max 40% each side = 80% block)
+            const plaqueHeight = (val / 100) * 45; 
+            top.style.height = plaqueHeight + "%";
+            bottom.style.height = plaqueHeight + "%";
+
+            // Slow down blood animation based on blockage
+            // 2s is fast, 10s is slow. 
+            // If val is 0 -> 2s. If val is 90 -> 10s.
+            const speed = 2 + (val / 10);
+            blood.style.animationDuration = speed + "s";
+
+            // Text Updates
+            if(val < 30) {
+                status.innerText = "Healthy Flow";
+                status.style.color = "#86efac";
+            } else if (val < 70) {
+                status.innerText = "Restricted Flow - Angina Risk";
+                status.style.color = "#fca5a5";
+            } else {
+                status.innerText = "CRITICAL BLOCKAGE - Heart Attack Risk";
+                status.style.color = "#ef4444";
+                // Dim the blood cells to simulate lack of oxygen
+                blood.style.opacity = "0.5";
+            }
+            
+            if(val < 70) blood.style.opacity = "1";
+        }
+
+        // --- 2. RISK CALCULATOR LOGIC ---
+        function calcRisk() {
+            const checkboxes = document.querySelectorAll('.risk-checkbox');
+            let checkedCount = 0;
+            checkboxes.forEach(box => { if(box.checked) checkedCount++; });
+
+            const fill = document.getElementById('riskFill');
+            const text = document.getElementById('riskText');
+            
+            // 5 items, 20% each
+            const percentage = checkedCount * 20;
+            fill.style.width = percentage + "%";
+
+            if(checkedCount <= 1) {
+                fill.style.background = "#10b981"; // Green
+                text.innerText = "Risk Level: Low";
+            } else if (checkedCount <= 3) {
+                fill.style.background = "#f59e0b"; // Orange
+                text.innerText = "Risk Level: Moderate";
+            } else {
+                fill.style.background = "#ef4444"; // Red
+                text.innerText = "Risk Level: HIGH";
+            }
+        }
+
+        // --- 3. TABS LOGIC ---
+        function openTab(id) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
+            // Deactivate buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show target
+            document.getElementById(id).classList.add('active');
+            // Find button that called this (simple hack using event not avail, so logic matching text)
+            // Actually, let's just loop buttons and match index logic or keep it simple:
+            event.target.classList.add('active');
+        }
+
+        // --- 4. SIMPLE QUIZ LOGIC ---
+        function checkAnswer(btn, isCorrect) {
+            const parent = btn.parentElement;
+            const result = parent.querySelector('p[id$="-result"]');
+            
+            if(isCorrect) {
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#16a34a";
+                result.innerText = "Correct!";
+                result.style.color = "green";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                result.innerText = "Wrong. Try again.";
+                result.style.color = "red";
+            }
+        }
+
+        // --- 5. PDF GENERATION ---
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(20);
+            doc.setTextColor(127, 29, 29);
+            doc.text("Coronary Heart Disease Notes", 20, 20);
+            
+            doc.setFontSize(12);
+            doc.setTextColor(0,0,0);
+            const text = document.getElementById('notes-area').innerText;
+            // Clean up text for PDF
+            const splitText = doc.splitTextToSize(text, 170);
+            doc.text(splitText, 20, 40);
+            
+            doc.save('CHD_Notes.pdf');
+        }
+    </script>
+</body>
+</html>
