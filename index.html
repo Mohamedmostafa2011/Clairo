@@ -54,7 +54,6 @@
   html{scroll-behavior:smooth}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background var(--transition),color var(--transition)}
 
-  /* BG */
   .bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
   .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.7;animation:drift 12s ease-in-out infinite alternate}
   .orb1{width:500px;height:500px;background:var(--orb1);top:-100px;left:-100px}
@@ -63,7 +62,6 @@
   @keyframes drift{0%{transform:translate(0,0)scale(1)}100%{transform:translate(40px,30px)scale(1.1)}}
   #particles{position:fixed;inset:0;pointer-events:none;z-index:0}
 
-  /* NAV */
   nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:var(--nav-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--card-border);transition:background var(--transition)}
   .nav-logo img{height:38px;filter:drop-shadow(0 0 10px var(--bio-glow))}
   .nav-right{display:flex;align-items:center;gap:12px}
@@ -80,7 +78,6 @@
   [data-theme="dark"] .theme-icon::before{content:'☀️'}
   [data-theme="light"] .theme-icon::before{content:'🌙'}
 
-  /* HERO */
   .hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 60px}
   .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:100px;backdrop-filter:blur(12px);font-size:13px;color:var(--text-sub);margin-bottom:32px;animation:fadeDown 0.8s ease both}
   .badge-dot{width:7px;height:7px;border-radius:50%;background:var(--bio);box-shadow:0 0 8px var(--bio);animation:pulse 2s ease infinite}
@@ -92,7 +89,6 @@
   .hero-sub{font-size:clamp(1rem,2.5vw,1.2rem);color:var(--text-sub);max-width:520px;line-height:1.7;margin-bottom:48px;animation:fadeUp 0.9s ease 0.3s both}
   .hero-author{font-size:14px;color:var(--text-sub);margin-bottom:48px;animation:fadeUp 0.9s ease 0.35s both;letter-spacing:0.3px}
 
-  /* CARDS */
   .cards{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;animation:fadeUp 0.9s ease 0.4s both}
   .card{width:280px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:24px;padding:32px 28px;backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);cursor:pointer;text-decoration:none;color:inherit;position:relative;overflow:hidden;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.35s ease,border-color 0.35s ease}
   .card::before{content:'';position:absolute;inset:0;border-radius:24px;opacity:0;transition:opacity 0.35s ease}
@@ -116,78 +112,22 @@
   .card-bio .card-btn:hover{background:var(--bio-dim)} .card-chem .card-btn:hover{background:var(--chem-dim)}
   .card-btn .arrow{transition:transform 0.3s ease} .card-btn:hover .arrow{transform:translateX(4px)}
 
-  /* PAPERS BUTTON */
-  .papers-entry{
-    margin-top:20px;
-    animation:fadeUp 0.9s ease 0.55s both;
-  }
-  .papers-btn{
-    display:flex;align-items:center;gap:12px;
-    padding:16px 32px;
-    background:var(--card-bg);
-    border:1px solid var(--card-border);
-    border-radius:100px;
-    backdrop-filter:blur(20px) saturate(160%);
-    -webkit-backdrop-filter:blur(20px) saturate(160%);
-    cursor:pointer;
-    text-decoration:none;color:inherit;
-    position:relative;overflow:hidden;
-    transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.35s ease,border-color 0.35s ease;
-    font-family:'DM Sans',sans-serif;
-  }
-  .papers-btn::before{
-    content:'';position:absolute;inset:0;border-radius:100px;
-    background:linear-gradient(135deg,var(--bio-dim),var(--chem-dim));
-    opacity:0;transition:opacity 0.35s ease;
-  }
-  .papers-btn:hover{
-    transform:translateY(-4px) scale(1.03);
-    box-shadow:0 16px 48px var(--mixed-glow);
-    border-color:rgba(120,200,220,0.35);
-  }
+  .papers-entry{margin-top:20px;animation:fadeUp 0.9s ease 0.55s both}
+  .papers-btn{display:flex;align-items:center;gap:12px;padding:16px 32px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:100px;backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);cursor:pointer;text-decoration:none;color:inherit;position:relative;overflow:hidden;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.35s ease,border-color 0.35s ease;font-family:'DM Sans',sans-serif}
+  .papers-btn::before{content:'';position:absolute;inset:0;border-radius:100px;background:linear-gradient(135deg,var(--bio-dim),var(--chem-dim));opacity:0;transition:opacity 0.35s ease}
+  .papers-btn:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 16px 48px var(--mixed-glow);border-color:rgba(120,200,220,0.35)}
   .papers-btn:hover::before{opacity:1}
-  .papers-btn::after{
-    content:'';position:absolute;top:-100%;left:-60%;width:40%;height:300%;
-    background:linear-gradient(105deg,transparent,rgba(255,255,255,0.06),transparent);
-    transform:skewX(-15deg);transition:left 0.6s ease;
-  }
+  .papers-btn::after{content:'';position:absolute;top:-100%;left:-60%;width:40%;height:300%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.06),transparent);transform:skewX(-15deg);transition:left 0.6s ease}
   .papers-btn:hover::after{left:160%}
-  .papers-btn-icon{
-    position:relative;z-index:1;
-    width:38px;height:38px;border-radius:12px;
-    background:var(--mixed-dim);
-    display:flex;align-items:center;justify-content:center;
-    font-size:18px;flex-shrink:0;
-    border:1px solid rgba(120,200,220,0.2);
-    transition:transform 0.3s ease;
-  }
+  .papers-btn-icon{position:relative;z-index:1;width:38px;height:38px;border-radius:12px;background:var(--mixed-dim);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid rgba(120,200,220,0.2);transition:transform 0.3s ease}
   .papers-btn:hover .papers-btn-icon{transform:scale(1.1) rotate(-3deg)}
-  .papers-btn-text{
-    position:relative;z-index:1;
-    display:flex;flex-direction:column;align-items:flex-start;text-align:left;
-  }
-  .papers-btn-label{
-    font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;
-    background:var(--mixed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    background-clip:text;
-    line-height:1.2;
-  }
-  .papers-btn-sub{
-    font-size:0.75rem;color:var(--text-sub);line-height:1.3;margin-top:2px;
-  }
-  .papers-btn-arrow{
-    position:relative;z-index:1;
-    margin-left:8px;
-    width:28px;height:28px;border-radius:50%;
-    background:var(--mixed-dim);
-    display:flex;align-items:center;justify-content:center;
-    transition:transform 0.3s ease, background 0.3s ease;
-    flex-shrink:0;
-  }
+  .papers-btn-text{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+  .papers-btn-label{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;background:var(--mixed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
+  .papers-btn-sub{font-size:0.75rem;color:var(--text-sub);line-height:1.3;margin-top:2px}
+  .papers-btn-arrow{position:relative;z-index:1;margin-left:8px;width:28px;height:28px;border-radius:50%;background:var(--mixed-dim);display:flex;align-items:center;justify-content:center;transition:transform 0.3s ease,background 0.3s ease;flex-shrink:0}
   .papers-btn-arrow svg{width:13px;height:13px;stroke:var(--mixed-text);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
   .papers-btn:hover .papers-btn-arrow{transform:translateX(3px);background:rgba(120,200,220,0.2)}
 
-  /* SHARED SECTION */
   .section{position:relative;z-index:1;padding:80px 24px;max-width:1100px;margin:0 auto}
   .section-header{text-align:center;margin-bottom:56px}
   .section-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-sub);opacity:0.6;margin-bottom:14px;display:block}
@@ -195,7 +135,6 @@
   .section-title .bio-word{color:var(--bio)} .section-title .chem-word{color:var(--chem)}
   .section-sub{margin-top:14px;font-size:1rem;color:var(--text-sub);max-width:560px;margin-left:auto;margin-right:auto;line-height:1.7}
 
-  /* CHAPTER GRID */
   .chapter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
   .chapter-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:28px;backdrop-filter:blur(20px);position:relative;overflow:hidden;transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease}
   .chapter-card:hover{transform:translateY(-6px)}
@@ -209,7 +148,6 @@
   .bio-card .resource-icon{background:var(--bio-dim)} .chem-card .resource-icon{background:var(--chem-dim)}
   .resource-text strong{display:block;color:var(--text);font-size:0.9rem;margin-bottom:1px}
 
-  /* DEEP DIVES */
   .topics-section{position:relative;z-index:1;padding:0 24px 80px}
   .topics-inner{max-width:1100px;margin:0 auto}
   .topics-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
@@ -220,7 +158,6 @@
   .pill-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
   .bio-pill .pill-dot{background:var(--bio)} .chem-pill .pill-dot{background:var(--chem)}
 
-  /* P6 */
   .p6-section{position:relative;z-index:1;padding:0 24px 80px}
   .p6-inner{max-width:1100px;margin:0 auto}
   .p6-card{background:var(--card-bg);border:1px solid rgba(167,139,250,0.25);border-radius:28px;padding:48px;backdrop-filter:blur(24px);display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;position:relative;overflow:hidden;box-shadow:0 0 80px rgba(167,139,250,0.08)}
@@ -233,14 +170,12 @@
   .p6-tag{padding:6px 14px;font-size:12px;font-weight:500;background:var(--chem-dim);color:var(--chem);border-radius:100px;border:1px solid rgba(167,139,250,0.2);transition:all 0.2s ease}
   .p6-tag:hover{background:rgba(167,139,250,0.25);transform:translateY(-1px)}
 
-  /* FEATURES */
   .features{position:relative;z-index:1;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:0 24px 80px}
   .feat{display:flex;align-items:center;gap:8px;padding:8px 18px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:100px;backdrop-filter:blur(12px);font-size:13px;color:var(--text-sub);transition:all 0.3s ease}
   .feat:hover{color:var(--text);border-color:var(--glass-border);transform:translateY(-2px)}
   .feat-dot{width:6px;height:6px;border-radius:50%}
   .feat-bio{background:var(--bio)} .feat-chem{background:var(--chem)} .feat-both{background:linear-gradient(90deg,var(--bio),var(--chem))}
 
-  /* SOCIAL */
   .social-section{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:20px;padding:0 24px 80px}
   .social-label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text-sub);opacity:0.6}
   .social-links{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}
@@ -259,29 +194,24 @@
   .social-link.ig::before{background:radial-gradient(circle at 0% 50%,rgba(225,48,108,0.1),transparent 70%)}
   .social-link.ig:hover{border-color:rgba(225,48,108,0.5);box-shadow:0 12px 40px rgba(225,48,108,0.2)} .social-link.ig:hover::before{opacity:1}
 
-  /* FOOTER */
   footer{position:relative;z-index:1;text-align:center;padding:24px;border-top:1px solid var(--card-border);font-size:13px;color:var(--text-sub);backdrop-filter:blur(12px)}
   footer span{color:var(--bio)}
   .footer-socials{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px}
   .footer-social{font-size:12px;color:var(--text-sub);text-decoration:none;opacity:0.6;transition:opacity 0.2s ease}
   .footer-social:hover{opacity:1}
 
-  /* DIVIDER */
   .divider{position:relative;z-index:1;display:flex;align-items:center;gap:20px;max-width:1100px;margin:0 auto 64px;padding:0 24px}
   .divider-line{flex:1;height:1px;background:var(--card-border)}
   .divider-text{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-sub);opacity:0.5;white-space:nowrap}
 
-  /* SCROLL LINE */
   .scroll-line{position:fixed;top:0;left:0;height:2px;z-index:999;background:linear-gradient(90deg,var(--bio),var(--chem));width:0%;transition:width 0.1s linear;box-shadow:0 0 8px var(--bio-glow)}
 
-  /* ANIMATIONS */
   @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
   @keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
   .reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease}
   .reveal.visible{opacity:1;transform:translateY(0)}
   .reveal-delay-1{transition-delay:0.1s} .reveal-delay-2{transition-delay:0.2s} .reveal-delay-3{transition-delay:0.3s}
 
-  /* RESPONSIVE */
   @media(max-width:768px){.p6-card{grid-template-columns:1fr;padding:32px 24px}}
   @media(max-width:600px){
     nav{padding:14px 20px} .card{width:min(320px,90vw)} .nav-socials{display:none}
@@ -291,125 +221,35 @@
     .papers-btn-sub{display:none}
   }
 
-  /* ═══════════════════════════════════════════
-     IFRAME PORTAL OVERLAY
-  ═══════════════════════════════════════════ */
-  .portal-overlay{
-    position:fixed;inset:0;z-index:9000;
-    display:flex;flex-direction:column;
-    opacity:0;pointer-events:none;
-    transition:opacity 0.35s cubic-bezier(0.4,0,0.2,1);
-  }
-  .portal-overlay.open{opacity:1;pointer-events:all;}
-
-  /* Blurred backdrop */
-  .portal-backdrop{
-    position:absolute;inset:0;
-    background:rgba(5,5,12,0.85);
-    backdrop-filter:blur(18px) saturate(160%);
-    -webkit-backdrop-filter:blur(18px) saturate(160%);
-  }
-  [data-theme="light"] .portal-backdrop{background:rgba(220,228,255,0.88);}
-
-  /* Portal window */
-  .portal-window{
-    position:relative;z-index:1;
-    display:flex;flex-direction:column;
-    width:calc(100% - 40px);
-    max-width:1400px;
-    height:calc(100vh - 40px);
-    margin:20px auto;
-    border-radius:20px;
-    overflow:hidden;
-    border:1px solid var(--card-border);
-    box-shadow:0 40px 120px rgba(0,0,0,0.6);
-    transform:translateY(24px) scale(0.98);
-    transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .portal-overlay.open .portal-window{transform:translateY(0) scale(1);}
-
-  /* Top bar */
-  .portal-bar{
-    display:flex;align-items:center;gap:12px;
-    padding:10px 16px;
-    background:rgba(12,12,24,0.95);
-    border-bottom:1px solid var(--card-border);
-    backdrop-filter:blur(20px);
-    flex-shrink:0;
-    user-select:none;
-  }
-  [data-theme="light"] .portal-bar{background:rgba(235,238,255,0.97);}
-
+  .portal-overlay{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.35s cubic-bezier(0.4,0,0.2,1)}
+  .portal-overlay.open{opacity:1;pointer-events:all}
+  .portal-backdrop{position:absolute;inset:0;background:rgba(5,5,12,0.85);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%)}
+  [data-theme="light"] .portal-backdrop{background:rgba(220,228,255,0.88)}
+  .portal-window{position:relative;z-index:1;display:flex;flex-direction:column;width:calc(100% - 40px);max-width:1400px;height:calc(100vh - 40px);margin:20px auto;border-radius:20px;overflow:hidden;border:1px solid var(--card-border);box-shadow:0 40px 120px rgba(0,0,0,0.6);transform:translateY(24px) scale(0.98);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+  .portal-overlay.open .portal-window{transform:translateY(0) scale(1)}
+  .portal-bar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(12,12,24,0.95);border-bottom:1px solid var(--card-border);backdrop-filter:blur(20px);flex-shrink:0;user-select:none}
+  [data-theme="light"] .portal-bar{background:rgba(235,238,255,0.97)}
   .portal-dots{display:flex;gap:6px;align-items:center}
-  .portal-dot{width:12px;height:12px;border-radius:50%;}
-  .portal-dot.close-dot{background:#ff5f57;cursor:pointer;transition:filter 0.2s ease;}
-  .portal-dot.close-dot:hover{filter:brightness(1.3);}
-  .portal-dot.min-dot{background:#febc2e;}
-  .portal-dot.max-dot{background:#28c840;}
-
-  .portal-url-bar{
-    flex:1;display:flex;align-items:center;gap:8px;
-    background:var(--card-bg);
-    border:1px solid var(--card-border);
-    border-radius:8px;padding:6px 12px;
-    font-size:12.5px;font-family:'DM Sans',sans-serif;
-    color:var(--text-sub);
-    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
-  }
-  .portal-lock{font-size:11px;opacity:0.5;flex-shrink:0;}
-  .portal-url-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-  .portal-actions{display:flex;gap:8px;align-items:center;}
-  .portal-action-btn{
-    width:30px;height:30px;border-radius:8px;
-    background:var(--glass-bg);border:1px solid var(--glass-border);
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;font-size:13px;color:var(--text-sub);
-    transition:all 0.2s ease;
-    text-decoration:none;
-  }
-  .portal-action-btn:hover{background:var(--card-bg);color:var(--text);transform:scale(1.08);}
-
-  /* Label chip */
-  .portal-chip{
-    display:flex;align-items:center;gap:6px;
-    padding:4px 12px;border-radius:100px;
-    font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;
-    flex-shrink:0;
-  }
-  .portal-chip.bio{background:var(--bio-dim);color:var(--bio);border:1px solid rgba(0,255,170,0.25);}
-  .portal-chip.chem{background:var(--chem-dim);color:var(--chem);border:1px solid rgba(167,139,250,0.25);}
-  .portal-chip.papers{background:var(--mixed-dim);color:var(--mixed-text);border:1px solid rgba(120,200,220,0.25);}
-
-  /* iframe */
-  .portal-iframe{
-    flex:1;width:100%;border:none;
-    background:#fff;
-    display:block;
-  }
-
-  /* Loading state */
-  .portal-loader{
-    position:absolute;bottom:0;left:0;right:0;
-    height:3px;
-    background:linear-gradient(90deg,var(--bio),var(--chem));
-    transform-origin:left;
-    transform:scaleX(0);
-    transition:transform 0.3s ease;
-    border-radius:0 0 0 0;
-  }
-  .portal-loader.loading{animation:loadBar 1.5s ease-in-out infinite;}
-  @keyframes loadBar{
-    0%{transform:scaleX(0);transform-origin:left;}
-    50%{transform:scaleX(0.7);transform-origin:left;}
-    50.01%{transform-origin:right;}
-    100%{transform:scaleX(0);transform-origin:right;}
-  }
-
-  /* Mobile: full screen */
-  @media(max-width:600px){
-    .portal-window{width:100%;height:100vh;margin:0;border-radius:0;border:none;}
-  }
+  .portal-dot{width:12px;height:12px;border-radius:50%}
+  .portal-dot.close-dot{background:#ff5f57;cursor:pointer;transition:filter 0.2s ease}
+  .portal-dot.close-dot:hover{filter:brightness(1.3)}
+  .portal-dot.min-dot{background:#febc2e}
+  .portal-dot.max-dot{background:#28c840}
+  .portal-url-bar{flex:1;display:flex;align-items:center;gap:8px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:6px 12px;font-size:12.5px;font-family:'DM Sans',sans-serif;color:var(--text-sub);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .portal-lock{font-size:11px;opacity:0.5;flex-shrink:0}
+  .portal-url-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .portal-actions{display:flex;gap:8px;align-items:center}
+  .portal-action-btn{width:30px;height:30px;border-radius:8px;background:var(--glass-bg);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--text-sub);transition:all 0.2s ease;text-decoration:none}
+  .portal-action-btn:hover{background:var(--card-bg);color:var(--text);transform:scale(1.08)}
+  .portal-chip{display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;flex-shrink:0}
+  .portal-chip.bio{background:var(--bio-dim);color:var(--bio);border:1px solid rgba(0,255,170,0.25)}
+  .portal-chip.chem{background:var(--chem-dim);color:var(--chem);border:1px solid rgba(167,139,250,0.25)}
+  .portal-chip.papers{background:var(--mixed-dim);color:var(--mixed-text);border:1px solid rgba(120,200,220,0.25)}
+  .portal-iframe{flex:1;width:100%;border:none;background:#fff;display:block}
+  .portal-loader{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bio),var(--chem));transform-origin:left;transform:scaleX(0);transition:transform 0.3s ease}
+  .portal-loader.loading{animation:loadBar 1.5s ease-in-out infinite}
+  @keyframes loadBar{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(0.7);transform-origin:left}50.01%{transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}
+  @media(max-width:600px){.portal-window{width:100%;height:100vh;margin:0;border-radius:0;border:none}}
 </style>
 </head>
 <body>
@@ -418,27 +258,22 @@
 <div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
 <canvas id="particles"></canvas>
 
-<!-- ═══════ IFRAME PORTAL OVERLAY ═══════ -->
 <div class="portal-overlay" id="portalOverlay">
   <div class="portal-backdrop" id="portalBackdrop"></div>
   <div class="portal-window">
     <div class="portal-bar">
-      <!-- macOS-style dots -->
       <div class="portal-dots">
         <div class="portal-dot close-dot" id="portalClose" title="Close"></div>
         <div class="portal-dot min-dot"></div>
         <div class="portal-dot max-dot"></div>
       </div>
-      <!-- Chip -->
       <div class="portal-chip" id="portalChip">🧬 IG-Bio</div>
-      <!-- URL bar -->
       <div class="portal-url-bar">
         <span class="portal-lock">🔒</span>
         <span class="portal-url-text" id="portalUrlText">ig-bio.vercel.app</span>
       </div>
-      <!-- Actions -->
       <div class="portal-actions">
-        <a class="portal-action-btn" id="portalExternal" href="#" target="_blank" title="Open in new tab">
+        <a class="portal-action-btn" id="portalExternal" href="#" target="_blank" rel="noopener" title="Open in new tab">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </a>
         <div class="portal-action-btn" id="portalCloseBtn" title="Close" onclick="closePortal()">
@@ -446,14 +281,11 @@
         </div>
       </div>
     </div>
-    <!-- Loading bar -->
     <div class="portal-loader" id="portalLoader"></div>
-    <!-- THE IFRAME -->
-    <iframe class="portal-iframe" id="portalIframe" src="about:blank" allow="fullscreen" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"></iframe>
+    <iframe class="portal-iframe" id="portalIframe" src="about:blank" allow="fullscreen"></iframe>
   </div>
 </div>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo"><img src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png" alt="Clairo"/></div>
   <div class="nav-right">
@@ -472,7 +304,6 @@
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-badge"><span class="badge-dot"></span>IGCSE Science Platform · CIE Curriculum</div>
   <img class="hero-logo" src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png" alt="Clairo Logo"/>
@@ -480,7 +311,6 @@
   <p class="hero-sub">One platform. Two sciences. Built for IGCSE students who want clarity, depth, and results — from Cairo to the world.</p>
   <p class="hero-author">By Mohamed Mostafa Abdelsalam ⭐️</p>
   <div class="cards">
-    <!-- BIO CARD — opens portal -->
     <div class="card card-bio" onclick="openPortal('https://ig-bio.vercel.app','bio')">
       <span class="card-icon">🧬</span>
       <span class="card-tag">CIE 0610</span>
@@ -488,7 +318,6 @@
       <p>Full chapter explanations, mind maps, 50 MCQs per chapter, audio lectures, revision notes — all downloadable, all free.</p>
       <span class="card-btn">Start Learning <span class="arrow">→</span></span>
     </div>
-    <!-- CHEM CARD — opens portal -->
     <div class="card card-chem" onclick="openPortal('https://ig-chem.vercel.app','chem')">
       <span class="card-icon">⚗️</span>
       <span class="card-tag">CIE 0620</span>
@@ -498,9 +327,8 @@
     </div>
   </div>
 
-  <!-- PAPERS BUTTON -->
   <div class="papers-entry">
-    <a class="papers-btn" onclick="openPortal('clairo_papers','papers');return false;" href="#">
+    <a class="papers-btn" href="#" onclick="openPapersPortal();return false;">
       <div class="papers-btn-icon">📝</div>
       <div class="papers-btn-text">
         <span class="papers-btn-label">Clairo Papers</span>
@@ -514,7 +342,6 @@
 
 </section>
 
-<!-- WHAT'S INSIDE -->
 <div class="section reveal">
   <div class="section-header">
     <span class="section-eyebrow">What's Inside</span>
@@ -549,7 +376,6 @@
   </div>
 </div>
 
-<!-- DEEP DIVES -->
 <div class="divider reveal"><div class="divider-line"></div><div class="divider-text">Topic Deep Dives</div><div class="divider-line"></div></div>
 <div class="topics-section reveal">
   <div class="topics-inner">
@@ -575,7 +401,6 @@
   </div>
 </div>
 
-<!-- P6 GUIDE -->
 <div class="divider reveal"><div class="divider-line"></div><div class="divider-text">Exam Mastery</div><div class="divider-line"></div></div>
 <div class="p6-section reveal">
   <div class="p6-inner">
@@ -597,7 +422,6 @@
   </div>
 </div>
 
-<!-- FEATURES -->
 <div class="divider reveal"><div class="divider-line"></div><div class="divider-text">At a Glance</div><div class="divider-line"></div></div>
 <div class="features reveal">
   <div class="feat"><span class="feat-dot feat-bio"></span> Audio Lectures</div>
@@ -615,7 +439,6 @@
   <div class="feat"><span class="feat-dot feat-bio"></span> 100% Free</div>
 </div>
 
-<!-- SOCIAL -->
 <div class="social-section reveal">
   <p class="social-label">Follow Clairo</p>
   <div class="social-links">
@@ -634,7 +457,6 @@
   </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
   <span>Clairo</span> · Science Education Platform · By Mohamed Mostafa Abdelsalam ⭐️ · © 2026
   <div class="footer-socials">
@@ -663,45 +485,40 @@ const chipLabels = {
 };
 
 function openPortal(url, type) {
-  // Update chip
   chip.className = 'portal-chip ' + type;
   chip.textContent = chipLabels[type] || '📄 Page';
-
-  // Update URL bar — for local files show a friendly label
-  if (url.startsWith('http')) {
-    urlText.textContent = url.replace('https://', '');
-  } else {
-    urlText.textContent = 'clairo.web.app/papers';
-  }
-
-  // Update external link — only for remote URLs
-  if (url.startsWith('http')) {
-    extLink.href = url;
-    extLink.style.display = '';
-  } else {
-    extLink.style.display = 'none';
-  }
-
-  // Show loading bar
+  urlText.textContent = url.replace('https://', '').replace('http://', '');
+  extLink.href = url;
+  extLink.style.display = '';
   loader.classList.add('loading');
-
-  // Load iframe
   iframe.src = url;
-
-  // On iframe load, stop loader
   iframe.onload = () => loader.classList.remove('loading');
-
-  // Lock body scroll
   document.body.style.overflow = 'hidden';
+  overlay.classList.add('open');
+}
 
-  // Open overlay
+/* ─── PAPERS PORTAL — builds full URL from current origin ─── */
+function openPapersPortal() {
+  // Use the current page's origin so it always resolves correctly
+  // e.g. https://clairo.web.app/clairo_papers/index.html
+  var base = window.location.origin;
+  var url  = base + '/clairo_papers/index.html';
+
+  chip.className = 'portal-chip papers';
+  chip.textContent = chipLabels.papers;
+  urlText.textContent = 'clairo.web.app/clairo_papers';
+  extLink.href = url;
+  extLink.style.display = '';
+  loader.classList.add('loading');
+  iframe.src = url;
+  iframe.onload = () => loader.classList.remove('loading');
+  document.body.style.overflow = 'hidden';
   overlay.classList.add('open');
 }
 
 function closePortal() {
   overlay.classList.remove('open');
   document.body.style.overflow = '';
-  // Small delay then clear src to save memory
   setTimeout(() => {
     if (!overlay.classList.contains('open')) {
       iframe.src = 'about:blank';
@@ -710,13 +527,8 @@ function closePortal() {
   }, 400);
 }
 
-// Close on backdrop click
 backdrop.addEventListener('click', closePortal);
-
-// Close on macOS dot
 document.getElementById('portalClose').addEventListener('click', closePortal);
-
-// Close on Escape key
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && overlay.classList.contains('open')) closePortal();
 });
