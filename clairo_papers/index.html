@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clairo Papers</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #060b18;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(99,179,237,0.4);
+    --blue: #63b3ed;
+    --blue-bright: #90cdf4;
+    --text: #e2e8f0;
+    --text-muted: #718096;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(66,153,225,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 60% at 80% 80%, rgba(99,179,237,0.06) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(99,179,237,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,179,237,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 700px;
+    padding: 40px 24px 60px;
+  }
+
+  header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  header img {
+    width: 42px; height: 42px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(99,179,237,0.4));
+  }
+
+  .header-text h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    letter-spacing: -0.3px; color: #fff;
+  }
+
+  .header-text span {
+    font-size: 12px; color: var(--text-muted);
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px;
+    backdrop-filter: blur(12px);
+    position: relative; overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99,179,237,0.3), transparent);
+  }
+
+  .cie-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(99,179,237,0.08);
+    border: 1px solid rgba(99,179,237,0.18);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.8px; color: var(--blue);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--blue-bright); margin-bottom: 26px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .card-title::before {
+    content: ''; display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--blue); border-radius: 50%;
+    box-shadow: 0 0 8px var(--blue);
+  }
+
+  .grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 7px; }
+
+  label {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  select, input[type="number"] {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; padding: 11px 14px; outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    width: 100%; appearance: none; -webkit-appearance: none; cursor: pointer;
+  }
+
+  select:focus, input[type="number"]:focus {
+    border-color: var(--border-hover);
+    background: rgba(99,179,237,0.07);
+    box-shadow: 0 0 0 3px rgba(99,179,237,0.08);
+  }
+
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾'; position: absolute;
+    right: 13px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 12px; pointer-events: none;
+  }
+
+  .type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .type-btn {
+    padding: 11px; border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+
+  .type-btn:hover { border-color: var(--border-hover); color: var(--text); }
+  .type-btn.active {
+    background: rgba(99,179,237,0.15);
+    border-color: var(--blue); color: var(--blue-bright);
+    box-shadow: 0 0 16px rgba(99,179,237,0.1);
+  }
+
+  .paper-hint { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .btn-get {
+    width: 100%; margin-top: 26px; padding: 15px;
+    background: linear-gradient(135deg, #3182ce, #63b3ed);
+    border: none; border-radius: 12px; color: #fff;
+    font-family: 'Syne', sans-serif; font-size: 15px;
+    font-weight: 700; letter-spacing: 0.3px;
+    cursor: pointer; transition: all 0.25s;
+    position: relative; overflow: hidden;
+  }
+
+  .btn-get::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+
+  .btn-get:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(49,130,206,0.35); }
+  .btn-get:hover::before { opacity: 1; }
+  .btn-get:active { transform: translateY(0); }
+  .btn-get.loading { pointer-events: none; opacity: 0.7; }
+
+  .error-msg {
+    margin-top: 14px; padding: 13px 16px;
+    background: rgba(245,101,101,0.08);
+    border: 1px solid rgba(245,101,101,0.25);
+    border-radius: 10px; font-size: 13px; color: #fc8181;
+    display: none;
+  }
+
+  /* ── PDF Viewer ── */
+  .viewer-wrap {
+    margin-top: 28px; display: none;
+    animation: fadeUp 0.35s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(10px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .viewer-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(99,179,237,0.07);
+    border: 1px solid rgba(99,179,237,0.2);
+    border-bottom: none;
+    border-radius: 14px 14px 0 0;
+    padding: 13px 18px; gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .viewer-info {
+    font-size: 12px; color: var(--blue-bright);
+    font-weight: 600; letter-spacing: 0.4px;
+    flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .viewer-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .btn-download {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px;
+    background: linear-gradient(135deg, #3182ce, #63b3ed);
+    border: none; color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-download:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-new {
+    padding: 8px 14px; border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+
+  .btn-new:hover { border-color: var(--border-hover); color: var(--text); }
+
+  .pdf-frame-wrap {
+    border: 1px solid rgba(99,179,237,0.2);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    overflow: hidden;
+    background: #0d1220;
+    position: relative;
+    min-height: 200px;
+  }
+
+  .pdf-loading {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 14px; background: #0a0f1e;
+    z-index: 2;
+  }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid rgba(99,179,237,0.15);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .pdf-loading p { font-size: 13px; color: var(--text-muted); }
+
+  iframe#pdf-frame {
+    width: 100%; height: 78vh;
+    border: none; display: block;
+    position: relative; z-index: 1;
+  }
+
+  footer {
+    margin-top: 36px; text-align: center;
+    font-size: 12px; color: var(--text-muted);
+  }
+
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <img src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png" alt="Clairo Logo" onerror="this.style.display='none'"/>
+    <div class="header-text">
+      <h1>Clairo Papers</h1>
+      <span>CIE IGCSE Past Papers</span>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="cie-badge">🎓 Cambridge IGCSE · CIE Only</div>
+    <div class="card-title">Get Your Paper In Seconds</div>
+
+    <div class="grid">
+
+      <div class="field">
+        <label>Subject</label>
+        <div class="select-wrap">
+          <select id="subject">
+            <option value="">Select subject</option>
+            <option value="physics">Physics</option>
+            <option value="chemistry">Chemistry</option>
+            <option value="biology">Biology</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Paper Number</label>
+        <input type="number" id="paper" placeholder="e.g. 2" min="1" max="9"/>
+        <div class="paper-hint">Paper 1 through Paper 9</div>
+      </div>
+
+      <div class="field">
+        <label>Session</label>
+        <div class="select-wrap">
+          <select id="session">
+            <option value="">Select month</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Year</label>
+        <div class="select-wrap">
+          <select id="year"></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Variant</label>
+        <div class="select-wrap">
+          <select id="variant">
+            <option value="1">Variant 1</option>
+            <option value="2">Variant 2</option>
+            <option value="3">Variant 3</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Type</label>
+        <div class="type-toggle">
+          <button class="type-btn active" data-val="QP" onclick="selectType(this)">📄 Question Paper</button>
+          <button class="type-btn" data-val="MS" onclick="selectType(this)">✅ Mark Scheme</button>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn-get" id="get-btn" onclick="getPaper()">Get Paper →</button>
+    <div class="error-msg" id="error">⚠ Please fill in all fields before continuing.</div>
+
+    <!-- Inline PDF Viewer -->
+    <div class="viewer-wrap" id="viewer-wrap">
+      <div class="viewer-topbar">
+        <div class="viewer-info" id="viewer-info">Loading paper…</div>
+        <div class="viewer-actions">
+          <a class="btn-download" id="download-btn" href="#" target="_blank" rel="noopener">
+            ⬇ Download PDF
+          </a>
+          <button class="btn-new" onclick="resetViewer()">← New Search</button>
+        </div>
+      </div>
+      <div class="pdf-frame-wrap">
+        <div class="pdf-loading" id="pdf-loading">
+          <div class="spinner"></div>
+          <p>Loading your paper…</p>
+        </div>
+        <iframe id="pdf-frame" title="PDF Viewer" onload="frameLoaded()"></iframe>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Part of the <a href="https://clairo.web.app" target="_blank">Clairo</a> ecosystem · Papers sourced via PMT, we appologise that some papers of 2025 aren't fully available!
+  </footer>
+
+</div>
+
+<script>
+  // Auto year dropdown up to current year
+  const yearSelect = document.getElementById('year');
+  const currentYear = new Date().getFullYear();
+  for (let y = currentYear; y >= 2010; y--) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    yearSelect.appendChild(opt);
+  }
+
+  let selectedType = 'QP';
+
+  function selectType(btn) {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedType = btn.dataset.val;
+  }
+
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
+  function getPaper() {
+    const subject = document.getElementById('subject').value;
+    const paper   = document.getElementById('paper').value;
+    const session = document.getElementById('session').value;
+    const year    = document.getElementById('year').value;
+    const variant = document.getElementById('variant').value;
+    const type    = selectedType;
+
+    const errorEl  = document.getElementById('error');
+    const viewerEl = document.getElementById('viewer-wrap');
+
+    if (!subject || !paper || !session || !year) {
+      errorEl.style.display = 'block';
+      viewerEl.style.display = 'none';
+      return;
+    }
+
+    errorEl.style.display = 'none';
+
+    const url = `https://pmt.physicsandmathstutor.com/download/${capitalize(subject)}/GCSE/Past-Papers/CIE/Paper-${paper}/International/${type.toUpperCase()}/${session}%20${year}%20(v${variant})%20${type.toUpperCase()}.pdf`;
+
+    // Topbar info
+    const typeLabel = type === 'QP' ? 'Question Paper' : 'Mark Scheme';
+    document.getElementById('viewer-info').textContent =
+      `${capitalize(subject)}  ·  Paper ${paper}  ·  ${typeLabel}  ·  ${session} ${year}  ·  Variant ${variant}`;
+
+    // Download button — direct link, browser handles it
+    const dlBtn = document.getElementById('download-btn');
+    dlBtn.href = url;
+
+    // Show loading spinner, load iframe
+    document.getElementById('pdf-loading').style.display = 'flex';
+    document.getElementById('pdf-frame').src = url;
+
+    // Show viewer panel
+    viewerEl.style.display = 'block';
+
+    // Smooth scroll to viewer
+    setTimeout(() => viewerEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+
+    // Button loading state
+    const getBtn = document.getElementById('get-btn');
+    getBtn.textContent = 'Loading…';
+    getBtn.classList.add('loading');
+  }
+
+  function frameLoaded() {
+    document.getElementById('pdf-loading').style.display = 'none';
+    const getBtn = document.getElementById('get-btn');
+    getBtn.textContent = 'Get Paper →';
+    getBtn.classList.remove('loading');
+  }
+
+  function resetViewer() {
+    const viewerEl = document.getElementById('viewer-wrap');
+    viewerEl.style.display = 'none';
+    document.getElementById('pdf-frame').src = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
