@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<!-- saved from url=(0060)file:///C:/Users/moustafa/Downloads/lenses_igcse.html#basics -->
+<html lang="en" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lenses — CIE IGCSE Physics</title>
+<style>
+/* ===== FONTS ===== */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --bg: #0a0c14;
+  --bg2: #111420;
+  --bg3: #181c2e;
+  --card: #1a1f35;
+  --card2: #1e2438;
+  --border: rgba(255,255,255,0.07);
+  --text: #e8eaf6;
+  --text2: #a0a8c8;
+  --text3: #606888;
+  --accent: #5c9eff;
+  --accent2: #7b5ea7;
+  --cyan: #00d4ff;
+  --green: #00e5a0;
+  --orange: #ff8c42;
+  --red: #ff5555;
+  --yellow: #ffd166;
+  --purple: #b388ff;
+  --convex-color: #5c9eff;
+  --concave-color: #ff6b8a;
+  --ray-color: #ffd166;
+  --object-color: #00e5a0;
+  --image-color: #ff8c42;
+  --axis-color: rgba(255,255,255,0.15);
+  --shadow: 0 8px 40px rgba(0,0,0,0.5);
+  --radius: 16px;
+  --radius-sm: 8px;
+  --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="light"] {
+  --bg: #f0f2fa;
+  --bg2: #e8eaf6;
+  --bg3: #dde0f0;
+  --card: #ffffff;
+  --card2: #f5f7ff;
+  --border: rgba(0,0,0,0.08);
+  --text: #1a1f35;
+  --text2: #4a5280;
+  --text3: #8a90b0;
+  --convex-color: #2566d0;
+  --concave-color: #d63060;
+  --ray-color: #cc8800;
+  --object-color: #007a55;
+  --image-color: #c05a00;
+  --axis-color: rgba(0,0,0,0.12);
+  --shadow: 0 8px 40px rgba(0,0,0,0.12);
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+code { font-family: 'JetBrains Mono', monospace; }
+a { color: var(--accent); text-decoration: none; }
+img { max-width: 100%; }
+canvas { display: block; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
+
+/* ===== HERO ===== */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+#hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(92,158,255,0.12) 0%, transparent 70%),
+              radial-gradient(ellipse 50% 40% at 80% 80%, rgba(123,94,167,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(92,158,255,0.15);
+  border: 1px solid rgba(92,158,255,0.3);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  margin-bottom: 1.5rem;
+  font-family: 'Syne', sans-serif;
+}
+#hero h1 {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 50%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+#hero p {
+  font-size: 1.15rem;
+  color: var(--text2);
+  max-width: 540px;
+  margin: 0 auto 2.5rem;
+  font-weight: 300;
+}
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 100px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+  text-decoration: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(92,158,255,0.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(92,158,255,0.4); }
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover { background: var(--card); }
+
+/* ===== FLOATING LENS ANIMATION in hero ===== */
+.hero-visual {
+  margin: 3rem auto 0;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: rgba(10,12,20,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+[data-theme="light"] nav { background: rgba(240,242,250,0.85); }
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--text2);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+.nav-links a:hover { color: var(--accent); }
+.nav-right { display: flex; gap: 0.75rem; align-items: center; }
+#themeToggle {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center;
+}
+#themeToggle:hover { color: var(--text); }
+
+/* ===== MAIN CONTENT ===== */
+main { padding-top: 70px; }
+
+/* ===== SECTIONS ===== */
+section {
+  padding: 5rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.section-desc {
+  color: var(--text2);
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin-bottom: 3rem;
+  font-weight: 300;
+}
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0;
+}
+
+/* ===== LEVEL BADGE ===== */
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border-radius: 100px;
+  margin-bottom: 0.75rem;
+}
+.level-basic { background: rgba(0,229,160,0.15); color: var(--green); }
+.level-inter { background: rgba(255,209,102,0.15); color: var(--yellow); }
+.level-adv { background: rgba(255,85,85,0.15); color: var(--red); }
+
+/* ===== CARDS ===== */
+.card-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+.card-grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.card-grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: rgba(92,158,255,0.2); }
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+.card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.card p {
+  color: var(--text2);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.card-accent-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.accent-blue { background: linear-gradient(90deg, var(--accent), var(--cyan)); }
+.accent-purple { background: linear-gradient(90deg, var(--accent2), var(--purple)); }
+.accent-green { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+.accent-orange { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+.accent-red { background: linear-gradient(90deg, var(--red), var(--orange)); }
+
+/* ===== TOOLTIP ===== */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dashed var(--accent);
+  cursor: help;
+  color: var(--accent);
+}
+.tooltip .tip-text {
+  visibility: hidden;
+  opacity: 0;
+  background: var(--card2);
+  color: var(--text);
+  text-align: center;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1rem;
+  position: absolute;
+  z-index: 200;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.tooltip:hover .tip-text { visibility: visible; opacity: 1; }
+
+/* ===== FORMULA BOX ===== */
+.formula-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  color: var(--cyan);
+  margin: 1rem 0;
+  display: inline-block;
+}
+
+/* ===== CANVAS WRAPPER ===== */
+.canvas-wrapper {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+}
+.canvas-wrapper canvas {
+  width: 100%;
+  height: auto;
+}
+
+/* ===== SIMULATOR ===== */
+#simulator {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 5rem 2rem;
+}
+.sim-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.sim-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+.control-group {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.control-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 0.75rem;
+  font-family: 'Syne', sans-serif;
+}
+.seg-control {
+  display: flex;
+  gap: 0.5rem;
+}
+.seg-btn {
+  flex: 1;
+  padding: 0.55rem 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-family: 'Syne', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.seg-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.seg-btn.active.concave-active {
+  background: var(--concave-color);
+  border-color: var(--concave-color);
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text3);
+  margin-top: 0.4rem;
+}
+.sim-output {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.5rem;
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+.output-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: 100px;
+  font-family: 'Syne', sans-serif;
+}
+.tag-real { background: rgba(0,229,160,0.15); color: var(--green); }
+.tag-virtual { background: rgba(179,136,255,0.15); color: var(--purple); }
+.tag-inverted { background: rgba(255,140,66,0.15); color: var(--orange); }
+.tag-upright { background: rgba(0,212,255,0.15); color: var(--cyan); }
+.tag-bigger { background: rgba(255,209,102,0.15); color: var(--yellow); }
+.tag-smaller { background: rgba(255,85,85,0.12); color: var(--red); }
+.tag-same { background: rgba(92,158,255,0.12); color: var(--accent); }
+.tag-none { background: rgba(160,168,200,0.1); color: var(--text3); }
+
+.step-mode-panel {
+  margin-top: 1rem;
+  display: none;
+}
+.step-mode-panel.visible { display: block; }
+.step-indicator {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.step-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 1px solid var(--text3);
+  transition: background var(--transition);
+  cursor: pointer;
+}
+.step-dot.done { background: var(--accent); border-color: var(--accent); }
+.step-dot.active { background: var(--yellow); border-color: var(--yellow); }
+.step-desc {
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text2);
+  border-left: 3px solid var(--yellow);
+}
+
+/* ===== SCENARIO CARDS ===== */
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.scenario-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: center;
+}
+.scenario-card:hover, .scenario-card.active {
+  border-color: var(--accent);
+  background: rgba(92,158,255,0.06);
+}
+.scenario-card .sc-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+.scenario-card .sc-sub {
+  font-size: 0.75rem;
+  color: var(--text3);
+}
+
+/* ===== IMAGE TABLE ===== */
+.img-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin-top: 1.5rem;
+}
+.img-table th {
+  background: var(--bg3);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+}
+.img-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.img-table tr:hover td { background: var(--card2); }
+
+/* ===== QUIZ ===== */
+#quiz { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 5rem 2rem; }
+.quiz-wrapper { max-width: 700px; margin: 0 auto; }
+.quiz-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+.quiz-q {
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.quiz-opts { display: flex; flex-direction: column; gap: 0.65rem; }
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 0.9rem;
+  background: var(--bg3);
+}
+.quiz-opt:hover:not(.locked) { border-color: var(--accent); background: rgba(92,158,255,0.07); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(0,229,160,0.1); color: var(--green); }
+.quiz-opt.wrong { border-color: var(--red); background: rgba(255,85,85,0.1); color: var(--red); }
+.quiz-opt.locked { cursor: default; }
+.opt-letter {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--text3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+.quiz-feedback {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  display: none;
+}
+.feedback-correct { background: rgba(0,229,160,0.1); color: var(--green); border: 1px solid rgba(0,229,160,0.3); }
+.feedback-wrong { background: rgba(255,85,85,0.1); color: var(--red); border: 1px solid rgba(255,85,85,0.3); }
+.quiz-progress { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+.qp-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: background var(--transition); }
+.qp-dot.answered { background: var(--accent); }
+.qp-dot.correct { background: var(--green); }
+.qp-dot.wrong { background: var(--red); }
+#quizScore {
+  display: none;
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.score-num { font-size: 4rem; font-weight: 800; font-family: 'Syne', sans-serif; }
+
+/* ===== SUMMARY ===== */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.sum-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+.sum-icon { font-size: 1.5rem; flex-shrink: 0; }
+.sum-content h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem; }
+.sum-content p { font-size: 0.82rem; color: var(--text2); line-height: 1.5; }
+
+/* ===== FOOTER ===== */
+footer {
+  padding: 2rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  color: var(--text3);
+  font-size: 0.82rem;
+}
+
+/* ===== FADE-IN ANIMATION ===== */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible { opacity: 1; transform: none; }
+
+/* ===== CONCAVE HIGHLIGHT ===== */
+.concave-highlight {
+  background: rgba(255,107,138,0.06);
+  border: 1px solid rgba(255,107,138,0.25);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  position: relative;
+}
+.concave-highlight::before {
+  content: '⚠ IMPORTANT — CIE EXAMS';
+  font-family: 'Syne', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--concave-color);
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+  .sim-controls { grid-template-columns: 1fr; }
+  .formula-box { font-size: 0.85rem; }
+}
+
+/* ===== ANIMATED RAYS ===== */
+@keyframes rayPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+.ray-animated { animation: rayPulse 2s ease-in-out infinite; }
+
+/* ===== PULSE BADGE ===== */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <span>🔬</span> LensLab
+  </div>
+  <ul class="nav-links">
+    <li><a href="file:///C:/Users/moustafa/Downloads/lenses_igcse.html#basics">Basics</a></li>
+    <li><a href="file:///C:/Users/moustafa/Downloads/lenses_igcse.html#convex">Convex</a></li>
+    <li><a href="file:///C:/Users/moustafa/Downloads/lenses_igcse.html#concave">Concave</a></li>
+    
+    <li><a href="file:///C:/Users/moustafa/Downloads/lenses_igcse.html#advanced">Advanced</a></li>
+    
+  </ul>
+  <div class="nav-right">
+    <button id="themeToggle" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-badge">CIE IGCSE Physics · Chapter 4</div>
+  <h1>Master Lenses.<br>See the Light.</h1>
+  <p>From basic optics to complex ray diagrams — an interactive journey through converging and diverging lenses.</p>
+  <div class="hero-buttons">
+    <a href="file:///C:/Users/moustafa/Downloads/lenses_igcse.html#basics" class="btn btn-primary">▶ Start Learning</a>
+    
+  </div>
+  
+</div>
+
+<main>
+
+<!-- ======= BASICS ======= -->
+<section id="basics" class="fade-in visible">
+  <div class="section-label">Level 1 — Foundations</div>
+  <h2 class="section-title">What is a Lens?</h2>
+  <p class="section-desc">A lens is a transparent object with curved surfaces that refracts (bends) light. They form the heart of cameras, eyes, microscopes, and telescopes.</p>
+
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <div class="card-accent-line accent-blue"></div>
+      <span class="card-icon">🔵</span>
+      <h3>Convex (Converging) Lens</h3>
+      <p><strong>Thicker at the middle</strong> than the edges. It bends parallel rays <em>towards</em> a focal point. Also called a <span class="tooltip">converging lens<span class="tip-text">It brings light rays together at one point</span></span>.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-red"></div>
+      <span class="card-icon">🔴</span>
+      <h3>Concave (Diverging) Lens</h3>
+      <p><strong>Thicker at the edges</strong> than the middle. It bends parallel rays <em>away from</em> each other. Also called a <span class="tooltip">diverging lens<span class="tip-text">It spreads light rays apart from each other</span></span>.</p>
+    </div>
+  </div>
+
+  <!-- Key Terms -->
+  <h3 style="margin:3rem 0 1.5rem;font-size:1.4rem;">📐 Key Terms</h3>
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="card-accent-line accent-blue"></div>
+      <span class="card-icon">⚫</span>
+      <h3>Optical Centre (P)</h3>
+      <p>The exact centre of the lens. Rays passing through this point travel in a <strong>straight line</strong> without bending.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-green"></div>
+      <span class="card-icon">➖</span>
+      <h3>Principal Axis</h3>
+      <p>An imaginary horizontal line passing through the optical centre, <strong>perpendicular</strong> to the lens surface.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-orange"></div>
+      <span class="card-icon">✦</span>
+      <h3>Principal Focus (F)</h3>
+      <p>The point where parallel rays <strong>converge</strong> (convex) or appear to <strong>diverge from</strong> (concave) after refraction.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-purple"></div>
+      <span class="card-icon">📏</span>
+      <h3>Focal Length (f)</h3>
+      <p>The distance between the <strong>optical centre</strong> and the <strong>principal focus</strong>. A shorter focal length = stronger lens.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-blue"></div>
+      <span class="card-icon">🪞</span>
+      <h3>Real Image</h3>
+      <p>Formed where rays <strong>actually meet</strong>. Can be projected onto a screen. Always <strong>inverted</strong> for a single lens.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-purple"></div>
+      <span class="card-icon">👁</span>
+      <h3>Virtual Image</h3>
+      <p>Formed where rays <strong>appear to come from</strong> (rays don't actually meet there). <strong>Cannot</strong> be projected on screen. Always upright.</p>
+    </div>
+  </div>
+
+  <!-- Lens shape diagram -->
+  <div style="margin-top:3rem;">
+    
+    
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ======= CONVEX ======= -->
+<section id="convex" class="fade-in visible">
+  <div class="level-badge level-inter">⚡ Intermediate</div>
+  <div class="section-label">Level 2 — Convex Lens</div>
+  <h2 class="section-title">Converging Lens — Ray Diagrams</h2>
+  <p class="section-desc">Three rules govern how we draw rays through a convex lens. Master these and you can find any image.</p>
+
+  <div class="card-grid card-grid-3" style="margin-bottom:2.5rem;">
+    <div class="card">
+      <div class="card-accent-line accent-blue"></div>
+      <span class="card-icon">1️⃣</span>
+      <h3>Ray Parallel to Axis</h3>
+      <p>A ray travelling <strong>parallel</strong> to the principal axis refracts and passes through the <strong>focal point F</strong> on the other side.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-green"></div>
+      <span class="card-icon">2️⃣</span>
+      <h3>Ray Through Centre</h3>
+      <p>A ray passing through the <strong>optical centre (P)</strong> travels in a straight line — it is <strong>not refracted</strong> at all.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-orange"></div>
+      <span class="card-icon">3️⃣</span>
+      <h3>Ray Through Focus</h3>
+      <p>A ray passing through the <strong>focal point F</strong> (on the object side) refracts and emerges <strong>parallel</strong> to the principal axis.</p>
+    </div>
+  </div>
+
+  <!-- Image formation table -->
+  <h3 style="font-size:1.3rem;margin-bottom:1rem;">📊 Image Formation Summary — Convex Lens</h3>
+  <div style="overflow-x:auto;">
+  <table class="img-table">
+    <thead>
+      <tr>
+        <th>Object Position</th>
+        <th>Image Position</th>
+        <th>Size</th>
+        <th>Nature</th>
+        <th>Orientation</th>
+        <th>Application</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Beyond 2F</td><td>Between F and 2F (other side)</td><td>Diminished</td><td>Real</td><td>Inverted</td><td>📷 Camera</td></tr>
+      <tr><td>At 2F</td><td>At 2F (other side)</td><td>Same size</td><td>Real</td><td>Inverted</td><td>🖨 Photocopier</td></tr>
+      <tr><td>Between F and 2F</td><td>Beyond 2F (other side)</td><td>Magnified</td><td>Real</td><td>Inverted</td><td>📽 Projector</td></tr>
+      <tr><td>At F</td><td>At infinity</td><td>—</td><td>No image formed</td><td>—</td><td>Searchlight</td></tr>
+      <tr><td>Between F and lens</td><td>Same side as object</td><td>Magnified</td><td>Virtual</td><td>Upright</td><td>🔍 Magnifying glass</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- Key rule -->
+  <div style="background:rgba(92,158,255,0.07);border:1px solid rgba(92,158,255,0.2);border-radius:var(--radius);padding:1.25rem;margin-top:1.5rem;">
+    <p style="font-size:0.92rem;color:var(--text2);">💡 <strong style="color:var(--accent)">Rule to remember:</strong> As the object moves <em>closer</em> to the lens, the image moves <em>further away</em> and becomes <em>larger</em>. When the object passes inside F, the image becomes virtual and jumps to the same side as the object.</p>
+  </div>
+
+  
+</section>
+
+<div class="divider"></div>
+
+<!-- ======= CONCAVE ======= -->
+<section id="concave" class="fade-in visible">
+  <div class="level-badge level-inter">⚡ Intermediate + ⚠ CIE FOCUS</div>
+  <div class="section-label">Level 2 — Concave Lens</div>
+  <h2 class="section-title">Diverging Lens — Deep Dive</h2>
+  <p class="section-desc">The concave (diverging) lens always produces the same type of image. Understanding this completely is critical for CIE exams.</p>
+
+  <div class="concave-highlight">
+    <p>A concave lens <strong style="color:var(--concave-color)">ALWAYS</strong> produces an image that is:</p>
+    <ul style="margin-top:0.75rem;margin-left:1.25rem;line-height:2.2;color:var(--text2);font-size:0.95rem;">
+      <li>✅ <strong>Virtual</strong> — rays don't actually meet; they diverge</li>
+      <li>✅ <strong>Upright</strong> — same orientation as the object</li>
+      <li>✅ <strong>Diminished</strong> — smaller than the object</li>
+      <li>✅ <strong>Same side as the object</strong> — image is on the same side as where light comes from</li>
+    </ul>
+    <p style="margin-top:0.85rem;font-size:0.88rem;color:var(--text3);">This is true <em>regardless</em> of where the object is placed. The object position only changes HOW MUCH it's diminished.</p>
+  </div>
+
+  <h3 style="font-size:1.3rem;margin:2rem 0 1rem;">📐 Ray Rules for Concave Lens</h3>
+  <div class="card-grid card-grid-3" style="margin-bottom:2.5rem;">
+    <div class="card">
+      <div class="card-accent-line accent-red"></div>
+      <span class="card-icon">1️⃣</span>
+      <h3>Ray Parallel to Axis</h3>
+      <p>After refraction, the ray <strong>diverges</strong> as if it came from the <strong>focal point F</strong> on the same side as the object. Trace back to find the virtual focus.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-red"></div>
+      <span class="card-icon">2️⃣</span>
+      <h3>Ray Through Centre</h3>
+      <p>Passes straight through the <strong>optical centre</strong> without bending — same rule as convex. This ray is your anchor.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-red"></div>
+      <span class="card-icon">3️⃣</span>
+      <h3>Ray Aimed at Far Focus</h3>
+      <p>A ray directed at the <strong>far focal point</strong> refracts and travels <strong>parallel</strong> to the principal axis after leaving the lens.</p>
+    </div>
+  </div>
+
+  
+
+  <div class="card" style="margin-top:1rem;">
+    <div class="card-accent-line accent-red"></div>
+    <h3>🔍 Why is the concave image always virtual?</h3>
+    <p style="margin-top:0.75rem;color:var(--text2);line-height:1.8;">When light hits a concave lens, it <em>spreads out</em> (diverges). The refracted rays never actually cross on the other side. If you trace them backwards (following dashed lines), they appear to come from a point on the <strong>same side</strong> as the object. Since no rays actually pass through this point, the image is virtual and cannot be projected on a screen.</p>
+    <div class="formula-box" style="margin-top:1rem;">Virtual image = rays traced backwards (dashed lines)</div>
+  </div>
+
+  <h3 style="font-size:1.3rem;margin:2rem 0 1rem;">📊 Concave Lens — Summary Table</h3>
+  <div style="overflow-x:auto;">
+  <table class="img-table">
+    <thead>
+      <tr><th>Object Position</th><th>Image Position</th><th>Size</th><th>Nature</th><th>Orientation</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Any position</td><td>Between F and lens (same side)</td><td><strong>Always Diminished</strong></td><td><strong>Always Virtual</strong></td><td><strong>Always Upright</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div style="background:rgba(255,107,138,0.05);border:1px solid rgba(255,107,138,0.2);border-radius:var(--radius);padding:1.25rem;margin-top:1.5rem;">
+    <p style="font-size:0.92rem;color:var(--text2);">🎯 <strong style="color:var(--concave-color)">CIE Exam Tip:</strong> In multiple choice questions, if you see "diverging lens" or "concave lens", the answer will always involve: virtual, upright, diminished. Memorise this combination!</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ======= SIMULATOR ======= -->
+
+
+<!-- ======= ADVANCED ======= -->
+<section id="advanced" class="fade-in visible">
+  <div class="level-badge level-adv">🔥 Advanced</div>
+  <div class="section-label">Level 3 — Advanced Optics</div>
+  <h2 class="section-title">Magnification &amp; Lens Equation</h2>
+  <p class="section-desc">Go beyond diagrams with the mathematical tools that describe image formation precisely.</p>
+
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <div class="card-accent-line accent-blue"></div>
+      <h3>📐 Magnification Formula</h3>
+      <p style="color:var(--text2);margin:0.75rem 0;">Magnification tells us how many times bigger the image is compared to the object.</p>
+      <div class="formula-box">m = image height / object height</div>
+      <div class="formula-box" style="margin-top:0.5rem;">m = image distance (v) / object distance (u)</div>
+      <p style="color:var(--text2);font-size:0.85rem;margin-top:0.75rem;">If m &gt; 1 → magnified &nbsp;|&nbsp; m &lt; 1 → diminished &nbsp;|&nbsp; m = 1 → same size<br>If m is negative → image is inverted (real image)</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-purple"></div>
+      <h3>🔢 Thin Lens Equation</h3>
+      <p style="color:var(--text2);margin:0.75rem 0;">Relates object distance (u), image distance (v), and focal length (f).</p>
+      <div class="formula-box">1/f = 1/v + 1/u</div>
+      <p style="color:var(--text2);font-size:0.85rem;margin-top:0.75rem;line-height:1.8;">
+        <strong>f</strong> = focal length (+ for convex, − for concave)<br>
+        <strong>u</strong> = object distance (always positive)<br>
+        <strong>v</strong> = image distance (+ if real, − if virtual)
+      </p>
+    </div>
+  </div>
+
+  <!-- Magnification Calculator -->
+  <div class="card" style="margin-top:1.5rem;">
+    <div class="card-accent-line accent-green"></div>
+    <h3>🧮 Interactive Lens Calculator</h3>
+    <p style="color:var(--text2);font-size:0.88rem;margin:0.75rem 0 1.25rem;">Enter any two values to calculate the third:</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;">
+      <div>
+        <label style="font-size:0.78rem;color:var(--text3);font-weight:600;display:block;margin-bottom:0.4rem;">Object dist u (cm)</label>
+        <input type="number" id="calcU" placeholder="e.g. 30" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.9rem;outline:none;" oninput="calcLens()">
+      </div>
+      <div>
+        <label style="font-size:0.78rem;color:var(--text3);font-weight:600;display:block;margin-bottom:0.4rem;">Image dist v (cm)</label>
+        <input type="number" id="calcV" placeholder="e.g. 60" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.9rem;outline:none;" oninput="calcLens()">
+      </div>
+      <div>
+        <label style="font-size:0.78rem;color:var(--text3);font-weight:600;display:block;margin-bottom:0.4rem;">Focal length f (cm)</label>
+        <input type="number" id="calcF" placeholder="e.g. 20" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.9rem;outline:none;" oninput="calcLens()">
+      </div>
+    </div>
+    <div id="calcResult" style="margin-top:1rem;padding:0.85rem 1rem;background:var(--bg3);border-radius:var(--radius-sm);font-family:&#39;JetBrains Mono&#39;,monospace;font-size:0.88rem;color:var(--cyan);display:none;"></div>
+  </div>
+
+  <!-- Applications -->
+  <h3 style="font-size:1.3rem;margin:3rem 0 1.25rem;">🌍 Real-World Applications</h3>
+  <div class="card-grid card-grid-3">
+    <div class="card">
+      <div class="card-accent-line accent-blue"></div>
+      <span class="card-icon">📷</span>
+      <h3>Camera</h3>
+      <p>Uses a <strong>convex lens</strong>. Object is beyond 2F → real, inverted, diminished image on sensor/film. The lens can move to focus.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-green"></div>
+      <span class="card-icon">👁</span>
+      <h3>Human Eye</h3>
+      <p>The eye lens is a <strong>convex lens</strong> whose shape can change (accommodation). It focuses light onto the retina — a real, inverted image.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-orange"></div>
+      <span class="card-icon">🔍</span>
+      <h3>Magnifying Glass</h3>
+      <p><strong>Convex lens</strong> with object between F and lens. Produces a virtual, upright, magnified image. Used for reading fine print.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-purple"></div>
+      <span class="card-icon">📽</span>
+      <h3>Projector</h3>
+      <p><strong>Convex lens</strong> with object between F and 2F. Creates a real, inverted, magnified image on a distant screen.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-red"></div>
+      <span class="card-icon">👓</span>
+      <h3>Spectacles (Short-sight)</h3>
+      <p><strong>Concave lens</strong> used to correct myopia. It diverges light before it hits the eye, moving the focus back to the retina.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent-line accent-blue"></div>
+      <span class="card-icon">🔭</span>
+      <h3>Telescope</h3>
+      <p>Uses two <strong>convex lenses</strong>: an objective (large) and an eyepiece (small) to magnify distant objects.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ======= QUIZ ======= -->
+
+
+<!-- ======= SUMMARY ======= -->
+<section id="summary" class="fade-in visible">
+  <div class="section-label">Revision</div>
+  <h2 class="section-title">⚡ Summary Mode</h2>
+  <p class="section-desc">Everything you need for the exam — at a glance.</p>
+
+  <div class="summary-grid">
+    <div class="sum-item"><div class="sum-icon">🔵</div><div class="sum-content"><h4>Convex = Converging</h4><p>Thicker middle. Bends light inward. Positive focal length. Real focus.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">🔴</div><div class="sum-content"><h4>Concave = Diverging</h4><p>Thicker edges. Bends light outward. Negative focal length. Virtual focus.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">✦</div><div class="sum-content"><h4>Focal Length (f)</h4><p>Distance from lens centre to focal point. Short f = powerful lens.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">🟢</div><div class="sum-content"><h4>Real Image</h4><p>Rays actually meet. Inverted. Can be on a screen. Convex lens only.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">🟣</div><div class="sum-content"><h4>Virtual Image</h4><p>Rays appear to diverge from a point. Upright. Cannot be projected.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">⚠️</div><div class="sum-content"><h4>Concave lens: ALWAYS</h4><p>Virtual + Upright + Diminished — regardless of object position!</p></div></div>
+    <div class="sum-item"><div class="sum-icon">📏</div><div class="sum-content"><h4>1/f = 1/v + 1/u</h4><p>Thin lens equation. Use + for real, − for virtual distances.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">🔢</div><div class="sum-content"><h4>m = v/u</h4><p>Magnification. &gt;1 = enlarged. &lt;1 = diminished. Negative = inverted.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">📷</div><div class="sum-content"><h4>Camera</h4><p>Convex. Object beyond 2F. Real, inverted, diminished image.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">🔍</div><div class="sum-content"><h4>Magnifying Glass</h4><p>Convex. Object inside F. Virtual, upright, magnified image.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">📽</div><div class="sum-content"><h4>Projector</h4><p>Convex. Object between F and 2F. Real, inverted, magnified image.</p></div></div>
+    <div class="sum-item"><div class="sum-icon">👓</div><div class="sum-content"><h4>Short-sight correction</h4><p>Concave lens. Diverges light before entering the eye.</p></div></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>LensLab · CIE IGCSE Physics 0625 · Chapter 4: Lenses</p>
+  <p style="margin-top:0.25rem;">Made for students, by students ❤</p>
+</footer>
+
+<script>
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+const themeBtn = document.getElementById('themeToggle');
+themeBtn.addEventListener('click', () => {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '☀️' : '🌙';
+  // Redraw all canvases
+  drawHero(); drawShapes(); drawScenario(currentScene); drawConcave(); updateSim();
+});
+
+function getColor(varName) {
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
+
+/* ============================================================
+   HERO ANIMATION
+   ============================================================ */
+function drawHero() {
+  const c = document.getElementById('heroCanvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+
+  const cx = W/2, cy = H/2;
+  const f = 120; // focal length in px
+  const lx = cx;
+
+  // Draw axis
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Draw lens
+  drawLensShape(ctx, lx, cy, 70, true, '#5c9eff');
+
+  // Draw focal points
+  ctx.fillStyle = '#5c9eff';
+  ctx.beginPath(); ctx.arc(lx+f, cy, 4, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(lx-f, cy, 4, 0, Math.PI*2); ctx.fill();
+
+  // Draw 3 parallel rays converging
+  const rayOffsets = [-35, 0, 35];
+  const colors = ['#ffd166','#00e5a0','#ff8c42'];
+  rayOffsets.forEach((dy, i) => {
+    const y = cy + dy;
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 1.8;
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.moveTo(0, y); ctx.lineTo(lx, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(lx, y); ctx.lineTo(lx+f, cy);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  // Labels
+  ctx.fillStyle = '#5c9eff';
+  ctx.font = '13px Syne, sans-serif';
+  ctx.fillText('F', lx+f+8, cy+5);
+  ctx.fillText('F', lx-f-16, cy+5);
+}
+
+function drawLensShape(ctx, cx, cy, h, isConvex, color) {
+  ctx.save();
+  ctx.strokeStyle = color || '#5c9eff';
+  ctx.lineWidth = 2.5;
+  ctx.fillStyle = color ? color+'22' : 'rgba(92,158,255,0.12)';
+  const curve = isConvex ? 22 : -22;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h);
+  ctx.bezierCurveTo(cx + curve, cy - h/2, cx + curve, cy + h/2, cx, cy + h);
+  ctx.bezierCurveTo(cx - curve, cy + h/2, cx - curve, cy - h/2, cx, cy - h);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawConcaveLensShape(ctx, cx, cy, h) {
+  ctx.save();
+  ctx.strokeStyle = '#ff6b8a';
+  ctx.lineWidth = 2.5;
+  ctx.fillStyle = 'rgba(255,107,138,0.1)';
+  const curve = 18;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h);
+  ctx.bezierCurveTo(cx - curve, cy - h/2, cx - curve, cy + h/2, cx, cy + h);
+  ctx.lineTo(cx, cy - h);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h);
+  ctx.bezierCurveTo(cx + curve, cy - h/2, cx + curve, cy + h/2, cx, cy + h);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* ============================================================
+   LENS SHAPES CANVAS
+   ============================================================ */
+function drawShapes() {
+  const c = document.getElementById('shapesCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+
+  const textCol = getColor('--text');
+  const text2Col = getColor('--text2');
+
+  // Convex (left)
+  const cx1 = W * 0.25, cy = H/2;
+  drawLensShape(ctx, cx1, cy, 70, true, '#5c9eff');
+  // Axis
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(cx1-120, cy); ctx.lineTo(cx1+120, cy); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#5c9eff';
+  ctx.font = 'bold 14px Syne, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Convex / Converging', cx1, H - 18);
+  ctx.fillStyle = text2Col;
+  ctx.font = '12px DM Sans, sans-serif';
+  ctx.fillText('Thicker in the middle', cx1, H - 4);
+
+  // Concave (right)
+  const cx2 = W * 0.75;
+  drawConcaveLensShape(ctx, cx2, cy, 70);
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(cx2-120, cy); ctx.lineTo(cx2+120, cy); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#ff6b8a';
+  ctx.font = 'bold 14px Syne, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Concave / Diverging', cx2, H - 18);
+  ctx.fillStyle = text2Col;
+  ctx.font = '12px DM Sans, sans-serif';
+  ctx.fillText('Thicker at the edges', cx2, H - 4);
+
+  // Arrows showing thickness
+  ctx.strokeStyle = '#ffd166';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([]);
+  // convex - show it's thick in middle
+  ctx.beginPath(); ctx.moveTo(cx1-8, cy); ctx.lineTo(cx1+8, cy); ctx.stroke();
+
+  ctx.textAlign = 'left';
+}
+
+/* ============================================================
+   SCENARIO DIAGRAM (CONVEX)
+   ============================================================ */
+let currentScene = 'beyond2f';
+
+const scenarioData = {
+  beyond2f: {
+    label: 'Object beyond 2F',
+    objX: 0.18, // fraction of canvas width (left of lens)
+    tags: ['Real','Inverted','Diminished','📷 Camera'],
+    tagClasses: ['tag-real','tag-inverted','tag-smaller','tag-same'],
+    desc: 'Object far beyond 2F: image forms close to F on other side, smaller than object.'
+  },
+  at2f: {
+    label: 'Object at 2F',
+    objX: 0.28,
+    tags: ['Real','Inverted','Same Size','🖨 Photocopier'],
+    tagClasses: ['tag-real','tag-inverted','tag-same','tag-same'],
+    desc: 'Object at 2F: image forms at 2F on other side, exact same size.'
+  },
+  between: {
+    label: 'Object between F & 2F',
+    objX: 0.37,
+    tags: ['Real','Inverted','Magnified','📽 Projector'],
+    tagClasses: ['tag-real','tag-inverted','tag-bigger','tag-same'],
+    desc: 'Object between F and 2F: image beyond 2F on other side, larger.'
+  },
+  atF: {
+    label: 'Object at F',
+    objX: 0.44,
+    tags: ['No Image Formed'],
+    tagClasses: ['tag-none'],
+    desc: 'Object at focal point: refracted rays are parallel and never meet — no image.'
+  },
+  insideF: {
+    label: 'Object inside F (Magnifying Glass)',
+    objX: 0.48,
+    tags: ['Virtual','Upright','Magnified','🔍 Magnifying Glass'],
+    tagClasses: ['tag-virtual','tag-upright','tag-bigger','tag-same'],
+    desc: 'Object inside F: rays diverge after lens. Trace back to find virtual, upright, magnified image same side as object.'
+  }
+};
+
+function drawScenario(key) {
+  const data = scenarioData[key];
+  const c = document.getElementById('scenarioCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+
+  const lx = W * 0.52; // lens x
+  const cy = H / 2;
+  const f = W * 0.14; // focal length
+
+  drawRayDiagram(ctx, W, H, lx, cy, f, 'convex', data.objX * W, true, key);
+
+  // Info
+  const infoEl = document.getElementById('scenarioInfo');
+  if (!infoEl) return;
+  const tags = data.tags.map((t,i) =>
+    `<span class="output-tag ${data.tagClasses[i]}">${t}</span>`
+  ).join('');
+  infoEl.innerHTML = `<div style="flex:1;min-width:200px"><strong>${data.label}</strong><br><span style="font-size:0.82rem;color:var(--text2)">${data.desc}</span></div><div style="display:flex;flex-wrap:wrap;gap:0.5rem">${tags}</div>`;
+}
+
+document.getElementById('convexScenarios').addEventListener('click', e => {
+  const card = e.target.closest('.scenario-card');
+  if (!card) return;
+  document.querySelectorAll('#convexScenarios .scenario-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  currentScene = card.dataset.scene;
+  drawScenario(currentScene);
+});
+
+/* ============================================================
+   CONCAVE CANVAS
+   ============================================================ */
+function drawConcave() {
+  const c = document.getElementById('concaveCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+
+  const lx = W * 0.52, cy = H/2, f = W * 0.14;
+  const objX = W * 0.28;
+  drawRayDiagram(ctx, W, H, lx, cy, f, 'concave', objX, true, 'concave_any');
+}
+
+/* ============================================================
+   CORE RAY DIAGRAM DRAWING ENGINE
+   ============================================================ */
+function drawRayDiagram(ctx, W, H, lx, cy, f, lensType, objX, showImage, scenario) {
+  const isConvex = lensType === 'convex';
+  const objH = -H * 0.28; // object height (negative = upward)
+  const objY = cy + objH; // top of object
+  const uDist = lx - objX; // object distance
+
+  // Grid / background fade
+  // Axis
+  ctx.strokeStyle = getColor('--axis-color') || 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5,5]);
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 2F and F markers
+  const markers = [
+    { x: lx - 2*f, label: '2F' },
+    { x: lx - f,   label: 'F'  },
+    { x: lx + f,   label: 'F\''},
+    { x: lx + 2*f, label: '2F\''}
+  ];
+  ctx.textAlign = 'center';
+  const textCol = getColor('--text2');
+  markers.forEach(m => {
+    if (m.x < 20 || m.x > W-20) return;
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(m.x, cy-6); ctx.lineTo(m.x, cy+6); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = textCol || '#888';
+    ctx.font = '11px Syne, sans-serif';
+    ctx.fillText(m.label, m.x, cy + 20);
+  });
+
+  // Lens
+  const lensH = H * 0.38;
+  if (isConvex) {
+    drawLensShape(ctx, lx, cy, lensH, true, '#5c9eff');
+  } else {
+    drawConcaveLensShape(ctx, lx, cy, lensH);
+  }
+
+  // Lens label
+  ctx.fillStyle = isConvex ? '#5c9eff' : '#ff6b8a';
+  ctx.font = 'bold 11px Syne, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('P', lx, cy - lensH - 8);
+
+  // Focal point dots
+  ctx.fillStyle = isConvex ? '#5c9eff' : '#ff6b8a';
+  [lx-f, lx+f].forEach(fx => {
+    ctx.beginPath(); ctx.arc(fx, cy, 4, 0, Math.PI*2); ctx.fill();
+  });
+
+  // Object arrow
+  ctx.strokeStyle = getColor('--object-color') || '#00e5a0';
+  ctx.fillStyle = getColor('--object-color') || '#00e5a0';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(objX, cy);
+  ctx.lineTo(objX, objY);
+  ctx.stroke();
+  drawArrow(ctx, objX, objY + (objH < 0 ? 10 : -10), objX, objY, 8);
+  ctx.font = 'bold 11px Syne, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Object', objX, objY - 10);
+
+  // Compute image
+  let imgX, imgY, imgH, isVirtual, isUpright;
+
+  if (isConvex) {
+    if (scenario === 'atF') {
+      // No image - parallel rays
+      drawConvexRays(ctx, objX, objY, lx, cy, f, uDist, true, W, H);
+      return;
+    }
+    // 1/v = 1/f - 1/u where u = uDist, f = f
+    const v = (f * uDist) / (uDist - f);
+    imgX = lx + v;
+    const mag = v / uDist;
+    imgH = objH * mag; // inverted if real (v>0), upright if virtual (v<0)
+    imgY = cy - imgH;
+    isVirtual = v < 0;
+    isUpright = isVirtual;
+
+    drawConvexRays(ctx, objX, objY, lx, cy, f, uDist, false, W, H);
+  } else {
+    // Concave: 1/v = 1/f - 1/u, f is negative
+    const fNeg = -f;
+    const v = (fNeg * uDist) / (uDist - fNeg); // v is negative (virtual)
+    imgX = lx + v; // will be on same side
+    const mag = v / uDist;
+    imgH = objH * mag;
+    imgY = cy - imgH;
+    isVirtual = true;
+    isUpright = true;
+
+    drawConcaveRays(ctx, objX, objY, lx, cy, f, uDist, W, H, imgX, imgY);
+  }
+
+  // Draw image if in frame
+  if (imgX > 10 && imgX < W - 10) {
+    ctx.strokeStyle = isVirtual ? getColor('--purple') || '#b388ff' : getColor('--image-color') || '#ff8c42';
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.lineWidth = 2;
+    if (isVirtual) {
+      ctx.setLineDash([5,3]);
+    }
+    ctx.beginPath();
+    ctx.moveTo(imgX, cy);
+    ctx.lineTo(imgX, imgY);
+    ctx.stroke();
+    drawArrow(ctx, imgX, imgY + (imgH < 0 ? 10 : -10), imgX, imgY, 7);
+    ctx.setLineDash([]);
+    ctx.font = 'bold 11px Syne, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(isVirtual ? 'Image (Virtual)' : 'Image', imgX, imgY - 10);
+  }
+}
+
+function drawConvexRays(ctx, ox, oy, lx, cy, f, u, atFocal, W, H) {
+  const rayW = 1.8;
+  const rayColors = ['#ffd166','#00d4ff','#ff8c42'];
+
+  // Ray 1: Parallel to axis → through F'
+  ctx.strokeStyle = rayColors[0];
+  ctx.lineWidth = rayW;
+  ctx.globalAlpha = 0.9;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(ox, oy); ctx.lineTo(lx, oy); ctx.stroke();
+  if (atFocal) {
+    // parallel output
+    ctx.beginPath(); ctx.moveTo(lx, oy); ctx.lineTo(W, oy); ctx.stroke();
+  } else {
+    ctx.beginPath(); ctx.moveTo(lx, oy); ctx.lineTo(lx+f + (W-lx-f)*2, oy + (cy-oy)/f*(W-lx)); ctx.stroke();
+    // truncate to canvas
+    ctx.beginPath();
+    const slope1 = (cy - oy) / f;
+    ctx.moveTo(lx, oy);
+    ctx.lineTo(W, oy + slope1*(W-lx));
+    ctx.stroke();
+  }
+
+  // Ray 2: Through centre
+  ctx.strokeStyle = rayColors[1];
+  ctx.beginPath();
+  ctx.moveTo(ox, oy);
+  if (atFocal) {
+    ctx.lineTo(W, cy + (cy-oy)*(W-ox)/(lx-ox));
+  } else {
+    ctx.lineTo(W, cy + (cy - oy) * (W-ox)/(lx-ox));
+  }
+  ctx.stroke();
+
+  // Ray 3: Through F (only if not atFocal)
+  if (!atFocal) {
+    ctx.strokeStyle = rayColors[2];
+    // from object tip, aimed at near focal pt (lx-f, cy)
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(lx, cy + (cy - oy) - (cy - (cy + (cy-oy)*(lx-f-ox)/(lx-ox-0.001)))); // aimed
+    // Simpler: compute slope from object tip to (lx-f, cy)
+    const slope3 = (cy - oy) / (lx - f - ox);
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(lx, oy + slope3*(lx-ox));
+    ctx.stroke();
+    // After lens: parallel
+    ctx.beginPath();
+    ctx.moveTo(lx, oy + slope3*(lx-ox));
+    ctx.lineTo(W, oy + slope3*(lx-ox));
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+}
+
+function drawConcaveRays(ctx, ox, oy, lx, cy, f, u, W, H, imgX, imgY) {
+  const rayColors = ['#ffd166','#00d4ff','#ff8c42'];
+  ctx.lineWidth = 1.8;
+  ctx.globalAlpha = 0.9;
+
+  // Ray 1: Parallel to axis → diverges as if from near F
+  ctx.strokeStyle = rayColors[0];
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(ox, oy); ctx.lineTo(lx, oy); ctx.stroke();
+  // After lens: diverge toward (lx-f, cy) but moving right
+  const slope1_after = (oy - cy) / f; // slope upward to the right
+  ctx.beginPath();
+  ctx.moveTo(lx, oy);
+  ctx.lineTo(W, oy + slope1_after * (W - lx));
+  ctx.stroke();
+  // Dashed back-trace to virtual focus area
+  ctx.setLineDash([4,4]);
+  ctx.globalAlpha = 0.4;
+  ctx.beginPath();
+  ctx.moveTo(lx, oy);
+  ctx.lineTo(imgX - 20, oy - slope1_after * (lx - imgX + 20));
+  ctx.stroke();
+  ctx.setLineDash([]); ctx.globalAlpha = 0.9;
+
+  // Ray 2: Through centre
+  ctx.strokeStyle = rayColors[1];
+  const slope2 = (cy - oy) / (lx - ox);
+  ctx.beginPath();
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(W, oy + slope2*(W-ox));
+  ctx.stroke();
+  // Dashed back trace
+  ctx.setLineDash([4,4]); ctx.globalAlpha = 0.4;
+  ctx.beginPath();
+  ctx.moveTo(ox, oy); ctx.lineTo(imgX - 5, oy + slope2*(imgX-5-ox));
+  ctx.stroke();
+  ctx.setLineDash([]); ctx.globalAlpha = 0.9;
+
+  // Ray 3: Aimed at far focal point (lx+f), refracts parallel
+  ctx.strokeStyle = rayColors[2];
+  const slope3 = (cy - oy) / (lx + f - ox);
+  ctx.beginPath();
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(lx, oy + slope3*(lx-ox));
+  ctx.stroke();
+  // After lens: horizontal
+  ctx.beginPath();
+  ctx.moveTo(lx, oy + slope3*(lx-ox));
+  ctx.lineTo(W, oy + slope3*(lx-ox));
+  ctx.stroke();
+
+  ctx.globalAlpha = 1;
+}
+
+function drawArrow(ctx, x1, y1, x2, y2, size) {
+  const angle = Math.atan2(y2-y1, x2-x1);
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - size*Math.cos(angle-0.45), y2 - size*Math.sin(angle-0.45));
+  ctx.lineTo(x2 - size*Math.cos(angle+0.45), y2 - size*Math.sin(angle+0.45));
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* ============================================================
+   SIMULATOR
+   ============================================================ */
+let simLens = 'convex';
+let simMode = 'full';
+let simStep = 0;
+const simStepsConvex = [
+  'Draw the principal axis (horizontal dashed line through the optical centre P).',
+  'Draw Ray 1: From the top of the object, draw a ray PARALLEL to the axis until it hits the lens.',
+  'Ray 1 refracts: for convex lens, it bends through the focal point F\' on the other side.',
+  'Draw Ray 2: From the top of the object, draw a ray straight through the OPTICAL CENTRE P — no bending.',
+  'Where Ray 1 and Ray 2 intersect → that is where the IMAGE TOP forms.',
+  'Draw the image arrow from the axis to the intersection point. Label it real/virtual, upright/inverted.',
+];
+const simStepsConcave = [
+  'Draw the principal axis through the optical centre P.',
+  'Ray 1: From object tip, draw a ray PARALLEL to axis to the lens.',
+  'After the concave lens, Ray 1 diverges as if coming from focal point F on the same side.',
+  'Draw dashed back-trace of Ray 1 to show where it appears to come from.',
+  'Ray 2: From object tip, draw a ray through the OPTICAL CENTRE P — no bending.',
+  'The intersection of back-traced dashed lines = virtual image location (same side as object).',
+];
+
+function setLens(type) {
+  simLens = type;
+  simStep = 0;
+  document.getElementById('btnConvex').classList.toggle('active', type === 'convex');
+  document.getElementById('btnConcave').classList.toggle('active', type === 'concave');
+  document.getElementById('btnConcave').classList.toggle('concave-active', type === 'concave');
+  document.getElementById('btnConvex').classList.remove('concave-active');
+  updateSim();
+}
+
+function setMode(mode) {
+  simMode = mode;
+  simStep = 0;
+  document.getElementById('btnFull').classList.toggle('active', mode === 'full');
+  document.getElementById('btnStep').classList.toggle('active', mode === 'step');
+  const panel = document.getElementById('stepPanel');
+  panel.classList.toggle('visible', mode === 'step');
+  updateSim();
+}
+
+function nextStep() {
+  const steps = simLens === 'convex' ? simStepsConvex : simStepsConcave;
+  if (simStep < steps.length) simStep++;
+  updateSim();
+}
+
+function prevStep() {
+  if (simStep > 0) simStep--;
+  updateSim();
+}
+
+function updateSim() {
+  const slider = document.getElementById('objSlider');
+  const val = parseInt(slider.value); // 10 to 95
+
+  const c = document.getElementById('simCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+
+  const lx = W * 0.52, cy = H/2, f = W * 0.14;
+
+  // Object position from slider: val=10 → close to lens, val=95 → far
+  const minObjX = lx - f * 0.6;
+  const maxObjX = lx - f * 3.5;
+  const t = (val - 10) / 85;
+  const objX = minObjX + (maxObjX - minObjX) * t;
+
+  const uDist = lx - objX;
+  const focalRatio = uDist / f;
+  document.getElementById('distLabel').textContent = focalRatio.toFixed(1) + 'F';
+
+  // Determine scenario
+  let scene;
+  if (simLens === 'convex') {
+    if (focalRatio < 1.0) scene = 'insideF';
+    else if (focalRatio < 1.1) scene = 'atF';
+    else if (focalRatio < 2.0) scene = 'between';
+    else if (focalRatio < 2.15) scene = 'at2f';
+    else scene = 'beyond2f';
+  } else {
+    scene = 'concave_any';
+  }
+
+  // Draw based on mode
+  if (simMode === 'full') {
+    drawRayDiagram(ctx, W, H, lx, cy, f, simLens, objX, true, scene);
+  } else {
+    drawStepMode(ctx, W, H, lx, cy, f, objX, scene);
+  }
+
+  // Update output tags
+  updateSimOutput(scene, focalRatio);
+  updateStepPanel();
+}
+
+function drawStepMode(ctx, W, H, lx, cy, f, objX, scene) {
+  const steps = simLens === 'convex' ? simStepsConvex : simStepsConcave;
+  const totalSteps = steps.length;
+  const objH = -H * 0.28;
+  const objY = cy + objH;
+  const uDist = lx - objX;
+
+  // Always draw axis and lens
+  ctx.strokeStyle = getColor('--axis-color') || 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1; ctx.setLineDash([5,5]);
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+  ctx.setLineDash([]);
+
+  const markers = [
+    {x: lx-2*f, label:'2F'},{x:lx-f,label:'F'},{x:lx+f,label:'F\''},{x:lx+2*f,label:'2F\''}
+  ];
+  ctx.textAlign='center'; const textCol = getColor('--text2');
+  markers.forEach(m=>{
+    if(m.x<20||m.x>W-20)return;
+    ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(m.x,cy-6); ctx.lineTo(m.x,cy+6); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=textCol||'#888'; ctx.font='11px Syne,sans-serif';
+    ctx.fillText(m.label,m.x,cy+20);
+  });
+
+  if (simLens === 'convex') drawLensShape(ctx,lx,cy,H*0.38,true,'#5c9eff');
+  else drawConcaveLensShape(ctx,lx,cy,H*0.38);
+
+  ctx.fillStyle = simLens === 'convex' ? '#5c9eff' : '#ff6b8a';
+  [lx-f,lx+f].forEach(fx => { ctx.beginPath(); ctx.arc(fx,cy,4,0,Math.PI*2); ctx.fill(); });
+
+  // Object
+  ctx.strokeStyle = getColor('--object-color') || '#00e5a0';
+  ctx.fillStyle = ctx.strokeStyle; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(objX,cy); ctx.lineTo(objX,objY); ctx.stroke();
+  drawArrow(ctx, objX, objY+10, objX, objY, 8);
+  ctx.font='bold 11px Syne,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Object', objX, objY-10);
+
+  if (simStep < 1) return;
+
+  // Step-by-step rays for convex
+  if (simLens === 'convex') {
+    if (simStep >= 2) {
+      // Ray 1 to lens
+      ctx.strokeStyle='#ffd166'; ctx.lineWidth=1.8; ctx.globalAlpha=0.9;
+      ctx.beginPath(); ctx.moveTo(objX,objY); ctx.lineTo(lx,objY); ctx.stroke();
+    }
+    if (simStep >= 3 && scene !== 'atF') {
+      const slope1 = (cy-objY)/f;
+      ctx.beginPath(); ctx.moveTo(lx,objY); ctx.lineTo(W,objY+slope1*(W-lx)); ctx.stroke();
+    }
+    if (simStep >= 4) {
+      ctx.strokeStyle='#00d4ff';
+      const slope2=(cy-objY)/(lx-objX);
+      ctx.beginPath(); ctx.moveTo(objX,objY); ctx.lineTo(W,objY+slope2*(W-objX)); ctx.stroke();
+    }
+    if (simStep >= 5 && scene !== 'atF') {
+      const v=(f*uDist)/(uDist-f);
+      const imgX=lx+v; const imgH=objH*(v/uDist); const imgY=cy-imgH;
+      ctx.strokeStyle='#ff8c42'; ctx.fillStyle='#ff8c42';
+      const isVirtual = v<0;
+      if(isVirtual) ctx.setLineDash([5,3]);
+      ctx.beginPath(); ctx.moveTo(imgX,cy); ctx.lineTo(imgX,imgY); ctx.stroke();
+      drawArrow(ctx,imgX,imgY+10,imgX,imgY,7);
+      ctx.setLineDash([]);
+      ctx.fillText(isVirtual?'Image (Virtual)':'Image',imgX,imgY-10);
+    }
+  } else {
+    // Concave step rays
+    const fNeg=-f; const v=(fNeg*uDist)/(uDist-fNeg);
+    const imgX=lx+v; const imgH=objH*(v/uDist); const imgY=cy-imgH;
+    if(simStep>=2){
+      ctx.strokeStyle='#ffd166'; ctx.lineWidth=1.8;
+      ctx.beginPath(); ctx.moveTo(objX,objY); ctx.lineTo(lx,objY); ctx.stroke();
+    }
+    if(simStep>=3){
+      const slope1a=(objY-cy)/f;
+      ctx.beginPath(); ctx.moveTo(lx,objY); ctx.lineTo(W,objY+slope1a*(W-lx)); ctx.stroke();
+    }
+    if(simStep>=4){
+      ctx.setLineDash([4,4]); ctx.globalAlpha=0.5;
+      ctx.beginPath(); ctx.moveTo(lx,objY); ctx.lineTo(imgX,objY-(objY-cy)/f*(lx-imgX)); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha=0.9;
+    }
+    if(simStep>=5){
+      ctx.strokeStyle='#00d4ff';
+      const slope2=(cy-objY)/(lx-objX);
+      ctx.beginPath(); ctx.moveTo(objX,objY); ctx.lineTo(W,objY+slope2*(W-objX)); ctx.stroke();
+    }
+    if(simStep>=6){
+      ctx.strokeStyle='#b388ff'; ctx.fillStyle='#b388ff';
+      ctx.setLineDash([5,3]);
+      ctx.beginPath(); ctx.moveTo(imgX,cy); ctx.lineTo(imgX,imgY); ctx.stroke();
+      drawArrow(ctx,imgX,imgY+10,imgX,imgY,7); ctx.setLineDash([]);
+      ctx.textAlign='center'; ctx.font='bold 11px Syne,sans-serif';
+      ctx.fillText('Image (Virtual)',imgX,imgY-10);
+    }
+  }
+  ctx.globalAlpha=1;
+}
+
+function updateStepPanel() {
+  if (simMode !== 'step') return;
+  const steps = simLens === 'convex' ? simStepsConvex : simStepsConcave;
+  const panel = document.getElementById('stepPanel');
+  const dots = document.getElementById('stepDots');
+  const desc = document.getElementById('stepDesc');
+
+  dots.innerHTML = steps.map((s,i) => {
+    let cls = 'step-dot';
+    if (i < simStep) cls += ' done';
+    else if (i === simStep) cls += ' active';
+    return `<div class="${cls}" title="${s}"></div>`;
+  }).join('');
+
+  if (simStep === 0) {
+    desc.textContent = 'Click "Next ▶" to begin building the ray diagram step by step.';
+  } else {
+    desc.textContent = `Step ${simStep}: ${steps[simStep-1]}`;
+  }
+}
+
+function updateSimOutput(scene, ratio) {
+  const el = document.getElementById('simOutput');
+  if (!el) return;
+
+  let tags = [];
+  if (simLens === 'concave') {
+    tags = [
+      ['Virtual', 'tag-virtual'],
+      ['Upright', 'tag-upright'],
+      ['Diminished', 'tag-smaller'],
+      ['Same side as object', 'tag-same']
+    ];
+  } else {
+    const data = {
+      insideF: [['Virtual','tag-virtual'],['Upright','tag-upright'],['Magnified','tag-bigger'],['🔍 Magnifying Glass','tag-same']],
+      atF:     [['No Image Formed','tag-none']],
+      between: [['Real','tag-real'],['Inverted','tag-inverted'],['Magnified','tag-bigger'],['📽 Projector','tag-same']],
+      at2f:    [['Real','tag-real'],['Inverted','tag-inverted'],['Same Size','tag-same'],['🖨 Photocopier','tag-same']],
+      beyond2f:[['Real','tag-real'],['Inverted','tag-inverted'],['Diminished','tag-smaller'],['📷 Camera','tag-same']],
+    };
+    tags = data[scene] || [];
+  }
+
+  el.innerHTML = `<span style="font-size:0.8rem;color:var(--text3);font-family:Syne,sans-serif;font-weight:600;">Object at ${ratio.toFixed(2)}F &nbsp;→</span> `
+    + tags.map(([t,c]) => `<span class="output-tag ${c}">${t}</span>`).join('');
+}
+
+/* ============================================================
+   LENS CALCULATOR
+   ============================================================ */
+function calcLens() {
+  const u = parseFloat(document.getElementById('calcU').value);
+  const v = parseFloat(document.getElementById('calcV').value);
+  const f = parseFloat(document.getElementById('calcF').value);
+  const result = document.getElementById('calcResult');
+  result.style.display = 'block';
+
+  const hasU = !isNaN(u), hasV = !isNaN(v), hasF = !isNaN(f);
+  const count = [hasU,hasV,hasF].filter(Boolean).length;
+
+  if (count < 2) {
+    result.textContent = 'Enter at least 2 values to calculate...';
+    return;
+  }
+
+  if (hasU && hasV) {
+    const calcF = 1/(1/v + 1/u);
+    const m = v/u;
+    result.innerHTML = `f = ${calcF.toFixed(2)} cm &nbsp;|&nbsp; Magnification m = ${m.toFixed(2)}`;
+  } else if (hasU && hasF) {
+    const calcV = (f*u)/(u-f);
+    const m = calcV/u;
+    result.innerHTML = `v = ${calcV.toFixed(2)} cm &nbsp;|&nbsp; Magnification m = ${m.toFixed(2)}${calcV < 0 ? '  → Virtual image' : '  → Real image'}`;
+  } else if (hasV && hasF) {
+    const calcU = (f*v)/(v-f);
+    const m = v/calcU;
+    result.innerHTML = `u = ${calcU.toFixed(2)} cm &nbsp;|&nbsp; Magnification m = ${m.toFixed(2)}`;
+  }
+}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+const quizData = [
+  {q:'What type of image does a concave (diverging) lens ALWAYS produce?', opts:['Real, inverted, diminished','Virtual, upright, diminished','Real, upright, magnified','Virtual, inverted, magnified'], ans:1, exp:'A concave lens always diverges rays, creating a virtual, upright, and diminished image on the same side as the object.'},
+  {q:'An object is placed beyond 2F in front of a convex lens. What type of image is formed?', opts:['Virtual, upright, magnified','Real, inverted, same size','Real, inverted, diminished','No image is formed'], ans:2, exp:'Beyond 2F: real, inverted, diminished image — used in cameras.'},
+  {q:'A convex lens has a focal length of 10 cm. An object is placed 15 cm from the lens. Where is the image?', opts:['30 cm, same side','30 cm, other side','20 cm, other side','15 cm, other side'], ans:1, exp:'1/v = 1/10 - 1/15 = (3-2)/30 = 1/30, so v = 30 cm on the other side (real image).'},
+  {q:'Which application uses a convex lens with the object placed between F and the lens?', opts:['Camera','Projector','Magnifying glass','Photocopier'], ans:2, exp:'A magnifying glass uses a convex lens with the object inside F, producing a virtual, upright, magnified image.'},
+  {q:'What happens when an object is placed exactly at the focal point of a convex lens?', opts:['A real diminished image forms','A virtual magnified image forms','No image is formed','A real magnified image forms'], ans:2, exp:'Rays refract parallel and never meet — no image is formed.'},
+  {q:'What is the focal length of a lens if an object 20 cm away produces an image 60 cm away on the other side?', opts:['15 cm','20 cm','30 cm','10 cm'], ans:0, exp:'1/f = 1/20 + 1/60 = 3/60 + 1/60 = 4/60, so f = 15 cm.'},
+  {q:'A concave lens is used to correct which eye defect?', opts:['Long-sightedness (hyperopia)','Short-sightedness (myopia)','Astigmatism','Presbyopia'], ans:1, exp:'Short-sightedness (myopia) is corrected with a concave lens, which diverges light before it enters the eye.'},
+  {q:'Which ray through a lens is NOT refracted at all?', opts:['Ray parallel to principal axis','Ray aimed at focal point','Ray through optical centre','Ray at 45° to axis'], ans:2, exp:'A ray through the optical centre (P) passes straight through without any bending.'},
+  {q:'An object is placed between F and 2F of a convex lens. The image is:', opts:['Virtual, upright, between F and lens','Real, inverted, beyond 2F','Real, inverted, between F and 2F','Virtual, upright, beyond 2F'], ans:1, exp:'Between F and 2F: real, inverted, magnified image beyond 2F — used in projectors.'},
+  {q:'The magnification of an image is 0.5. This means the image is:', opts:['Magnified, virtual','Same size as object','Diminished (half the size)','Magnified, real'], ans:2, exp:'Magnification < 1 means the image is smaller (diminished). m=0.5 means image is half the object size.'},
+];
+
+let quizAnswered = new Array(quizData.length).fill(null);
+let currentQ = 0;
+
+function buildQuiz() {
+  const container = document.getElementById('quizContainer');
+  const progress = document.getElementById('quizProgress');
+  progress.innerHTML = quizData.map((_,i)=>`<div class="qp-dot" id="qp${i}"></div>`).join('');
+  container.innerHTML = '';
+
+  quizData.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-card fade-in';
+    div.id = `qcard${qi}`;
+    div.style.display = qi === 0 ? 'block' : 'none';
+    div.innerHTML = `
+      <div class="quiz-q">${qi+1}. ${q.q}</div>
+      <div class="quiz-opts">
+        ${q.opts.map((o,oi) => `
+          <div class="quiz-opt" data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(${qi},${oi})">
+            <div class="opt-letter">${'ABCD'[oi]}</div>
+            <span>${o}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback" id="qfb${qi}"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
+        <button class="btn btn-primary" onclick="nextQ(${qi})" style="padding:0.5rem 1.25rem;font-size:0.82rem;" id="qnext${qi}" ${qi===quizData.length-1?'':''}>${qi===quizData.length-1?'Finish 🎉':'Next ▶'}</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function selectOpt(qi, oi) {
+  if (quizAnswered[qi] !== null) return;
+  quizAnswered[qi] = oi;
+
+  const q = quizData[qi];
+  const opts = document.querySelectorAll(`[data-qi="${qi}"]`);
+  opts.forEach(opt => opt.classList.add('locked'));
+
+  opts[oi].classList.add(oi === q.ans ? 'correct' : 'wrong');
+  if (oi !== q.ans) opts[q.ans].classList.add('correct');
+
+  const fb = document.getElementById(`qfb${qi}`);
+  fb.style.display = 'block';
+  fb.className = `quiz-feedback ${oi===q.ans?'feedback-correct':'feedback-wrong'}`;
+  fb.textContent = (oi===q.ans?'✅ Correct! ':'❌ Wrong. ') + q.exp;
+
+  // Update progress dot
+  const dot = document.getElementById(`qp${qi}`);
+  dot.classList.add('answered', oi===q.ans?'correct':'wrong');
+}
+
+function nextQ(qi) {
+  document.getElementById(`qcard${qi}`).style.display = 'none';
+  if (qi === quizData.length - 1) {
+    showScore();
+    return;
+  }
+  document.getElementById(`qcard${qi+1}`).style.display = 'block';
+  setTimeout(()=>document.getElementById(`qcard${qi+1}`).classList.add('visible'), 10);
+}
+
+function showScore() {
+  document.getElementById('quizContainer').style.display = 'none';
+  document.getElementById('quizProgress').style.display = 'none';
+  const correct = quizAnswered.filter((a,i)=>a===quizData[i].ans).length;
+  const score = document.getElementById('quizScore');
+  score.style.display = 'block';
+  document.getElementById('scoreNum').textContent = `${correct}/10`;
+  document.getElementById('scoreNum').style.color = correct>=8?'var(--green)':correct>=5?'var(--yellow)':'var(--red)';
+  score.querySelector('p').textContent = correct>=8?'🎉 Excellent! Exam-ready!':correct>=5?'👍 Good work — review the missed ones!':'📚 Keep studying — you\'ve got this!';
+}
+
+function restartQuiz() {
+  quizAnswered = new Array(quizData.length).fill(null);
+  document.getElementById('quizScore').style.display = 'none';
+  document.getElementById('quizContainer').style.display = 'block';
+  document.getElementById('quizProgress').style.display = 'flex';
+  buildQuiz();
+}
+
+/* ============================================================
+   INTERSECTION OBSERVER (fade-in)
+   ============================================================ */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+/* ============================================================
+   INIT
+   ============================================================ */
+window.addEventListener('load', () => {
+  drawHero();
+  drawShapes();
+  drawScenario('beyond2f');
+  drawConcave();
+  updateSim();
+  buildQuiz();
+});
+
+window.addEventListener('resize', () => {
+  // Responsive: redraw on window resize (debounced)
+  clearTimeout(window._resizeT);
+  window._resizeT = setTimeout(()=>{
+    drawHero(); drawShapes(); drawScenario(currentScene); drawConcave(); updateSim();
+  }, 150);
+});
+</script>
+
+
+</body></html>
