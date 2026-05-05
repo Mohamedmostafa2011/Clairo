@@ -851,7 +851,6 @@ kbd {
   #sidebar { display: none; }
   .toolbar-center .tool-btn span { display: none; }
 }
-cat >> /home/claude/style.css << 'CSSEOF'
 
 /* ============================================================
    AI LOGIC PARSER PANEL
@@ -1245,4 +1244,3 @@ cat >> /home/claude/style.css << 'CSSEOF'
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(79, 156, 249, 0.15);
 }
-CSSEOF
