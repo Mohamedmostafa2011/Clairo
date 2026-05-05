@@ -1901,3 +1901,368 @@ function App() {
 
 // Start
 document.addEventListener('DOMContentLoaded', App);
+cat >> /home/claude/script.js << 'JSEOF'
+
+/* ============================================================
+   AI LOGIC PARSER
+   Uses Claude API to parse natural language logic into circuit
+   ============================================================ */
+const AIParser = {
+  pendingCircuit: null,
+
+  open() {
+    const overlay = document.getElementById('ai-parser-overlay');
+    overlay.classList.remove('ai-overlay-hidden');
+    overlay.style.display = 'flex';
+    setTimeout(() => document.getElementById('ai-logic-input').focus(), 100);
+    this.hideStatus();
+    this.hideResult();
+  },
+
+  close() {
+    const overlay = document.getElementById('ai-parser-overlay');
+    overlay.style.display = 'none';
+    overlay.classList.add('ai-overlay-hidden');
+    this.pendingCircuit = null;
+  },
+
+  showStatus(msg, type = 'loading') {
+    const area = document.getElementById('ai-status-area');
+    const content = document.getElementById('ai-status-content');
+    area.classList.remove('ai-status-hidden');
+    content.className = type;
+    content.textContent = msg;
+  },
+
+  hideStatus() {
+    document.getElementById('ai-status-area').classList.add('ai-status-hidden');
+  },
+
+  showResult(parsedExpr, circuit) {
+    this.pendingCircuit = circuit;
+    const area = document.getElementById('ai-result-area');
+    const expr = document.getElementById('ai-parsed-expr');
+    area.classList.remove('ai-result-hidden');
+    expr.textContent = parsedExpr;
+  },
+
+  hideResult() {
+    document.getElementById('ai-result-area').classList.add('ai-result-hidden');
+    this.pendingCircuit = null;
+  },
+
+  async generate() {
+    const input = document.getElementById('ai-logic-input').value.trim();
+    if (!input) return;
+
+    const btn = document.getElementById('ai-generate-btn');
+    btn.disabled = true;
+    this.hideResult();
+    this.showStatus('Analyzing your logic expression…', 'loading');
+
+    const systemPrompt = `You are a logic circuit compiler. Convert any logic expression or natural language description into a JSON circuit specification.
+
+SUPPORTED GATE TYPES: AND, OR, NOT, NAND, NOR, XOR, XNOR
+
+INPUT FORMATS you must handle:
+- Formal: X = (A AND B) OR C
+- Natural: "Output is 1 when A is 1 and B is 0"  
+- Mixed: "X=1 if ((A AND NOT B) NAND C) XOR ((A AND C) OR B)"
+- Symbolic: A & B | ~C, A * B + ~C
+- Any combination of keywords: AND/and/&/*, OR/or/|/+, NOT/not/~/!, NAND/nand, NOR/nor, XOR/xor/^, XNOR/xnor
+
+Rules:
+- Variables like A, B, C, In1, myVar → all become input nodes
+- The output variable (left side of =, or implied) becomes the output node
+- Build a tree of gates for the expression
+- Each intermediate sub-expression needs its own gate node
+
+Return ONLY valid JSON (no markdown, no explanation) in this exact structure:
+{
+  "parsedExpression": "human-readable cleaned up version of the expression",
+  "inputs": ["A", "B", "C"],
+  "output": "X",
+  "gates": [
+    {"id": "g1", "type": "NOT", "inputs": ["A"]},
+    {"id": "g2", "type": "AND", "inputs": ["g1", "B"]},
+    {"id": "g3", "type": "OR", "inputs": ["g2", "C"]}
+  ],
+  "outputFrom": "g3"
+}
+
+"inputs" array: names of all input variables used
+"gates" array: each gate has id, type, and inputs (array of variable names or gate ids)
+"outputFrom": id of the gate whose output feeds the final output node
+
+Example for "X = (A AND NOT B) NAND C":
+{
+  "parsedExpression": "X = (A AND NOT B) NAND C",
+  "inputs": ["A", "B", "C"],
+  "output": "X",
+  "gates": [
+    {"id": "g1", "type": "NOT", "inputs": ["B"]},
+    {"id": "g2", "type": "AND", "inputs": ["A", "g1"]},
+    {"id": "g3", "type": "NAND", "inputs": ["g2", "C"]}
+  ],
+  "outputFrom": "g3"
+}`;
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: input }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const text = data.content?.find(b => b.type === 'text')?.text || '';
+      
+      // Strip any markdown code fences
+      const clean = text.replace(/```json|```/gi, '').trim();
+      const circuit = JSON.parse(clean);
+
+      this.hideStatus();
+      this.showResult(circuit.parsedExpression, circuit);
+
+    } catch (err) {
+      console.error('AI Parse error:', err);
+      this.hideStatus();
+      this.showStatus(
+        err.message.includes('JSON') 
+          ? '⚠ Could not parse the AI response. Try rephrasing your expression.'
+          : `⚠ ${err.message}`,
+        'error'
+      );
+    }
+
+    btn.disabled = false;
+  },
+
+  applyCircuit() {
+    const circuit = this.pendingCircuit;
+    if (!circuit) return;
+
+    // Clear existing canvas
+    State.components = [];
+    State.wires = [];
+    State.selected.clear();
+
+    const idMap = {}; // varName or gateId → component id
+
+    // Layout constants
+    const colGap = 180;
+    const rowGap = 90;
+    const startX = 80;
+    const canvasHeight = 500;
+
+    // Place input nodes
+    const inputs = circuit.inputs || [];
+    inputs.forEach((name, i) => {
+      const id = uid();
+      const y = (i * rowGap) + (canvasHeight / 2) - ((inputs.length - 1) * rowGap / 2);
+      const comp = {
+        id,
+        type: 'input',
+        x: startX,
+        y: y - INPUT_H / 2,
+        value: 1,
+        outputValue: 1,
+        label: name
+      };
+      State.components.push(comp);
+      idMap[name] = id;
+    });
+
+    // Topological layout of gates: assign columns
+    const gates = circuit.gates || [];
+    const gateDepth = {};
+
+    function getDepth(gateId) {
+      if (gateDepth[gateId] !== undefined) return gateDepth[gateId];
+      const gate = gates.find(g => g.id === gateId);
+      if (!gate) return 0;
+      let maxDepth = 0;
+      gate.inputs.forEach(inp => {
+        if (gates.find(g => g.id === inp)) {
+          maxDepth = Math.max(maxDepth, getDepth(inp) + 1);
+        }
+      });
+      gateDepth[gateId] = maxDepth;
+      return maxDepth;
+    }
+
+    gates.forEach(g => getDepth(g.id));
+
+    // Group gates by column depth
+    const cols = {};
+    gates.forEach(g => {
+      const d = gateDepth[g.id] || 0;
+      if (!cols[d]) cols[d] = [];
+      cols[d].push(g);
+    });
+
+    const numCols = Object.keys(cols).length;
+
+    // Place gates
+    Object.entries(cols).forEach(([depth, gateList]) => {
+      const col = parseInt(depth);
+      const x = startX + INPUT_W + 40 + col * colGap;
+      gateList.forEach((gate, i) => {
+        const id = uid();
+        const y = (i * rowGap) + (canvasHeight / 2) - ((gateList.length - 1) * rowGap / 2);
+        const comp = {
+          id,
+          type: gate.type,
+          x,
+          y: y - GATE_H / 2,
+          outputValue: 0
+        };
+        State.components.push(comp);
+        idMap[gate.id] = id;
+      });
+    });
+
+    // Place output node
+    const outX = startX + INPUT_W + 40 + numCols * colGap + 40;
+    const outId = uid();
+    State.components.push({
+      id: outId,
+      type: 'output',
+      x: outX,
+      y: canvasHeight / 2 - OUTPUT_R,
+      outputValue: 0,
+      label: circuit.output || 'X'
+    });
+
+    // Create wires for gates
+    gates.forEach(gate => {
+      const toId = idMap[gate.id];
+      if (!toId) return;
+      gate.inputs.forEach((inp, pinIdx) => {
+        const fromId = idMap[inp];
+        if (!fromId) return;
+        State.wires.push({
+          id: uid(),
+          fromId,
+          toId,
+          fromPin: 0,
+          toPin: pinIdx,
+          active: false
+        });
+      });
+    });
+
+    // Wire final gate to output
+    const finalGateId = idMap[circuit.outputFrom];
+    if (finalGateId) {
+      State.wires.push({
+        id: uid(),
+        fromId: finalGateId,
+        toId: outId,
+        fromPin: 0,
+        toPin: 0,
+        active: false
+      });
+    }
+
+    State.pushHistory();
+    State.simulating = true;
+    document.getElementById('btn-simulate').classList.add('sim-active');
+    document.getElementById('status-sim').textContent = '● SIM ON';
+    document.getElementById('status-sim').className = 'sim-on';
+
+    LogicEngine.propagate(State);
+    Renderer.render();
+    fitToScreen();
+
+    this.close();
+  },
+
+  init() {
+    // Open button
+    document.getElementById('btn-ai-parse').addEventListener('click', () => this.open());
+
+    // Close button
+    document.getElementById('ai-close-btn').addEventListener('click', () => this.close());
+
+    // Overlay click-outside
+    document.getElementById('ai-parser-overlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('ai-parser-overlay')) this.close();
+    });
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('ai-parser-overlay').style.display === 'flex') {
+        this.close();
+      }
+    });
+
+    // Generate button
+    document.getElementById('ai-generate-btn').addEventListener('click', () => this.generate());
+
+    // Ctrl+Enter in textarea
+    document.getElementById('ai-logic-input').addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        this.generate();
+      }
+    });
+
+    // Clear button
+    document.getElementById('ai-clear-input').addEventListener('click', () => {
+      document.getElementById('ai-logic-input').value = '';
+      document.getElementById('ai-char-count').textContent = '0 / 500';
+      this.hideStatus();
+      this.hideResult();
+    });
+
+    // Char count
+    document.getElementById('ai-logic-input').addEventListener('input', (e) => {
+      const len = e.target.value.length;
+      const counter = document.getElementById('ai-char-count');
+      counter.textContent = `${len} / 500`;
+      counter.style.color = len > 450 ? 'var(--orange)' : '';
+      if (len > 500) e.target.value = e.target.value.slice(0, 500);
+    });
+
+    // Example chips
+    document.querySelectorAll('.ai-example-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const expr = chip.dataset.expr;
+        const textarea = document.getElementById('ai-logic-input');
+        textarea.value = expr;
+        const len = expr.length;
+        document.getElementById('ai-char-count').textContent = `${len} / 500`;
+        this.hideStatus();
+        this.hideResult();
+        textarea.focus();
+      });
+    });
+
+    // Apply to canvas
+    document.getElementById('ai-apply-btn').addEventListener('click', () => this.applyCircuit());
+
+    // Cancel result
+    document.getElementById('ai-cancel-build').addEventListener('click', () => {
+      this.hideResult();
+      this.hideStatus();
+    });
+  }
+};
+
+// Extend App bootstrap to init AIParser
+const _origApp = App;
+// We patch after DOMContentLoaded; insert AIParser.init call:
+document.addEventListener('DOMContentLoaded', () => {
+  AIParser.init();
+});
+JSEOF
