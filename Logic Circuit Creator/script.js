@@ -65,7 +65,7 @@ const LogicEngine = {
     });
 
     const queue = components.filter(c => inDegree[c.id] === 0).map(c => c.id);
-    const sorted = [];
+    const sorted =[];
 
     while (queue.length) {
       const id = queue.shift();
@@ -117,7 +117,7 @@ const LogicEngine = {
    ============================================================ */
 const State = {
   components: [],
-  wires: [],
+  wires:[],
   selected: new Set(),       // Set of ids
   tool: 'select',            // 'select' | 'wire'
   simulating: false,
@@ -127,11 +127,11 @@ const State = {
   viewX: 0, viewY: 0, viewScale: 1,
 
   // History
-  history: [],
+  history:[],
   historyIndex: -1,
 
   // Clipboard
-  clipboard: [],
+  clipboard:[],
 
   // Serialise for history
   snapshot() {
@@ -343,7 +343,7 @@ const Renderer = {
     }
     const xOffset = (type === 'XOR' || type === 'XNOR') ? 8 : 0;
     return {
-      inputs: [
+      inputs:[
         { x: xOffset, y: h * 0.3 },
         { x: xOffset, y: h * 0.7 }
       ],
@@ -353,11 +353,11 @@ const Renderer = {
 
   getAbsPins(comp) {
     if (comp.type === 'input') {
-      return { inputs: [], output: { x: comp.x + INPUT_W, y: comp.y + INPUT_H/2 } };
+      return { inputs:[], output: { x: comp.x + INPUT_W, y: comp.y + INPUT_H/2 } };
     }
     if (comp.type === 'output') {
       // Input pin is at cx:0, cy:OUTPUT_R in local space → absolute = comp.x + 0, comp.y + OUTPUT_R
-      return { inputs: [{ x: comp.x, y: comp.y + OUTPUT_R }], output: null };
+      return { inputs:[{ x: comp.x, y: comp.y + OUTPUT_R }], output: null };
     }
     const pins = this.getGatePins(comp);
     return {
@@ -453,6 +453,7 @@ const Renderer = {
       e.stopPropagation();
       if (State.simulating) {
         comp.value = comp.value === 1 ? 0 : 1;
+        State.pushHistory();
         LogicEngine.propagate(State);
         Renderer.render();
         PropertiesPanel.update();
@@ -558,7 +559,7 @@ const Renderer = {
         if (!e.shiftKey) State.selected.clear();
         State.selected.add(wire.id);
         Renderer.render();
-        PropertiesPanel.showWire(wire);
+        PropertiesPanel.update();
       }
     });
 
@@ -582,6 +583,7 @@ const InteractionManager = {
   selecting: false,
   selStart: null,
   selRect: null,
+  selInitialIds: null,
   spaceDown: false,
 
   init() {
@@ -638,12 +640,15 @@ const InteractionManager = {
 
     if (!compEl && !wireId) {
       // Start selection rect
-      State.selected.clear();
+      this.selInitialIds = e.shiftKey ? new Set(State.selected) : new Set();
+      State.selected = new Set(this.selInitialIds);
+      
       this.selecting = true;
       this.selStart = pt;
       this.selRect = svgEl('rect', { class: 'selection-rect', x: pt.x, y: pt.y, width: 0, height: 0 });
       document.getElementById('ui-layer').appendChild(this.selRect);
       Renderer.render();
+      PropertiesPanel.update();
     }
   },
 
@@ -658,12 +663,32 @@ const InteractionManager = {
 
     if (this.dragging) {
       const pt = this.svgPoint(e);
-      const comp = State.getComponent(this.dragging.id);
-      if (comp) {
-        comp.x = this.snapToGrid(pt.x - this.dragging.offsetX);
-        comp.y = this.snapToGrid(pt.y - this.dragging.offsetY);
-        Renderer.render();
+      
+      if (this.dragMulti) {
+        const newX = this.snapToGrid(pt.x - this.dragging.offsetX);
+        const newY = this.snapToGrid(pt.y - this.dragging.offsetY);
+        const startComp = this.dragMulti.startPos.find(p => p.id === this.dragging.id);
+        
+        if (startComp) {
+          const dx = newX - startComp.x;
+          const dy = newY - startComp.y;
+          
+          this.dragMulti.startPos.forEach(p => {
+            const c = State.getComponent(p.id);
+            if (c) {
+              c.x = p.x + dx;
+              c.y = p.y + dy;
+            }
+          });
+        }
+      } else {
+        const comp = State.getComponent(this.dragging.id);
+        if (comp) {
+          comp.x = this.snapToGrid(pt.x - this.dragging.offsetX);
+          comp.y = this.snapToGrid(pt.y - this.dragging.offsetY);
+        }
       }
+      Renderer.render();
       return;
     }
 
@@ -698,6 +723,9 @@ const InteractionManager = {
 
       // Select components in rect
       State.selected.clear();
+      if (this.selInitialIds) {
+        this.selInitialIds.forEach(id => State.selected.add(id));
+      }
       State.components.forEach(c => {
         const cx = c.x, cy = c.y;
         const cw = c.type === 'input' ? INPUT_W : (c.type === 'output' ? OUTPUT_R*2 : GATE_W);
@@ -724,18 +752,22 @@ const InteractionManager = {
     if (this.dragging) {
       State.pushHistory();
       this.dragging = null;
+      this.dragMulti = null;
       Renderer.render();
+      PropertiesPanel.update();
       return;
     }
 
     if (this.selecting) {
       this.selecting = false;
       this.selStart = null;
+      this.selInitialIds = null;
       if (this.selRect) {
         this.selRect.remove();
         this.selRect = null;
       }
       Renderer.render();
+      PropertiesPanel.update();
       return;
     }
 
@@ -765,7 +797,7 @@ const InteractionManager = {
       offsetY: pt.y - comp.y
     };
 
-    // If multi-selected, drag all
+    // If multi-selected, log initial coords for rigid body dragging
     if (State.selected.size > 1) {
       this.dragMulti = {
         ids: [...State.selected],
@@ -802,7 +834,6 @@ const InteractionManager = {
     const existing = State.wires.find(w => w.toId === compId && w.toPin === idx);
     if (existing) return; // Already connected
 
-    // Check for cycles (simple check)
     const wire = {
       id: uid(),
       fromId: from.compId,
@@ -836,6 +867,7 @@ const InteractionManager = {
       State.selected.clear();
       State.selected.add(id);
       Renderer.render();
+      PropertiesPanel.update();
     }
     ContextMenu.show(e.clientX, e.clientY, id);
   },
@@ -861,7 +893,7 @@ const InteractionManager = {
 
   onKeyDown(e) {
     const tag = e.target.tagName.toLowerCase();
-    if (tag === 'input') return;
+    if (tag === 'input' || tag === 'textarea') return;
 
     if (e.key === ' ') {
       e.preventDefault();
@@ -880,11 +912,17 @@ const InteractionManager = {
 
     if (e.ctrlKey || e.metaKey) {
       switch (e.key.toLowerCase()) {
-        case 'z': e.preventDefault(); State.undo(); LogicEngine.propagate(State); Renderer.render(); break;
-        case 'y': e.preventDefault(); State.redo(); LogicEngine.propagate(State); Renderer.render(); break;
+        case 'z': 
+          e.preventDefault(); 
+          if (State.undo()) { LogicEngine.propagate(State); Renderer.render(); PropertiesPanel.update(); } 
+          break;
+        case 'y': 
+          e.preventDefault(); 
+          if (State.redo()) { LogicEngine.propagate(State); Renderer.render(); PropertiesPanel.update(); } 
+          break;
         case 'c': e.preventDefault(); this.copy(); break;
         case 'v': e.preventDefault(); this.paste(); break;
-        case 'a': e.preventDefault(); State.components.forEach(c => State.selected.add(c.id)); Renderer.render(); break;
+        case 'a': e.preventDefault(); State.components.forEach(c => State.selected.add(c.id)); Renderer.render(); PropertiesPanel.update(); break;
       }
       return;
     }
@@ -926,6 +964,7 @@ const InteractionManager = {
     State.pushHistory();
     if (State.simulating) LogicEngine.propagate(State);
     Renderer.render();
+    PropertiesPanel.update();
   },
 
   onSidebarDragStart(e) {
@@ -971,13 +1010,11 @@ function createComponent(type, x, y) {
   }
 
   State.addComponent(comp);
+  State.selected.clear();
+  State.selected.add(id);
   State.pushHistory();
   if (State.simulating) LogicEngine.propagate(State);
   Renderer.render();
-
-  State.selected.clear();
-  State.selected.add(id);
-  Renderer.renderComponents();
   PropertiesPanel.update();
 }
 
@@ -987,7 +1024,7 @@ function createComponent(type, x, y) {
 const PropertiesPanel = {
   update() {
     const panel = document.getElementById('prop-content');
-    const ids = [...State.selected];
+    const ids =[...State.selected];
 
     if (ids.length === 0) {
       panel.innerHTML = `<div class="no-selection">
@@ -1004,13 +1041,18 @@ const PropertiesPanel = {
     if (ids.length > 1) {
       panel.innerHTML = `<div class="prop-group">
         <div class="prop-label">SELECTION</div>
-        <div class="prop-value">${ids.length} components</div>
+        <div class="prop-value">${ids.length} items</div>
       </div>`;
       return;
     }
 
     const comp = State.getComponent(ids[0]);
-    if (comp) this.showComponent(comp);
+    if (comp) {
+      this.showComponent(comp);
+    } else {
+      const wire = State.wires.find(w => w.id === ids[0]);
+      if (wire) this.showWire(wire);
+    }
   },
 
   showComponent(comp) {
@@ -1157,10 +1199,18 @@ const MiniMap = {
       const from = State.getComponent(w.fromId);
       const to = State.getComponent(w.toId);
       if (!from || !to) return;
-      const fx = from.x * scale + offX + 40 * scale;
-      const fy = from.y * scale + offY + 20 * scale;
-      const tx = to.x * scale + offX;
-      const ty = to.y * scale + offY + 20 * scale;
+      
+      const fromPins = Renderer.getAbsPins(from);
+      const toPins = Renderer.getAbsPins(to);
+      if (!fromPins.output) return;
+      const toPin = toPins.inputs[w.toPin] || toPins.inputs[0];
+      if (!toPin) return;
+
+      const fx = fromPins.output.x * scale + offX;
+      const fy = fromPins.output.y * scale + offY;
+      const tx = toPin.x * scale + offX;
+      const ty = toPin.y * scale + offY;
+
       ctx.beginPath();
       ctx.moveTo(fx, fy);
       ctx.lineTo(tx, ty);
@@ -1173,14 +1223,15 @@ const MiniMap = {
     State.components.forEach(c => {
       const x = c.x * scale + offX;
       const y = c.y * scale + offY;
-      const w = 14 * scale + 4;
-      const h = 10 * scale + 4;
+      const cw = (c.type === 'input' ? INPUT_W : (c.type === 'output' ? OUTPUT_R*2 : GATE_W)) * scale;
+      const ch = (c.type === 'input' ? INPUT_H : (c.type === 'output' ? OUTPUT_R*2 : GATE_H)) * scale;
+      
       ctx.fillStyle = isDark ? '#1a1e28' : '#ffffff';
       ctx.strokeStyle = State.selected.has(c.id) ? '#4f9cf9' :
         (c.type === 'input' ? '#4f9cf9' : c.type === 'output' ? '#2ecc71' : (isDark ? '#4a5578' : '#8090b8'));
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(x, y, w, h, 1);
+      ctx.roundRect(x, y, cw, ch, 2);
       ctx.fill();
       ctx.stroke();
     });
@@ -1367,10 +1418,14 @@ function exportPNG() {
 }
 
 function downloadCanvas(canvas) {
-  const link = document.createElement('a');
-  link.download = 'circuit.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
+  try {
+    const link = document.createElement('a');
+    link.download = 'circuit.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch (err) {
+    alert("Export failed due to browser CORS policies regarding the downloaded logo image. Wait a moment or check your privacy settings.");
+  }
 }
 
 // ── Export helper: draw a gate on canvas ctx ─────────────
@@ -1610,11 +1665,11 @@ function importJSON(file) {
     try {
       const data = JSON.parse(e.target.result);
       State.components = data.components || [];
-      State.wires = data.wires || [];
+      State.wires = data.wires ||[];
       State.selected.clear();
 
       // Update nodeCounter to avoid id collisions
-      const maxId = [...State.components, ...State.wires]
+      const maxId =[...State.components, ...State.wires]
         .map(x => parseInt(x.id.replace('n', '')) || 0)
         .reduce((a, b) => Math.max(a, b), 0);
       nodeCounter = maxId;
@@ -1736,14 +1791,14 @@ Renderer.updateStatus = updateStatus;
 function loadDemoCircuit() {
   const aId = uid(), bId = uid(), andId = uid(), outId = uid();
 
-  State.components = [
+  State.components =[
     { id: aId, type: 'input', x: 80, y: 100, value: 1, outputValue: 1, label: 'A' },
     { id: bId, type: 'input', x: 80, y: 200, value: 0, outputValue: 0, label: 'B' },
     { id: andId, type: 'AND', x: 240, y: 140, outputValue: 0 },
     { id: outId, type: 'output', x: 420, y: 190, outputValue: 0, label: 'X' }
   ];
 
-  State.wires = [
+  State.wires =[
     { id: uid(), fromId: aId, toId: andId, fromPin: 0, toPin: 0, active: false },
     { id: uid(), fromId: bId, toId: andId, fromPin: 0, toPin: 1, active: false },
     { id: uid(), fromId: andId, toId: outId, fromPin: 0, toPin: 0, active: false }
@@ -1753,12 +1808,360 @@ function loadDemoCircuit() {
 }
 
 /* ============================================================
+   AI LOGIC PARSER
+   Uses Claude API to parse natural language logic into circuit
+   ============================================================ */
+const AIParser = {
+  pendingCircuit: null,
+
+  open() {
+    const overlay = document.getElementById('ai-parser-overlay');
+    overlay.classList.remove('ai-overlay-hidden');
+    overlay.style.display = 'flex';
+    setTimeout(() => document.getElementById('ai-logic-input').focus(), 100);
+    this.hideStatus();
+    this.hideResult();
+  },
+
+  close() {
+    const overlay = document.getElementById('ai-parser-overlay');
+    overlay.style.display = 'none';
+    overlay.classList.add('ai-overlay-hidden');
+    this.pendingCircuit = null;
+  },
+
+  showStatus(msg, type = 'loading') {
+    const area = document.getElementById('ai-status-area');
+    const content = document.getElementById('ai-status-content');
+    area.classList.remove('ai-status-hidden');
+    content.className = type;
+    content.textContent = msg;
+  },
+
+  hideStatus() {
+    document.getElementById('ai-status-area').classList.add('ai-status-hidden');
+  },
+
+  showResult(parsedExpr, circuit) {
+    this.pendingCircuit = circuit;
+    const area = document.getElementById('ai-result-area');
+    const expr = document.getElementById('ai-parsed-expr');
+    area.classList.remove('ai-result-hidden');
+    expr.textContent = parsedExpr;
+  },
+
+  hideResult() {
+    document.getElementById('ai-result-area').classList.add('ai-result-hidden');
+    this.pendingCircuit = null;
+  },
+
+  async generate() {
+    const input = document.getElementById('ai-logic-input').value.trim();
+    if (!input) return;
+
+    const btn = document.getElementById('ai-generate-btn');
+    btn.disabled = true;
+    this.hideResult();
+    this.showStatus('Analyzing your logic expression…', 'loading');
+
+    const systemPrompt = `You are a logic circuit compiler. Convert any logic expression or natural language description into a JSON circuit specification.
+
+SUPPORTED GATE TYPES: AND, OR, NOT, NAND, NOR, XOR, XNOR
+
+INPUT FORMATS you must handle:
+- Formal: X = (A AND B) OR C
+- Natural: "Output is 1 when A is 1 and B is 0"  
+- Mixed: "X=1 if ((A AND NOT B) NAND C) XOR ((A AND C) OR B)"
+- Symbolic: A & B | ~C, A * B + ~C
+- Any combination of keywords: AND/and/&/*, OR/or/|/+, NOT/not/~/!, NAND/nand, NOR/nor, XOR/xor/^, XNOR/xnor
+
+Rules:
+- Variables like A, B, C, In1, myVar → all become input nodes
+- The output variable (left side of =, or implied) becomes the output node
+- Build a tree of gates for the expression
+- Each intermediate sub-expression needs its own gate node
+- All gates MUST have exactly 1 or 2 inputs (NOT takes 1, all others take exactly 2). For 3+ inputs, cascade multiple 2-input gates.
+
+Return ONLY valid JSON (no markdown, no explanation) in this exact structure:
+{
+  "parsedExpression": "human-readable cleaned up version of the expression",
+  "inputs":["A", "B", "C"],
+  "output": "X",
+  "gates":[
+    {"id": "g1", "type": "NOT", "inputs": ["A"]},
+    {"id": "g2", "type": "AND", "inputs": ["g1", "B"]},
+    {"id": "g3", "type": "OR", "inputs": ["g2", "C"]}
+  ],
+  "outputFrom": "g3"
+}
+
+"inputs" array: names of all input variables used
+"gates" array: each gate has id, type, and inputs (array of variable names or gate ids)
+"outputFrom": id of the gate whose output feeds the final output node`;
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages:[{ role: 'user', content: input }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const text = data.content?.find(b => b.type === 'text')?.text || '';
+      
+      // Strip any markdown code fences
+      const clean = text.replace(/```json|```/gi, '').trim();
+      const circuit = JSON.parse(clean);
+
+      this.hideStatus();
+      this.showResult(circuit.parsedExpression, circuit);
+
+    } catch (err) {
+      console.error('AI Parse error:', err);
+      this.hideStatus();
+      this.showStatus(
+        err.message.includes('JSON') 
+          ? '⚠ Could not parse the AI response. Try rephrasing your expression.'
+          : `⚠ ${err.message}`,
+        'error'
+      );
+    }
+
+    btn.disabled = false;
+  },
+
+  applyCircuit() {
+    const circuit = this.pendingCircuit;
+    if (!circuit) return;
+
+    // Clear existing canvas
+    State.components = [];
+    State.wires =[];
+    State.selected.clear();
+
+    const idMap = {}; // varName or gateId → component id
+
+    // Layout constants
+    const colGap = 180;
+    const rowGap = 90;
+    const startX = 80;
+    const canvasHeight = 500;
+
+    // Place input nodes
+    const inputs = circuit.inputs ||[];
+    inputs.forEach((name, i) => {
+      const id = uid();
+      const y = (i * rowGap) + (canvasHeight / 2) - ((inputs.length - 1) * rowGap / 2);
+      const comp = {
+        id,
+        type: 'input',
+        x: startX,
+        y: y - INPUT_H / 2,
+        value: 1,
+        outputValue: 1,
+        label: name
+      };
+      State.components.push(comp);
+      idMap[name] = id;
+    });
+
+    // Topological layout of gates: assign columns
+    const gates = circuit.gates ||[];
+    const gateDepth = {};
+
+    function getDepth(gateId, visited = new Set()) {
+      if (gateDepth[gateId] !== undefined) return gateDepth[gateId];
+      if (visited.has(gateId)) return 0; // prevent cycle crash
+      visited.add(gateId);
+      
+      const gate = gates.find(g => g.id === gateId);
+      if (!gate) return 0;
+      let maxDepth = 0;
+      gate.inputs.forEach(inp => {
+        if (gates.find(g => g.id === inp)) {
+          maxDepth = Math.max(maxDepth, getDepth(inp, visited) + 1);
+        }
+      });
+      gateDepth[gateId] = maxDepth;
+      return maxDepth;
+    }
+
+    gates.forEach(g => getDepth(g.id));
+
+    // Group gates by column depth
+    const cols = {};
+    gates.forEach(g => {
+      const d = gateDepth[g.id] || 0;
+      if (!cols[d]) cols[d] = [];
+      cols[d].push(g);
+    });
+
+    const numCols = Object.keys(cols).length;
+
+    // Place gates
+    Object.entries(cols).forEach(([depth, gateList]) => {
+      const col = parseInt(depth);
+      const x = startX + INPUT_W + 40 + col * colGap;
+      gateList.forEach((gate, i) => {
+        const id = uid();
+        const y = (i * rowGap) + (canvasHeight / 2) - ((gateList.length - 1) * rowGap / 2);
+        const comp = {
+          id,
+          type: gate.type,
+          x,
+          y: y - GATE_H / 2,
+          outputValue: 0
+        };
+        State.components.push(comp);
+        idMap[gate.id] = id;
+      });
+    });
+
+    // Place output node
+    const outX = startX + INPUT_W + 40 + numCols * colGap + 40;
+    const outId = uid();
+    State.components.push({
+      id: outId,
+      type: 'output',
+      x: outX,
+      y: canvasHeight / 2 - OUTPUT_R,
+      outputValue: 0,
+      label: circuit.output || 'X'
+    });
+
+    // Create wires for gates
+    gates.forEach(gate => {
+      const toId = idMap[gate.id];
+      if (!toId) return;
+      gate.inputs.forEach((inp, pinIdx) => {
+        const fromId = idMap[inp];
+        if (!fromId) return;
+        State.wires.push({
+          id: uid(),
+          fromId,
+          toId,
+          fromPin: 0,
+          toPin: pinIdx, // Requires exactly 1 or 2 pins based on prompt enforcement
+          active: false
+        });
+      });
+    });
+
+    // Wire final gate (or directly from an input) to output
+    const finalGateId = idMap[circuit.outputFrom];
+    if (finalGateId) {
+      State.wires.push({
+        id: uid(),
+        fromId: finalGateId,
+        toId: outId,
+        fromPin: 0,
+        toPin: 0,
+        active: false
+      });
+    }
+
+    State.pushHistory();
+    State.simulating = true;
+    document.getElementById('btn-simulate').classList.add('sim-active');
+    document.getElementById('status-sim').textContent = '● SIM ON';
+    document.getElementById('status-sim').className = 'sim-on';
+
+    LogicEngine.propagate(State);
+    Renderer.render();
+    fitToScreen();
+
+    this.close();
+  },
+
+  init() {
+    // Open button
+    document.getElementById('btn-ai-parse').addEventListener('click', () => this.open());
+
+    // Close button
+    document.getElementById('ai-close-btn').addEventListener('click', () => this.close());
+
+    // Overlay click-outside
+    document.getElementById('ai-parser-overlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('ai-parser-overlay')) this.close();
+    });
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('ai-parser-overlay').style.display === 'flex') {
+        this.close();
+      }
+    });
+
+    // Generate button
+    document.getElementById('ai-generate-btn').addEventListener('click', () => this.generate());
+
+    // Ctrl+Enter in textarea
+    document.getElementById('ai-logic-input').addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        this.generate();
+      }
+    });
+
+    // Clear button
+    document.getElementById('ai-clear-input').addEventListener('click', () => {
+      document.getElementById('ai-logic-input').value = '';
+      document.getElementById('ai-char-count').textContent = '0 / 500';
+      this.hideStatus();
+      this.hideResult();
+    });
+
+    // Char count
+    document.getElementById('ai-logic-input').addEventListener('input', (e) => {
+      const len = e.target.value.length;
+      const counter = document.getElementById('ai-char-count');
+      counter.textContent = `${len} / 500`;
+      counter.style.color = len > 450 ? 'var(--orange)' : '';
+      if (len > 500) e.target.value = e.target.value.slice(0, 500);
+    });
+
+    // Example chips
+    document.querySelectorAll('.ai-example-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const expr = chip.dataset.expr;
+        const textarea = document.getElementById('ai-logic-input');
+        textarea.value = expr;
+        const len = expr.length;
+        document.getElementById('ai-char-count').textContent = `${len} / 500`;
+        this.hideStatus();
+        this.hideResult();
+        textarea.focus();
+      });
+    });
+
+    // Apply to canvas
+    document.getElementById('ai-apply-btn').addEventListener('click', () => this.applyCircuit());
+
+    // Cancel result
+    document.getElementById('ai-cancel-build').addEventListener('click', () => {
+      this.hideResult();
+      this.hideStatus();
+    });
+  }
+};
+
+/* ============================================================
    APP BOOTSTRAP
    ============================================================ */
 function App() {
   Renderer.init();
   MiniMap.init();
   InteractionManager.init();
+  AIParser.init();
 
   loadDemoCircuit();
   LogicEngine.propagate(State);
@@ -1771,17 +2174,17 @@ function App() {
   document.getElementById('btn-wire').addEventListener('click', () => setTool('wire'));
 
   document.getElementById('btn-undo').addEventListener('click', () => {
-    State.undo(); LogicEngine.propagate(State); Renderer.render();
+    if (State.undo()) { LogicEngine.propagate(State); Renderer.render(); PropertiesPanel.update(); }
   });
   document.getElementById('btn-redo').addEventListener('click', () => {
-    State.redo(); LogicEngine.propagate(State); Renderer.render();
+    if (State.redo()) { LogicEngine.propagate(State); Renderer.render(); PropertiesPanel.update(); }
   });
   document.getElementById('btn-delete').addEventListener('click', () => {
     State.removeSelected(); LogicEngine.propagate(State); Renderer.render(); PropertiesPanel.update();
   });
   document.getElementById('btn-clear').addEventListener('click', () => {
     if (confirm('Clear all components and wires?')) {
-      State.components = []; State.wires = []; State.selected.clear();
+      State.components = []; State.wires =[]; State.selected.clear();
       State.pushHistory(); Renderer.render(); PropertiesPanel.update();
     }
   });
@@ -1901,368 +2304,3 @@ function App() {
 
 // Start
 document.addEventListener('DOMContentLoaded', App);
-cat >> /home/claude/script.js << 'JSEOF'
-
-/* ============================================================
-   AI LOGIC PARSER
-   Uses Claude API to parse natural language logic into circuit
-   ============================================================ */
-const AIParser = {
-  pendingCircuit: null,
-
-  open() {
-    const overlay = document.getElementById('ai-parser-overlay');
-    overlay.classList.remove('ai-overlay-hidden');
-    overlay.style.display = 'flex';
-    setTimeout(() => document.getElementById('ai-logic-input').focus(), 100);
-    this.hideStatus();
-    this.hideResult();
-  },
-
-  close() {
-    const overlay = document.getElementById('ai-parser-overlay');
-    overlay.style.display = 'none';
-    overlay.classList.add('ai-overlay-hidden');
-    this.pendingCircuit = null;
-  },
-
-  showStatus(msg, type = 'loading') {
-    const area = document.getElementById('ai-status-area');
-    const content = document.getElementById('ai-status-content');
-    area.classList.remove('ai-status-hidden');
-    content.className = type;
-    content.textContent = msg;
-  },
-
-  hideStatus() {
-    document.getElementById('ai-status-area').classList.add('ai-status-hidden');
-  },
-
-  showResult(parsedExpr, circuit) {
-    this.pendingCircuit = circuit;
-    const area = document.getElementById('ai-result-area');
-    const expr = document.getElementById('ai-parsed-expr');
-    area.classList.remove('ai-result-hidden');
-    expr.textContent = parsedExpr;
-  },
-
-  hideResult() {
-    document.getElementById('ai-result-area').classList.add('ai-result-hidden');
-    this.pendingCircuit = null;
-  },
-
-  async generate() {
-    const input = document.getElementById('ai-logic-input').value.trim();
-    if (!input) return;
-
-    const btn = document.getElementById('ai-generate-btn');
-    btn.disabled = true;
-    this.hideResult();
-    this.showStatus('Analyzing your logic expression…', 'loading');
-
-    const systemPrompt = `You are a logic circuit compiler. Convert any logic expression or natural language description into a JSON circuit specification.
-
-SUPPORTED GATE TYPES: AND, OR, NOT, NAND, NOR, XOR, XNOR
-
-INPUT FORMATS you must handle:
-- Formal: X = (A AND B) OR C
-- Natural: "Output is 1 when A is 1 and B is 0"  
-- Mixed: "X=1 if ((A AND NOT B) NAND C) XOR ((A AND C) OR B)"
-- Symbolic: A & B | ~C, A * B + ~C
-- Any combination of keywords: AND/and/&/*, OR/or/|/+, NOT/not/~/!, NAND/nand, NOR/nor, XOR/xor/^, XNOR/xnor
-
-Rules:
-- Variables like A, B, C, In1, myVar → all become input nodes
-- The output variable (left side of =, or implied) becomes the output node
-- Build a tree of gates for the expression
-- Each intermediate sub-expression needs its own gate node
-
-Return ONLY valid JSON (no markdown, no explanation) in this exact structure:
-{
-  "parsedExpression": "human-readable cleaned up version of the expression",
-  "inputs": ["A", "B", "C"],
-  "output": "X",
-  "gates": [
-    {"id": "g1", "type": "NOT", "inputs": ["A"]},
-    {"id": "g2", "type": "AND", "inputs": ["g1", "B"]},
-    {"id": "g3", "type": "OR", "inputs": ["g2", "C"]}
-  ],
-  "outputFrom": "g3"
-}
-
-"inputs" array: names of all input variables used
-"gates" array: each gate has id, type, and inputs (array of variable names or gate ids)
-"outputFrom": id of the gate whose output feeds the final output node
-
-Example for "X = (A AND NOT B) NAND C":
-{
-  "parsedExpression": "X = (A AND NOT B) NAND C",
-  "inputs": ["A", "B", "C"],
-  "output": "X",
-  "gates": [
-    {"id": "g1", "type": "NOT", "inputs": ["B"]},
-    {"id": "g2", "type": "AND", "inputs": ["A", "g1"]},
-    {"id": "g3", "type": "NAND", "inputs": ["g2", "C"]}
-  ],
-  "outputFrom": "g3"
-}`;
-
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: input }]
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const text = data.content?.find(b => b.type === 'text')?.text || '';
-      
-      // Strip any markdown code fences
-      const clean = text.replace(/```json|```/gi, '').trim();
-      const circuit = JSON.parse(clean);
-
-      this.hideStatus();
-      this.showResult(circuit.parsedExpression, circuit);
-
-    } catch (err) {
-      console.error('AI Parse error:', err);
-      this.hideStatus();
-      this.showStatus(
-        err.message.includes('JSON') 
-          ? '⚠ Could not parse the AI response. Try rephrasing your expression.'
-          : `⚠ ${err.message}`,
-        'error'
-      );
-    }
-
-    btn.disabled = false;
-  },
-
-  applyCircuit() {
-    const circuit = this.pendingCircuit;
-    if (!circuit) return;
-
-    // Clear existing canvas
-    State.components = [];
-    State.wires = [];
-    State.selected.clear();
-
-    const idMap = {}; // varName or gateId → component id
-
-    // Layout constants
-    const colGap = 180;
-    const rowGap = 90;
-    const startX = 80;
-    const canvasHeight = 500;
-
-    // Place input nodes
-    const inputs = circuit.inputs || [];
-    inputs.forEach((name, i) => {
-      const id = uid();
-      const y = (i * rowGap) + (canvasHeight / 2) - ((inputs.length - 1) * rowGap / 2);
-      const comp = {
-        id,
-        type: 'input',
-        x: startX,
-        y: y - INPUT_H / 2,
-        value: 1,
-        outputValue: 1,
-        label: name
-      };
-      State.components.push(comp);
-      idMap[name] = id;
-    });
-
-    // Topological layout of gates: assign columns
-    const gates = circuit.gates || [];
-    const gateDepth = {};
-
-    function getDepth(gateId) {
-      if (gateDepth[gateId] !== undefined) return gateDepth[gateId];
-      const gate = gates.find(g => g.id === gateId);
-      if (!gate) return 0;
-      let maxDepth = 0;
-      gate.inputs.forEach(inp => {
-        if (gates.find(g => g.id === inp)) {
-          maxDepth = Math.max(maxDepth, getDepth(inp) + 1);
-        }
-      });
-      gateDepth[gateId] = maxDepth;
-      return maxDepth;
-    }
-
-    gates.forEach(g => getDepth(g.id));
-
-    // Group gates by column depth
-    const cols = {};
-    gates.forEach(g => {
-      const d = gateDepth[g.id] || 0;
-      if (!cols[d]) cols[d] = [];
-      cols[d].push(g);
-    });
-
-    const numCols = Object.keys(cols).length;
-
-    // Place gates
-    Object.entries(cols).forEach(([depth, gateList]) => {
-      const col = parseInt(depth);
-      const x = startX + INPUT_W + 40 + col * colGap;
-      gateList.forEach((gate, i) => {
-        const id = uid();
-        const y = (i * rowGap) + (canvasHeight / 2) - ((gateList.length - 1) * rowGap / 2);
-        const comp = {
-          id,
-          type: gate.type,
-          x,
-          y: y - GATE_H / 2,
-          outputValue: 0
-        };
-        State.components.push(comp);
-        idMap[gate.id] = id;
-      });
-    });
-
-    // Place output node
-    const outX = startX + INPUT_W + 40 + numCols * colGap + 40;
-    const outId = uid();
-    State.components.push({
-      id: outId,
-      type: 'output',
-      x: outX,
-      y: canvasHeight / 2 - OUTPUT_R,
-      outputValue: 0,
-      label: circuit.output || 'X'
-    });
-
-    // Create wires for gates
-    gates.forEach(gate => {
-      const toId = idMap[gate.id];
-      if (!toId) return;
-      gate.inputs.forEach((inp, pinIdx) => {
-        const fromId = idMap[inp];
-        if (!fromId) return;
-        State.wires.push({
-          id: uid(),
-          fromId,
-          toId,
-          fromPin: 0,
-          toPin: pinIdx,
-          active: false
-        });
-      });
-    });
-
-    // Wire final gate to output
-    const finalGateId = idMap[circuit.outputFrom];
-    if (finalGateId) {
-      State.wires.push({
-        id: uid(),
-        fromId: finalGateId,
-        toId: outId,
-        fromPin: 0,
-        toPin: 0,
-        active: false
-      });
-    }
-
-    State.pushHistory();
-    State.simulating = true;
-    document.getElementById('btn-simulate').classList.add('sim-active');
-    document.getElementById('status-sim').textContent = '● SIM ON';
-    document.getElementById('status-sim').className = 'sim-on';
-
-    LogicEngine.propagate(State);
-    Renderer.render();
-    fitToScreen();
-
-    this.close();
-  },
-
-  init() {
-    // Open button
-    document.getElementById('btn-ai-parse').addEventListener('click', () => this.open());
-
-    // Close button
-    document.getElementById('ai-close-btn').addEventListener('click', () => this.close());
-
-    // Overlay click-outside
-    document.getElementById('ai-parser-overlay').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('ai-parser-overlay')) this.close();
-    });
-
-    // Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && document.getElementById('ai-parser-overlay').style.display === 'flex') {
-        this.close();
-      }
-    });
-
-    // Generate button
-    document.getElementById('ai-generate-btn').addEventListener('click', () => this.generate());
-
-    // Ctrl+Enter in textarea
-    document.getElementById('ai-logic-input').addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        e.preventDefault();
-        this.generate();
-      }
-    });
-
-    // Clear button
-    document.getElementById('ai-clear-input').addEventListener('click', () => {
-      document.getElementById('ai-logic-input').value = '';
-      document.getElementById('ai-char-count').textContent = '0 / 500';
-      this.hideStatus();
-      this.hideResult();
-    });
-
-    // Char count
-    document.getElementById('ai-logic-input').addEventListener('input', (e) => {
-      const len = e.target.value.length;
-      const counter = document.getElementById('ai-char-count');
-      counter.textContent = `${len} / 500`;
-      counter.style.color = len > 450 ? 'var(--orange)' : '';
-      if (len > 500) e.target.value = e.target.value.slice(0, 500);
-    });
-
-    // Example chips
-    document.querySelectorAll('.ai-example-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const expr = chip.dataset.expr;
-        const textarea = document.getElementById('ai-logic-input');
-        textarea.value = expr;
-        const len = expr.length;
-        document.getElementById('ai-char-count').textContent = `${len} / 500`;
-        this.hideStatus();
-        this.hideResult();
-        textarea.focus();
-      });
-    });
-
-    // Apply to canvas
-    document.getElementById('ai-apply-btn').addEventListener('click', () => this.applyCircuit());
-
-    // Cancel result
-    document.getElementById('ai-cancel-build').addEventListener('click', () => {
-      this.hideResult();
-      this.hideStatus();
-    });
-  }
-};
-
-// Extend App bootstrap to init AIParser
-const _origApp = App;
-// We patch after DOMContentLoaded; insert AIParser.init call:
-document.addEventListener('DOMContentLoaded', () => {
-  AIParser.init();
-});
-JSEOF
