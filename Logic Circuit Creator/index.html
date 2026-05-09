@@ -52,8 +52,14 @@
     </div>
 
     <div class="toolbar-right">
-      <button class="tool-btn" id="btn-ai-parse" title="AI Logic Parser (Ctrl+Enter)">
-        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 3h12M2 8h8M2 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="13" cy="13" r="2.5" fill="var(--accent)"/><path d="M12.3 12.3l1.4 1.4" stroke="white" stroke-width="1" stroke-linecap="round"/></svg>
+      <button class="tool-btn ai-parse-toolbar-btn" id="btn-ai-parse" title="AI Logic Parser — describe any circuit in natural language">
+        <svg width="16" height="16" viewBox="0 0 16 16">
+          <rect x="1" y="3" width="10" height="1.5" rx="0.75" fill="currentColor" opacity="0.7"/>
+          <rect x="1" y="7" width="7" height="1.5" rx="0.75" fill="currentColor" opacity="0.7"/>
+          <rect x="1" y="11" width="8.5" height="1.5" rx="0.75" fill="currentColor" opacity="0.7"/>
+          <circle cx="13" cy="11.5" r="2.5" fill="var(--accent)"/>
+          <path d="M11.8 10.3l1.4 1.4 1.8-1.8" stroke="white" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         AI Parse
       </button>
       <div class="separator"></div>
@@ -149,6 +155,22 @@
             <span class="comp-name">Output</span>
           </div>
         </div>
+      </div>
+
+      <!-- AI Parse shortcut in sidebar -->
+      <div class="sidebar-section">
+        <div class="section-label">AI ASSISTANT</div>
+        <button class="ai-sidebar-btn" id="btn-ai-parse-sidebar">
+          <svg width="14" height="14" viewBox="0 0 16 16">
+            <rect x="1" y="3" width="10" height="1.5" rx="0.75" fill="currentColor" opacity="0.8"/>
+            <rect x="1" y="7" width="7" height="1.5" rx="0.75" fill="currentColor" opacity="0.8"/>
+            <rect x="1" y="11" width="8.5" height="1.5" rx="0.75" fill="currentColor" opacity="0.8"/>
+            <circle cx="13" cy="11.5" r="2.5" fill="currentColor"/>
+            <path d="M11.8 10.3l1.4 1.4 1.8-1.8" stroke="var(--bg-secondary)" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Parse Logic Expression
+        </button>
+        <p class="ai-sidebar-hint">Type a formula in any format and auto-build the circuit</p>
       </div>
 
       <div class="sidebar-section">
@@ -250,58 +272,92 @@
     </div>
   </div>
 
-  <!-- AI Logic Parser Panel -->
-  <div id="ai-parser-overlay" class="ai-overlay-hidden">
+  <!-- ═══════════════════════════════════════════════════════
+       AI LOGIC PARSER MODAL
+       ═══════════════════════════════════════════════════════ -->
+  <div id="ai-parser-overlay">
     <div id="ai-parser-panel">
+
+      <!-- Header -->
       <div class="ai-panel-header">
         <div class="ai-panel-title-group">
           <div class="ai-panel-icon">
-            <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" stroke="var(--accent)" stroke-width="1.5" fill="none"/><path d="M6 9h6M9 6v6" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M3 5h10M3 10h7M3 15h9" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="16.5" cy="14.5" r="3" fill="var(--accent)" opacity="0.9"/>
+              <path d="M15.2 13.2l1.5 1.5 2-2" stroke="white" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </div>
           <div>
             <div class="ai-panel-title">AI Logic Parser</div>
-            <div class="ai-panel-subtitle">Describe any circuit in natural language</div>
+            <div class="ai-panel-subtitle">Describe any circuit — it auto-builds on canvas</div>
           </div>
         </div>
         <button class="ai-close-btn" id="ai-close-btn" title="Close (Esc)">
-          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
       </div>
-      <div class="ai-examples-row">
-        <span class="ai-examples-label">Examples:</span>
-        <button class="ai-example-chip" data-expr="X = (A AND B) OR (NOT C)">A AND B OR NOT C</button>
-        <button class="ai-example-chip" data-expr="Output is 1 when A is 1 and B is 0, or when C is 1">Natural language</button>
-        <button class="ai-example-chip" data-expr="X = A XNOR (B OR C)">XNOR circuit</button>
+
+      <!-- Format pills -->
+      <div class="ai-formats-row">
+        <span class="ai-formats-label">Accepts:</span>
+        <span class="ai-format-pill">X = A AND (B OR C)</span>
+        <span class="ai-format-pill">A &amp; ~B | C</span>
+        <span class="ai-format-pill">natural language</span>
+        <span class="ai-format-pill">X=1 if …</span>
+        <span class="ai-format-pill">A * B + ~C</span>
       </div>
+
+      <!-- Example chips -->
+      <div class="ai-examples-row">
+        <span class="ai-examples-label">Try:</span>
+        <button class="ai-example-chip" data-expr="X = (A AND B) OR (NOT C)">Basic OR/AND/NOT</button>
+        <button class="ai-example-chip" data-expr="X=1 if ((A AND NOT B) NAND C) XOR ((A AND C) OR B)">Complex expression</button>
+        <button class="ai-example-chip" data-expr="Output is HIGH when A is 1 and B is 0, or when C is 1">Natural language</button>
+        <button class="ai-example-chip" data-expr="X = A XNOR (B NOR C)">XNOR / NOR</button>
+        <button class="ai-example-chip" data-expr="X = (A & B) | (~A & C) | (B ^ C)">Symbolic</button>
+      </div>
+
+      <!-- Textarea -->
       <div class="ai-input-area">
-        <textarea id="ai-logic-input" placeholder="Type your logic expression in any format..." spellcheck="false"></textarea>
-        <div class="ai-input-actions">
-          <div class="ai-char-count" id="ai-char-count">0 / 500</div>
+        <textarea
+          id="ai-logic-input"
+          maxlength="500"
+          spellcheck="false"
+          placeholder="Examples:&#10;  X = (A AND NOT B) NAND C&#10;  X=1 if A is 1 AND B is 0&#10;  Output is 1 when A and B are HIGH, or C is LOW&#10;  X = A &amp; ~B | (C ^ D)&#10;&#10;Press Ctrl+Enter to generate"></textarea>
+        <div class="ai-input-footer">
+          <span class="ai-char-count" id="ai-char-count">0 / 500</span>
           <div class="ai-action-btns">
             <button class="ai-clear-btn" id="ai-clear-input">Clear</button>
             <button class="ai-generate-btn" id="ai-generate-btn">
-              <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="2,2 12,7 2,12" fill="currentColor"/></svg>
+              <svg width="13" height="13" viewBox="0 0 13 13"><polygon points="2,1.5 11,6.5 2,11.5" fill="currentColor"/></svg>
               Generate Circuit
             </button>
           </div>
         </div>
       </div>
-      <div id="ai-status-area" class="ai-status-hidden"><div id="ai-status-content"></div></div>
+
+      <!-- Status (loading / error) -->
+      <div id="ai-status-area" class="ai-status-hidden">
+        <div id="ai-status-content"></div>
+      </div>
+
+      <!-- Result preview -->
       <div id="ai-result-area" class="ai-result-hidden">
-        <div class="ai-result-header">
-          <div class="ai-result-title">Parsed Expression</div>
-          <div id="ai-parsed-expr" class="ai-parsed-expr"></div>
-        </div>
+        <div class="ai-result-label">Parsed as:</div>
+        <div id="ai-parsed-expr" class="ai-parsed-expr"></div>
+        <div id="ai-circuit-summary" class="ai-circuit-summary"></div>
         <div class="ai-result-actions">
-          <button class="ai-btn-secondary" id="ai-cancel-build">Cancel</button>
+          <button class="ai-btn-secondary" id="ai-cancel-build">Discard</button>
           <button class="ai-btn-primary" id="ai-apply-btn">
             <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 6l4 4 6-7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Apply to Canvas
           </button>
         </div>
       </div>
+
     </div>
-  </div>
+  </div><!-- /#ai-parser-overlay -->
 
   <script src="script.js"></script>
 </body>
