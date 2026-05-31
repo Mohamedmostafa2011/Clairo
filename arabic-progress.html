@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تتبع التقدم - اللغة العربية</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0e0a0;
+    --gold-dark: #a67c2e;
+    --bg: #0f0f1a;
+    --card-bg: #1a1a2e;
+    --card-border: #2a2a4a;
+    --text: #f0f0f0;
+    --text-muted: #8888aa;
+    --success: #2ecc71;
+    --success-glow: rgba(46, 204, 113, 0.3);
+    --accent: #6c63ff;
+    --accent-glow: rgba(108, 99, 255, 0.3);
+    --section-1: #6c63ff;
+    --section-2: #e84393;
+    --section-3: #00b894;
+  }
+
+  body {
+    font-family: 'Cairo', 'Amiri', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding-bottom: 60px;
+  }
+
+  /* ---- Header ---- */
+  header {
+    background: linear-gradient(135deg, #1a1a3e, #0f0f1a);
+    border-bottom: 2px solid var(--gold);
+    padding: 20px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(108,99,255,0.08), transparent 60%),
+                radial-gradient(circle at 80% 50%, rgba(233,67,147,0.08), transparent 60%);
+  }
+  header h1 {
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--gold-light);
+    position: relative;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 12px rgba(201,168,76,0.35);
+  }
+  header .subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-top: 4px;
+    position: relative;
+  }
+  header .logo-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+    position: relative;
+  }
+  header .logo-bar img {
+    height: 36px;
+    border-radius: 8px;
+  }
+  header .logo-bar span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+  header .logo-bar a {
+    color: var(--gold-light);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  header .logo-bar a:hover { text-decoration: underline; }
+
+  /* ---- Overall Progress Bar ---- */
+  .overall-section {
+    max-width: 820px;
+    margin: 30px auto 10px;
+    padding: 0 20px;
+  }
+  .overall-card {
+    background: linear-gradient(135deg, #1a1a3e, #16213e);
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+    padding: 24px 28px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(201,168,76,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  .overall-card .sparkle-bg {
+    position: absolute;
+    top: -50%; left: -50%; right: -50%; bottom: -50%;
+    background: radial-gradient(circle at 30% 40%, rgba(201,168,76,0.04), transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(108,99,255,0.04), transparent 50%);
+    pointer-events: none;
+  }
+  .overall-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .overall-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .overall-stats .big-number {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--gold-light);
+  }
+  .overall-stats .big-number span { font-size: 1.6rem; color: var(--text-muted); }
+  .overall-stats .overall-percent {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--success);
+  }
+  .overall-bar-wrap {
+    width: 100%;
+    margin-top: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .overall-bar-track {
+    width: 100%;
+    height: 14px;
+    background: #2a2a4a;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .overall-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+  .overall-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 2s infinite;
+  }
+  @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+  .overall-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ---- Sections Container ---- */
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* ---- Section Card ---- */
+  .section-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .section-card.completed {
+    border-color: var(--success);
+    box-shadow: 0 0 40px var(--success-glow);
+  }
+  .section-card.accent-1 { border-top: 4px solid var(--section-1); }
+  .section-card.accent-2 { border-top: 4px solid var(--section-2); }
+  .section-card.accent-3 { border-top: 4px solid var(--section-3); }
+  .section-card.accent-1.completed { box-shadow: 0 0 40px rgba(108,99,255,0.25); }
+  .section-card.accent-2.completed { box-shadow: 0 0 40px rgba(232,67,147,0.25); }
+  .section-card.accent-3.completed { box-shadow: 0 0 40px rgba(0,184,148,0.25); }
+
+  /* Section Header */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .section-title-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  .section-icon.s1 { background: rgba(108,99,255,0.15); color: var(--section-1); }
+  .section-icon.s2 { background: rgba(232,67,147,0.15); color: var(--section-2); }
+  .section-icon.s3 { background: rgba(0,184,148,0.15); color: var(--section-3); }
+
+  .section-title-area h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+  }
+  .section-title-area .completion-badge {
+    display: none;
+    background: var(--success);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .section-card.completed .completion-badge { display: inline-block; animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  .section-progress-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    direction: ltr;
+    display: inline-block;
+  }
+  .section-progress-text .num-green { color: var(--success); font-weight: 800; }
+  .section-progress-text .num-total { color: var(--text); font-weight: 700; }
+  .section-progress-text .percent {
+    font-size: 0.95rem;
+    padding: 2px 10px;
+    border-radius: 20px;
+    background: rgba(46,204,113,0.1);
+    color: var(--success);
+    font-weight: 700;
+    margin-right: 6px;
+  }
+
+  /* Section Progress Bar */
+  .section-bar-wrap { margin: 8px 0 16px; }
+  .section-bar-track {
+    width: 100%;
+    height: 8px;
+    background: #2a2a4a;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .section-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 6px;
+    transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .section-card.accent-1 .section-bar-fill { background: linear-gradient(90deg, #6c63ff, #a29bfe); }
+  .section-card.accent-2 .section-bar-fill { background: linear-gradient(90deg, #e84393, #fd79a8); }
+  .section-card.accent-3 .section-bar-fill { background: linear-gradient(90deg, #00b894, #55efc4); }
+
+  /* ---- Lesson Items ---- */
+  .lesson-list { display: flex; flex-direction: column; gap: 6px; }
+  .lesson-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .lesson-item:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.08);
+    transform: translateX(-4px);
+  }
+  .lesson-item.done {
+    background: rgba(46,204,113,0.06);
+    border-color: rgba(46,204,113,0.15);
+  }
+  .lesson-item.done:hover { border-color: rgba(46,204,113,0.3); }
+
+  .checkbox-wrap {
+    position: relative;
+    width: 24px; height: 24px;
+    flex-shrink: 0;
+  }
+  .checkbox-wrap input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%; height: 100%;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .checkbox-wrap .check-visual {
+    width: 24px; height: 24px;
+    border: 2px solid #555;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    color: transparent;
+  }
+  .checkbox-wrap input:checked + .check-visual {
+    background: var(--success);
+    border-color: var(--success);
+    color: #fff;
+    box-shadow: 0 0 16px rgba(46,204,113,0.4);
+    animation: popCheck 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes popCheck { 0%{transform:scale(0.8)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
+
+  .lesson-item .lesson-num {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+  .lesson-item.done .lesson-num { color: var(--success); opacity: 1; }
+
+  .lesson-item .lesson-name {
+    font-size: 1rem;
+    font-weight: 500;
+    flex: 1;
+  }
+  .lesson-item.done .lesson-name { color: var(--success); }
+  .lesson-item .lesson-check {
+    color: var(--success);
+    font-weight: 700;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  .lesson-item.done .lesson-check { opacity: 1; animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  @keyframes popIn { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+
+  /* ---- Celebration Overlay ---- */
+  .celebration-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.4s ease;
+  }
+  .celebration-overlay.active { display: flex; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+  .celebration-modal {
+    background: linear-gradient(145deg, #1a1a3e, #16213e);
+    border: 2px solid var(--gold);
+    border-radius: 28px;
+    padding: 40px 36px 30px;
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: modalPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes modalPop { 0%{transform:scale(0.5);opacity:0} 100%{transform:scale(1);opacity:1} }
+
+  .celebration-modal .big-emoji {
+    font-size: 4.5rem;
+    margin-bottom: 8px;
+    animation: bounce 1s infinite;
+  }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+
+  .celebration-modal h2 {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 4px;
+    color: var(--gold-light);
+  }
+  .celebration-modal p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+  }
+
+  .celebration-modal .certificate-preview {
+    border: 2px solid var(--gold);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 10px auto 16px;
+    max-width: 380px;
+    box-shadow: 0 4px 30px rgba(201,168,76,0.15);
+  }
+  .celebration-modal .certificate-preview img {
+    width: 100%;
+    display: block;
+  }
+
+  .celebration-modal .btn-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: #1a1a2e;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.3); }
+  .btn-outline {
+    background: transparent;
+    border: 2px solid var(--gold);
+    color: var(--gold-light);
+  }
+  .btn-outline:hover { background: rgba(201,168,76,0.1); transform: translateY(-2px); }
+  .btn-success {
+    background: linear-gradient(135deg, #1a8a4a, var(--success));
+    color: #fff;
+  }
+  .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46,204,113,0.3); }
+  .btn-close-celeb {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-muted);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .btn-close-celeb:hover { background: rgba(255,255,255,0.12); }
+
+  /* ---- Confetti Canvas ---- */
+  #confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1001;
+  }
+
+  /* ---- Download Stats Button ---- */
+  .download-stats-area {
+    text-align: center;
+    margin-top: 30px;
+  }
+  .btn-download-stats {
+    background: linear-gradient(135deg, #2d2d5e, #1a1a3e);
+    border: 1px solid var(--card-border);
+    color: var(--text);
+    padding: 14px 32px;
+    border-radius: 14px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .btn-download-stats:hover {
+    border-color: var(--gold);
+    background: #2d2d5e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(201,168,76,0.1);
+  }
+
+  /* ---- Footer ---- */
+  footer {
+    text-align: center;
+    padding: 30px 20px 10px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+  footer a { color: var(--gold-light); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.6rem; }
+    .section-header { flex-direction: column; align-items: flex-start; }
+    .section-title-area h2 { font-size: 1.3rem; }
+    .overall-stats { gap: 16px; }
+    .overall-stats .big-number { font-size: 2.2rem; }
+    .celebration-modal { padding: 28px 20px; }
+    .celebration-modal .big-emoji { font-size: 3.2rem; }
+    .celebration-modal h2 { font-size: 1.5rem; }
+    .lesson-item { padding: 8px 12px; }
+    .container { padding: 0 12px; }
+    .section-card { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ======== HEADER ======== -->
+<header>
+  <h1>📚 إحصائيات تقدم اللغة العربية</h1>
+  <div class="subtitle">تتبع تقدمك في النحو • القراءة • النصوص</div>
+  <div class="logo-bar">
+    <img src="https://huggingface.co/datasets/MidoSTM11/Mido/resolve/main/Final%20Logo.png" alt="Clairo Logo">
+    <span>مشغل بـ</span>
+    <a href="https://clairo.web.app" target="_blank">Clairo</a>
+  </div>
+</header>
+
+<!-- ======== OVERALL PROGRESS ======== -->
+<div class="overall-section" id="overall-section">
+  <div class="overall-card">
+    <div class="sparkle-bg"></div>
+    <h2>🏆 التقدم العام</h2>
+    <div class="overall-stats">
+      <div>
+        <div class="big-number" id="overall-completed">0<span>/16</span></div>
+        <div style="font-size:0.8rem;color:var(--text-muted)">درس مكتمل</div>
+      </div>
+      <div>
+        <div class="overall-percent" id="overall-percent">0%</div>
+        <div style="font-size:0.8rem;color:var(--text-muted)">إنجاز</div>
+      </div>
+    </div>
+    <div class="overall-bar-wrap">
+      <div class="overall-bar-track">
+        <div class="overall-bar-fill" id="overall-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="overall-label">
+        <span>ابدأ رحلتك</span>
+        <span id="overall-label-end">أكمل جميع الدروس</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== SECTIONS ======== -->
+<div class="container">
+
+  <!-- النحو -->
+  <div class="section-card accent-1" data-section="nahw">
+    <div class="section-header">
+      <div class="section-title-area">
+        <div class="section-icon s1">📖</div>
+        <h2>النحو</h2>
+        <span class="completion-badge">✅ مكتمل</span>
+      </div>
+      <div class="section-progress-text" id="prog-nahw">
+        <span class="num-green" id="done-nahw">0</span>
+        <span class="num-total">/ 6</span>
+        <span class="percent" id="pct-nahw">0%</span>
+      </div>
+    </div>
+    <div class="section-bar-wrap">
+      <div class="section-bar-track">
+        <div class="section-bar-fill" id="bar-nahw" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="lesson-list" id="list-nahw">
+      <div class="lesson-item" data-idx="0">
+        <span class="lesson-num">١</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nahw" data-lesson="0">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">اسم الفاعل</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="1">
+        <span class="lesson-num">٢</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nahw" data-lesson="1">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">صيغ المبالغة</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="2">
+        <span class="lesson-num">٣</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nahw" data-lesson="2">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">اسم المفعول</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="3">
+        <span class="lesson-num">٤</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nahw" data-lesson="3">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">اسما الزمان والمكان</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="4">
+        <span class="lesson-num">٥</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nahw" data-lesson="4">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">اسم الآلة</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="5">
+        <span class="lesson-num">٦</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nahw" data-lesson="5">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">اسم التفضيل</span>
+        <span class="lesson-check">✓</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- القراءة -->
+  <div class="section-card accent-2" data-section="qiraa">
+    <div class="section-header">
+      <div class="section-title-area">
+        <div class="section-icon s2">📗</div>
+        <h2>القراءة</h2>
+        <span class="completion-badge">✅ مكتمل</span>
+      </div>
+      <div class="section-progress-text" id="prog-qiraa">
+        <span class="num-green" id="done-qiraa">0</span>
+        <span class="num-total">/ 4</span>
+        <span class="percent" id="pct-qiraa">0%</span>
+      </div>
+    </div>
+    <div class="section-bar-wrap">
+      <div class="section-bar-track">
+        <div class="section-bar-fill" id="bar-qiraa" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="lesson-list" id="list-qiraa">
+      <div class="lesson-item" data-idx="0">
+        <span class="lesson-num">١</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="qiraa" data-lesson="0">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">الحياة دقائق وثوانٍ</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="1">
+        <span class="lesson-num">٢</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="qiraa" data-lesson="1">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">فالق الحب والنوى</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="2">
+        <span class="lesson-num">٣</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="qiraa" data-lesson="2">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">الحمامة المطوقة</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="3">
+        <span class="lesson-num">٤</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="qiraa" data-lesson="3">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">المشروعات الصغيرة</span>
+        <span class="lesson-check">✓</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- النصوص -->
+  <div class="section-card accent-3" data-section="nusus">
+    <div class="section-header">
+      <div class="section-title-area">
+        <div class="section-icon s3">📜</div>
+        <h2>النصوص</h2>
+        <span class="completion-badge">✅ مكتمل</span>
+      </div>
+      <div class="section-progress-text" id="prog-nusus">
+        <span class="num-green" id="done-nusus">0</span>
+        <span class="num-total">/ 6</span>
+        <span class="percent" id="pct-nusus">0%</span>
+      </div>
+    </div>
+    <div class="section-bar-wrap">
+      <div class="section-bar-track">
+        <div class="section-bar-fill" id="bar-nusus" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="lesson-list" id="list-nusus">
+      <div class="lesson-item" data-idx="0">
+        <span class="lesson-num">١</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nusus" data-lesson="0">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">سفينة نوح (نص قرآني)</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="1">
+        <span class="lesson-num">٢</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nusus" data-lesson="1">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">خلال كريمة (للشاعر حافظ إبراهيم)</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="2">
+        <span class="lesson-num">٣</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nusus" data-lesson="2">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">رسالة إلى ابني (للدكتور فاخر عاقل)</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="3">
+        <span class="lesson-num">٤</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nusus" data-lesson="3">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">وادي الكنانة (للشاعر محمد الهراوي)</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="4">
+        <span class="lesson-num">٥</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nusus" data-lesson="4">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">استعن بالله (حديث شريف)</span>
+        <span class="lesson-check">✓</span>
+      </div>
+      <div class="lesson-item" data-idx="5">
+        <span class="lesson-num">٦</span>
+        <div class="checkbox-wrap">
+          <input type="checkbox" class="lesson-checkbox" data-section="nusus" data-lesson="5">
+          <div class="check-visual">✓</div>
+        </div>
+        <span class="lesson-name">حب الوطن (للشاعر مصطفى صادق الرافعي)</span>
+        <span class="lesson-check">✓</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======== DOWNLOAD STATS BUTTON ======== -->
+<div class="download-stats-area">
+  <button class="btn-download-stats" onclick="downloadStatsImage()">
+    📸 تحميل صورة الإحصائيات
+  </button>
+  <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">
+    احفظ صورة توضح الدروس المكتملة وغير المكتملة مع النسب
+  </div>
+</div>
+
+<!-- ======== CELEBRATION OVERLAY ======== -->
+<div class="celebration-overlay" id="celebration-overlay">
+  <canvas id="confetti-canvas"></canvas>
+  <div class="celebration-modal" id="celebration-modal">
+    <div class="big-emoji" id="cel-emoji">🎉</div>
+    <h2 id="cel-title">أحسنت!</h2>
+    <p id="cel-desc">لقد أتممت هذا القسم بنجاح!</p>
+    <div class="certificate-preview" id="cel-cert-preview">
+      <canvas id="cert-canvas" width="600" height="420"></canvas>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="cel-download-btn">📥 تحميل الشهادة</button>
+      <button class="btn btn-close-celeb" onclick="closeCelebration()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==============================
+// DATA
+// ==============================
+const SECTIONS = {
+  nahw:  { name: 'النحو',    total: 6, doneKey: 'done-nahw',  barKey: 'bar-nahw',  pctKey: 'pct-nahw',  cardSelector: '.section-card[data-section="nahw"]'  },
+  qiraa: { name: 'القراءة', total: 4, doneKey: 'done-qiraa', barKey: 'bar-qiraa', pctKey: 'pct-qiraa', cardSelector: '.section-card[data-section="qiraa"]' },
+  nusus: { name: 'النصوص', total: 6, doneKey: 'done-nusus', barKey: 'bar-nusus', pctKey: 'pct-nusus', cardSelector: '.section-card[data-section="nusus"]' }
+};
+const TOTAL_LESSONS = 16;
+const STORAGE_KEY = 'arabicProgressV2';
+
+// ==============================
+// STATE
+// ==============================
+let state = {};
+let previousSectionComplete = {};
+let previousAllComplete = false;
+
+function getDefaultState() {
+  return {
+    nahw:  [false, false, false, false, false, false],
+    qiraa: [false, false, false, false],
+    nusus: [false, false, false, false, false, false]
+  };
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Validate structure before trusting it
+      if (parsed && parsed.nahw && parsed.qiraa && parsed.nusus) {
+        state = parsed;
+        return;
+      }
+    }
+  } catch(e) {
+    console.warn('Could not load saved progress:', e);
+  }
+  state = getDefaultState();
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {
+    console.warn('Could not save progress:', e);
+  }
+}
+
+function initPreviousState() {
+  for (const s of ['nahw', 'qiraa', 'nusus']) {
+    const done = state[s].filter(Boolean).length;
+    const total = SECTIONS[s].total;
+    previousSectionComplete[s] = (done === total && total > 0);
+  }
+  const overallDone = Object.keys(SECTIONS).reduce((sum, s) => sum + state[s].filter(Boolean).length, 0);
+  previousAllComplete = (overallDone === TOTAL_LESSONS);
+}
+
+// ==============================
+// RENDER
+// ==============================
+function renderAll() {
+  for (const section of ['nahw', 'qiraa', 'nusus']) {
+    const items = document.querySelectorAll(`#list-${section} .lesson-item`);
+    items.forEach((item, i) => {
+      const cb = item.querySelector('.lesson-checkbox');
+      const isChecked = state[section] && state[section][i] === true;
+      cb.checked = isChecked;
+      if (isChecked) {
+        item.classList.add('done');
+      } else {
+        item.classList.remove('done');
+      }
+    });
+  }
+  updateAll();
+}
+
+function updateAll() {
+  let totalDone = 0;
+  for (const section of ['nahw', 'qiraa', 'nusus']) {
+    const info = SECTIONS[section];
+    const arr = state[section];
+    const done = arr.filter(Boolean).length;
+    totalDone += done;
+    const pct = info.total > 0 ? Math.round((done / info.total) * 100) : 0;
+
+    document.getElementById(info.doneKey).textContent = done;
+    document.getElementById(info.barKey).style.width = pct + '%';
+    document.getElementById(info.pctKey).textContent = pct + '%';
+
+    const card = document.querySelector(info.cardSelector);
+    if (done === info.total && info.total > 0) {
+      card.classList.add('completed');
+    } else {
+      card.classList.remove('completed');
+    }
+  }
+
+  const overallPct = Math.round((totalDone / TOTAL_LESSONS) * 100);
+  document.getElementById('overall-completed').innerHTML = totalDone + '<span>/' + TOTAL_LESSONS + '</span>';
+  document.getElementById('overall-percent').textContent = overallPct + '%';
+  document.getElementById('overall-bar-fill').style.width = overallPct + '%';
+  document.getElementById('overall-label-end').textContent =
+    totalDone === TOTAL_LESSONS
+      ? '🎉 ألف مبروك! اكتمل الجميع!'
+      : (TOTAL_LESSONS - totalDone) + ' درس متبقي';
+
+  checkCelebrations();
+}
+
+function checkCelebrations() {
+  for (const section of ['nahw', 'qiraa', 'nusus']) {
+    const info = SECTIONS[section];
+    const arr = state[section];
+    const done = arr.filter(Boolean).length;
+    const justCompleted = (done === info.total && info.total > 0 && !previousSectionComplete[section]);
+    if (justCompleted) {
+      previousSectionComplete[section] = true;
+      showSectionCelebration(section);
+      return;
+    }
+  }
+
+  const totalDone = Object.keys(SECTIONS).reduce((sum, s) => sum + state[s].filter(Boolean).length, 0);
+  if (totalDone === TOTAL_LESSONS && !previousAllComplete) {
+    previousAllComplete = true;
+    showGrandCelebration();
+  }
+}
+
+// ==============================
+// CHECKBOX HANDLING
+// ==============================
+document.querySelectorAll('.lesson-checkbox').forEach(cb => {
+  cb.addEventListener('change', function() {
+    const section = this.dataset.section;
+    const lesson = parseInt(this.dataset.lesson);
+    state[section][lesson] = this.checked;
+
+    const item = this.closest('.lesson-item');
+    if (this.checked) {
+      item.classList.add('done');
+    } else {
+      item.classList.remove('done');
+      // Un-completing a section resets the celebration flag so it can trigger again
+      previousSectionComplete[section] = false;
+      previousAllComplete = false;
+    }
+
+    saveState();
+    updateAll();
+  });
+});
+
+// ==============================
+// CONFETTI
+// ==============================
+function launchConfetti(durationMs = 4000, count = 120) {
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = [];
+  const colors = ['#e84393','#6c63ff','#00b894','#fdcb6e','#e17055','#00cec9','#fd79a8','#a29bfe','#f8c291','#f6e58d'];
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * -1 - 20,
+      w: Math.random() * 10 + 5,
+      h: Math.random() * 6 + 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 3,
+      vy: Math.random() * 3 + 2,
+      rot: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 6,
+      opacity: 1
+    });
+  }
+
+  const start = performance.now();
+  function animate(now) {
+    const elapsed = now - start;
+    if (elapsed > durationMs) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = 'none';
+      return;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const fade = elapsed > durationMs - 1000 ? 1 - ((elapsed - (durationMs - 1000)) / 1000) : 1;
+    for (const p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.rot += p.rotSpeed;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.globalAlpha = Math.max(0, fade * p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    }
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+}
+
+// ==============================
+// CERTIFICATE GENERATION
+// ==============================
+function drawCertificate(ctx, w, h, type, sectionName) {
+  const isGrand = type === 'grand';
+
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, '#1a1a3e');
+  grad.addColorStop(0.5, '#16213e');
+  grad.addColorStop(1, '#0f0f2a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = isGrand ? '#c9a84c' : '#a29bfe';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(10, 10, w-20, h-20);
+
+  ctx.strokeStyle = isGrand ? 'rgba(201,168,76,0.3)' : 'rgba(162,155,254,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(18, 18, w-36, h-36);
+
+  ctx.strokeStyle = isGrand ? '#c9a84c' : '#6c63ff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(40, 45);
+  ctx.lineTo(w-40, 45);
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = isGrand ? '#f0e0a0' : '#a29bfe';
+  ctx.font = 'bold 22px "Cairo", sans-serif';
+  ctx.fillText(isGrand ? 'شَهَادَةُ إتْقَانِ اللُّغَةِ الْعَرَبِيَّةِ' : 'شَهَادَةُ إتْقَان', w/2, 75);
+
+  ctx.font = '40px sans-serif';
+  ctx.fillStyle = isGrand ? '#c9a84c' : '#a29bfe';
+  ctx.fillText(isGrand ? '🏆' : '⭐', w/2, 125);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = isGrand ? 'bold 32px "Cairo", sans-serif' : 'bold 28px "Cairo", sans-serif';
+  ctx.fillText(isGrand ? 'اللغة العربية كاملة' : sectionName, w/2, 175);
+
+  ctx.fillStyle = '#ccc';
+  ctx.font = '16px "Cairo", sans-serif';
+  if (isGrand) {
+    ctx.fillText('نفخر بتقديم هذه الشهادة تقديراً لإتقانك', w/2, 225);
+    ctx.fillText('جميع دروس النحو والقراءة والنصوص', w/2, 252);
+    ctx.fillText('بجدارة واقتدار', w/2, 279);
+  } else {
+    ctx.fillText('نفخر بتقديم هذه الشهادة تقديراً لإتمامك', w/2, 225);
+    ctx.fillText(`جميع دروس "${sectionName}" بنجاح`, w/2, 252);
+  }
+
+  ctx.fillStyle = '#888';
+  ctx.font = '14px "Cairo", sans-serif';
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric' });
+  ctx.fillText(`التاريخ: ${dateStr}`, w/2, 310);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.font = '12px "Cairo", sans-serif';
+  ctx.fillText('مشغل بـ Clairo — clairo.web.app', w/2, 355);
+
+  ctx.strokeStyle = isGrand ? 'rgba(201,168,76,0.4)' : 'rgba(162,155,254,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(40, h-30);
+  ctx.lineTo(w-40, h-30);
+  ctx.stroke();
+
+  ctx.fillStyle = isGrand ? '#c9a84c' : '#6c63ff';
+  ctx.font = '18px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('✦', 50, 55);
+  ctx.textAlign = 'left';
+  ctx.fillText('✦', w-50, 55);
+  ctx.textAlign = 'right';
+  ctx.fillText('✦', 50, h-40);
+  ctx.textAlign = 'left';
+  ctx.fillText('✦', w-50, h-40);
+}
+
+// ==============================
+// CELEBRATION MODAL
+// ==============================
+function showSectionCelebration(section) {
+  const info = SECTIONS[section];
+
+  document.getElementById('cel-emoji').textContent = '🎉';
+  document.getElementById('cel-title').textContent = `أحسنت! أكملت "${info.name}" 🎉`;
+  document.getElementById('cel-desc').textContent = `لقد أنهيت جميع دروس ${info.name} بنجاح. استمر في التقدم!`;
+
+  const certCanvas = document.getElementById('cert-canvas');
+  const ctx = certCanvas.getContext('2d');
+  drawCertificate(ctx, 600, 420, 'section', info.name);
+
+  document.getElementById('cel-download-btn').onclick = function() {
+    const link = document.createElement('a');
+    link.download = `شهادة-${info.name}.png`;
+    link.href = certCanvas.toDataURL('image/png');
+    link.click();
+  };
+
+  document.getElementById('celebration-overlay').classList.add('active');
+  launchConfetti(4000, 90);
+}
+
+function showGrandCelebration() {
+  document.getElementById('cel-emoji').textContent = '🏆';
+  document.getElementById('cel-title').textContent = '🎊 ألف مبروك! 🎊';
+  document.getElementById('cel-desc').textContent = 'لقد أتممت جميع دروس اللغة العربية! النحو، القراءة، والنصوص — تفوق عظيم!';
+
+  const certCanvas = document.getElementById('cert-canvas');
+  const ctx = certCanvas.getContext('2d');
+  drawCertificate(ctx, 600, 420, 'grand', '');
+
+  document.getElementById('cel-download-btn').onclick = function() {
+    const link = document.createElement('a');
+    link.download = 'شهادة-اللغة-العربية-الكاملة.png';
+    link.href = certCanvas.toDataURL('image/png');
+    link.click();
+  };
+
+  document.getElementById('celebration-overlay').classList.add('active');
+  launchConfetti(6000, 180);
+}
+
+function closeCelebration() {
+  document.getElementById('celebration-overlay').classList.remove('active');
+}
+
+// ==============================
+// DOWNLOAD STATS IMAGE — Pure Canvas (no html2canvas)
+// ==============================
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function downloadStatsImage() {
+  const SCALE = 2;
+  const W = 700, H_BASE = 900;
+  const lessonNames = {
+    nahw:  ['اسم الفاعل','صيغ المبالغة','اسم المفعول','اسما الزمان والمكان','اسم الآلة','اسم التفضيل'],
+    qiraa: ['الحياة دقائق وثوانٍ','فالق الحب والنوى','الحمامة المطوقة','المشروعات الصغيرة'],
+    nusus: ['سفينة نوح','خلال كريمة','رسالة إلى ابني','وادي الكنانة','استعن بالله','حب الوطن']
+  };
+  const sectionsInfo = [
+    { key:'nahw',  label:'النحو',   color:'#6c63ff' },
+    { key:'qiraa', label:'القراءة', color:'#e84393' },
+    { key:'nusus', label:'النصوص', color:'#00b894' }
+  ];
+
+  // ---- measure total height needed ----
+  // We'll just use a generous fixed height
+  const CANVAS_H = 980;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = W * SCALE;
+  canvas.height = CANVAS_H * SCALE;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+
+  // RTL direction for text
+  ctx.direction = 'rtl';
+
+  // ---- Background ----
+  const bgGrad = ctx.createLinearGradient(0, 0, W, CANVAS_H);
+  bgGrad.addColorStop(0, '#0f0f1a');
+  bgGrad.addColorStop(1, '#1a1a3e');
+  ctx.fillStyle = bgGrad;
+  roundRect(ctx, 0, 0, W, CANVAS_H, 20);
+  ctx.fill();
+
+  // ---- Outer gold border ----
+  ctx.strokeStyle = '#c9a84c';
+  ctx.lineWidth = 3;
+  roundRect(ctx, 6, 6, W - 12, CANVAS_H - 12, 16);
+  ctx.stroke();
+
+  // ---- Inner border ----
+  ctx.strokeStyle = 'rgba(201,168,76,0.2)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, 14, 14, W - 28, CANVAS_H - 28, 12);
+  ctx.stroke();
+
+  let y = 48;
+
+  // ---- Title ----
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 28px Arial, sans-serif';
+  ctx.fillStyle = '#f0e0a0';
+  ctx.fillText('إحصائيات تقدم اللغة العربية 📚', W / 2, y);
+  y += 38;
+
+  // ---- Date ----
+  const dateStr = new Date().toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric' });
+  ctx.font = '15px Arial, sans-serif';
+  ctx.fillStyle = '#8888aa';
+  ctx.fillText('تم التحديث: ' + dateStr, W / 2, y);
+  y += 36;
+
+  // ---- Separator line ----
+  ctx.strokeStyle = 'rgba(201,168,76,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(40, y); ctx.lineTo(W - 40, y);
+  ctx.stroke();
+  y += 24;
+
+  // ---- Overall card ----
+  const totalDone = Object.keys(SECTIONS).reduce((s, k) => s + state[k].filter(Boolean).length, 0);
+  const overallPct = Math.round((totalDone / TOTAL_LESSONS) * 100);
+
+  const cardX = 30, cardW = W - 60;
+
+  // Overall card background
+  ctx.fillStyle = 'rgba(201,168,76,0.05)';
+  roundRect(ctx, cardX, y, cardW, 110, 12);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(201,168,76,0.25)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, cardX, y, cardW, 110, 12);
+  ctx.stroke();
+
+  // "التقدم العام" label
+  ctx.textAlign = 'center';
+  ctx.font = '14px Arial, sans-serif';
+  ctx.fillStyle = '#8888aa';
+  ctx.fillText('التقدم العام', W / 2, y + 20);
+
+  // Big number
+  ctx.font = 'bold 42px Arial, sans-serif';
+  ctx.fillStyle = '#f0e0a0';
+  ctx.fillText(totalDone + ' / ' + TOTAL_LESSONS, W / 2, y + 54);
+
+  // Progress bar
+  const barX = cardX + 20, barY = y + 76, barW = cardW - 40, barH = 10;
+  ctx.fillStyle = '#2a2a4a';
+  roundRect(ctx, barX, barY, barW, barH, 5);
+  ctx.fill();
+  if (overallPct > 0) {
+    const fillGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+    fillGrad.addColorStop(0, '#a67c2e');
+    fillGrad.addColorStop(0.5, '#c9a84c');
+    fillGrad.addColorStop(1, '#f0e0a0');
+    ctx.fillStyle = fillGrad;
+    roundRect(ctx, barX, barY, barW * (overallPct / 100), barH, 5);
+    ctx.fill();
+  }
+
+  // Percent text
+  ctx.font = 'bold 18px Arial, sans-serif';
+  ctx.fillStyle = '#2ecc71';
+  ctx.fillText(overallPct + '%', W / 2, y + 100);
+
+  y += 126;
+
+  // ---- Section cards ----
+  for (const si of sectionsInfo) {
+    const arr = state[si.key];
+    const done = arr.filter(Boolean).length;
+    const total = SECTIONS[si.key].total;
+    const pct = Math.round((done / total) * 100);
+    const names = lessonNames[si.key];
+
+    // Badge rows: wrap every 2 items
+    const rows = [];
+    for (let i = 0; i < names.length; i += 2) rows.push(names.slice(i, i + 2));
+    const secH = 36 + 14 + 12 + 16 + rows.length * 32 + 12;
+
+    // Card bg
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    roundRect(ctx, cardX, y, cardW, secH, 12);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, cardX, y, cardW, secH, 12);
+    ctx.stroke();
+
+    // Top accent bar
+    ctx.fillStyle = si.color;
+    roundRect(ctx, cardX, y, cardW, 4, 12);
+    ctx.fill();
+    // fix bottom corners of accent bar
+    ctx.fillRect(cardX, y + 2, cardW, 2);
+
+    const innerY = y + 14;
+
+    // Section name (right-aligned)
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 20px Arial, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(si.label, cardX + cardW - 16, innerY + 10);
+
+    // Count & percent (left side)
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 16px Arial, sans-serif';
+    ctx.fillStyle = '#2ecc71';
+    ctx.fillText(done + ' / ' + total, cardX + 16, innerY + 10);
+
+    ctx.font = '13px Arial, sans-serif';
+    ctx.fillStyle = '#2ecc71';
+    ctx.fillText(pct + '%', cardX + 70, innerY + 10);
+
+    // Section progress bar
+    const sBarY = innerY + 24;
+    ctx.fillStyle = '#2a2a4a';
+    roundRect(ctx, cardX + 16, sBarY, cardW - 32, 7, 4);
+    ctx.fill();
+    if (pct > 0) {
+      ctx.fillStyle = si.color;
+      roundRect(ctx, cardX + 16, sBarY, (cardW - 32) * (pct / 100), 7, 4);
+      ctx.fill();
+    }
+
+    // Lesson badges
+    let badgeY = sBarY + 18;
+    for (const row of rows) {
+      // Each row: up to 2 badges, placed RTL (right to left)
+      const badgeH = 24, badgePad = 14, gap = 10;
+      // measure widths
+      ctx.font = '13px Arial, sans-serif';
+      const widths = row.map(name => ctx.measureText(name).width + badgePad * 2 + 20);
+      // place from right
+      let bx = cardX + cardW - 16;
+      for (let i = 0; i < row.length; i++) {
+        const name = row[i];
+        const bw = Math.min(widths[i], (cardW - 32 - gap) / row.length);
+        bx -= bw;
+        const checked = arr[names.indexOf(name)];
+        // badge bg
+        ctx.fillStyle = checked ? 'rgba(46,204,113,0.12)' : 'rgba(255,255,255,0.05)';
+        roundRect(ctx, bx, badgeY, bw, badgeH, 6);
+        ctx.fill();
+        ctx.strokeStyle = checked ? 'rgba(46,204,113,0.3)' : 'rgba(255,255,255,0.08)';
+        ctx.lineWidth = 1;
+        roundRect(ctx, bx, badgeY, bw, badgeH, 6);
+        ctx.stroke();
+        // text
+        ctx.textAlign = 'center';
+        ctx.font = '12px Arial, sans-serif';
+        ctx.fillStyle = checked ? '#2ecc71' : '#777';
+        const checkMark = checked ? '✓ ' : '';
+        ctx.fillText(checkMark + name, bx + bw / 2, badgeY + badgeH / 2);
+        bx -= gap;
+      }
+      badgeY += badgeH + 8;
+    }
+
+    y += secH + 14;
+  }
+
+  // ---- Footer ----
+  y += 6;
+  ctx.textAlign = 'center';
+  ctx.font = '12px Arial, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.fillText('مشغل بـ Clairo — clairo.web.app', W / 2, y);
+
+  // ---- Download ----
+  const link = document.createElement('a');
+  link.download = 'إحصائيات-اللغة-العربية.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// ==============================
+// INIT
+// ==============================
+loadState();
+initPreviousState();
+renderAll();
+
+// Save on page close/refresh
+window.addEventListener('beforeunload', saveState);
+</script>
+
+<footer>
+  <p>مشغل بـ <a href="https://clairo.web.app" target="_blank">Clairo</a> — جميع الحقوق محفوظة © 2026</p>
+</footer>
+
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a045ad4e9bf29782',t:'MTc4MDIyNzM0NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
