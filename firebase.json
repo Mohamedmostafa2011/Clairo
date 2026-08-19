@@ -3,12 +3,24 @@
     {
       "site": "clairo",
       "public": ".",
-      "ignore": ["firebase.json", ".github", "*.yml"]
+      "ignore": ["firebase.json", ".github", "*.yml"],
+      "rewrites": [
+        {
+          "source": "/",
+          "destination": "/main.html"
+        }
+      ]
     },
     {
       "site": "igclairo",
       "public": ".",
-      "ignore": ["firebase.json", ".github", "*.yml"]
+      "ignore": ["firebase.json", ".github", "*.yml"],
+      "rewrites": [
+        {
+          "source": "/",
+          "destination": "/main.html"
+        }
+      ]
     }
   ]
 }
