@@ -609,5 +609,26 @@ papersBtn.addEventListener('mousemove', e => {
 });
 papersBtn.addEventListener('mouseleave', () => { papersBtn.style.transform = ''; });
 </script>
+
+<!-- Firebase App & Analytics SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js";
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyA017aj8H-fokXjAsOjcRN21ZG6iznfV5c",
+    authDomain: "clairo-4f782.firebaseapp.com",
+    projectId: "clairo-4f782",
+    storageBucket: "clairo-4f782.firebasestorage.app",
+    messagingSenderId: "195175053143",
+    appId: "1:195175053143:web:4638d72068d997b06d3012",
+    measurementId: "G-K1CBHC9BJM"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
