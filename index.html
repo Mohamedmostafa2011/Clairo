@@ -120,11 +120,12 @@
 
     <!-- Top HUD -->
     <div class="hud">
-      <div class="logo">FC<b>26</b> FLAGS<span class="ver" id="verTag">v6</span></div>
+      <div class="logo">FC<b>26</b> FLAGS<span class="ver" id="verTag">v7</span></div>
       <div class="pill">👤 Faces: <b id="faceCount">0</b></div>
       <div class="pill">🏳️ Pool: <b id="poolCount">0</b> teams</div>
       <div class="spacer"></div>
       <button class="btn ghost" id="autoBtn">⚡ Auto: ON</button>
+      <button class="btn ghost" id="shotBtn">📸 Save</button>
       <button class="btn ghost" id="respinBtn" disabled>🔄 Re-roll all</button>
     </div>
 
@@ -217,6 +218,7 @@
   const poolCount= document.getElementById('poolCount');
   const respinBtn= document.getElementById('respinBtn');
   const autoBtn  = document.getElementById('autoBtn');
+  const shotBtn  = document.getElementById('shotBtn');
   const statusEl = document.getElementById('status');
   const statusText=document.getElementById('statusText');
   const dbg = document.getElementById('dbg');
@@ -416,9 +418,14 @@
 
       // draw
       for(const f of faces){
-        const top = f.y - 8;
+        const size = Math.max(34, f.w*0.50);
+        const cardH = size*1.15;
+        // Position the flag on top of the head, but clamp so the whole card is
+        // ALWAYS visible on screen (never pushed above the frame).
+        let fy = f.y + f.h*0.02;              // bottom edge of card ~ top of face
+        if(fy - cardH < 6) fy = cardH + 6;    // keep top of card on screen
         const team = f.team || rand(TEAMS);
-        drawFlag(f.x+f.w/2, top, Math.max(30, f.w*0.42), team, team.c, !f.team);
+        drawFlag(f.x+f.w/2, fy, size, team, team.c, !f.team);
 
         // box + tap hint for faces that are not locked
         if(!f.locked){
@@ -551,6 +558,28 @@ locked=${faces.filter(f=>f.locked).length}${lastError?`\nERR: ${lastError.messag
     autoBtn.textContent = '⚡ Auto: ' + (autoLock ? 'ON' : 'OFF');
   });
 
+  // save a screenshot (video + canvas merged into one image)
+  shotBtn.addEventListener('click', ()=>{
+    try{
+      const c = document.createElement('canvas');
+      c.width = stage.width; c.height = stage.height;
+      const cx = c.getContext('2d');
+      // mirror the video to match the on-screen selfie view, then overlay the
+      // stage (already drawn in display/mirrored coordinates) as-is.
+      cx.translate(c.width, 0); cx.scale(-1, 1);
+      cx.drawImage(video, 0, 0, c.width, c.height);
+      cx.setTransform(1,0,0,1,0,0);
+      cx.drawImage(stage, 0, 0, c.width, c.height);
+      const a = document.createElement('a');
+      a.download = 'fc26-flag-'+Date.now()+'.png';
+      a.href = c.toDataURL('image/png');
+      a.click();
+      statusText.textContent = '📸 Screenshot saved!';
+    }catch(err){
+      statusText.textContent = '⚠️ Screenshot failed';
+    }
+  });
+
   // show a big, obvious error if anything breaks at runtime
   function showFatal(msg){
     loadMsg.classList.remove('hidden');
@@ -590,5 +619,5 @@ locked=${faces.filter(f=>f.locked).length}${lastError?`\nERR: ${lastError.messag
 
   fitCanvas();
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2e4c9c6d8aee167',t:'MTc4NzI2NDQ1Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
